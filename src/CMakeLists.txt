@@ -1,6 +1,8 @@
 add_library(
     aoeval
     SHARED
+    MemAllocator.cpp
+    MemAllocator.h
     AOBatch.cpp
     AOBatch.h
     Basis.cpp
