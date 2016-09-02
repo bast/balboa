@@ -70,14 +70,14 @@ void Basis::deallocate()
 
 
 void Basis::init(const int    in_basis_type,
-                      const int    in_num_centers,
-                      const double in_center_coordinates[],
-                      const int    in_num_shells,
-                      const int    in_shell_centers[],
-                      const int    in_shell_l_quantum_numbers[],
-                      const int    in_shell_num_primitives[],
-                      const double in_primitive_exponents[],
-                      const double in_contraction_coefficients[])
+                 const int    in_num_centers,
+                 const double in_center_coordinates[],
+                 const int    in_num_shells,
+                 const int    in_shell_centers[],
+                 const int    in_shell_l_quantum_numbers[],
+                 const int    in_shell_num_primitives[],
+                 const double in_primitive_exponents[],
+                 const double in_contraction_coefficients[])
 {
     int i, l, deg, kc, ks;
     size_t block_size;

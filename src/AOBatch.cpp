@@ -26,15 +26,6 @@ AOBatch::~AOBatch()
 {
     MemAllocator::deallocate(ao);
 
-    MemAllocator::deallocate(ao_compressed);
-    MemAllocator::deallocate(ao_compressed_index);
-
-    MemAllocator::deallocate(k_ao_compressed);
-    MemAllocator::deallocate(k_ao_compressed_index);
-
-    MemAllocator::deallocate(l_ao_compressed);
-    MemAllocator::deallocate(l_ao_compressed_index);
-
     nullify();
 }
 
@@ -43,16 +34,6 @@ void AOBatch::nullify()
 {
     ao_length = -1;
     ao = NULL;
-
-    ao_compressed         = NULL;
-    ao_compressed_num     = -1;
-    ao_compressed_index   = NULL;
-    k_ao_compressed       = NULL;
-    k_ao_compressed_num   = -1;
-    k_ao_compressed_index = NULL;
-    l_ao_compressed       = NULL;
-    l_ao_compressed_num   = -1;
-    l_ao_compressed_index = NULL;
 }
 
 
@@ -89,25 +70,7 @@ void AOBatch::get_ao(const Basis &basis,
         MemAllocator::deallocate(ao);
         ao = (double*) MemAllocator::allocate(block_size*sizeof(double));
 
-        MemAllocator::deallocate(ao_compressed);
-        ao_compressed = (double*) MemAllocator::allocate(block_size*sizeof(double));
-
-        MemAllocator::deallocate(k_ao_compressed);
-        k_ao_compressed = (double*) MemAllocator::allocate(block_size*sizeof(double));
-
-        MemAllocator::deallocate(l_ao_compressed);
-        l_ao_compressed = (double*) MemAllocator::allocate(block_size*sizeof(double));
-
         block_size = basis.num_ao;
-
-        MemAllocator::deallocate(ao_compressed_index);
-        ao_compressed_index = (int*) MemAllocator::allocate(block_size*sizeof(int));
-
-        MemAllocator::deallocate(k_ao_compressed_index);
-        k_ao_compressed_index = (int*) MemAllocator::allocate(block_size*sizeof(int));
-
-        MemAllocator::deallocate(l_ao_compressed_index);
-        l_ao_compressed_index = (int*) MemAllocator::allocate(block_size*sizeof(int));
     }
 
     std::fill(&ao[0], &ao[ao_length], 0.0);
@@ -143,13 +106,6 @@ void AOBatch::get_ao(const Basis &basis,
 //      }
 //      exit(1);
 //  }
-
-    compress(basis,
-             use_gradient,
-             ao_compressed_num,
-             ao_compressed_index,
-             ao_compressed,
-             std::vector<int>());
 }
 
 
@@ -179,72 +135,6 @@ void AOBatch::get_ao_shell(const int        ishell,
             std::cout << "ERROR: get_ao order too high\n";
             exit(1);
             break;
-    }
-}
-
-
-void AOBatch::compress(const Basis       &basis,
-                            const bool             use_gradient,
-                                  int              &aoc_num,
-                                  int              *(&aoc_index),
-                                  double           *(&aoc),
-                            const std::vector<int> &coor)
-{
-    std::vector<int> cent;
-    for (size_t j = 0; j < coor.size(); j++)
-    {
-        cent.push_back((coor[j] - 1)/3);
-    }
-
-    int num_slices;
-    (use_gradient) ? (num_slices = 4) : (num_slices = 1);
-
-    int n = 0;
-    for (int i = 0; i < basis.num_ao; i++)
-    {
-        if (is_same_center(basis.get_ao_center(i), cent))
-        {
-            double tmax = 0.0;
-            for (int ib = 0; ib < AO_BLOCK_LENGTH; ib++)
-            {
-                double t = fabs(ao[i*AO_BLOCK_LENGTH + ib]);
-                if (t > tmax) tmax = t;
-            }
-            if (tmax > 1.0e-15)
-            {
-                aoc_index[n] = i;
-                n++;
-            }
-        }
-    }
-    aoc_num = n;
-
-    if (aoc_num == 0) return;
-
-    int kp[3] = {0, 0, 0};
-    for (size_t j = 0; j < coor.size(); j++)
-    {
-        kp[(coor[j] - 1)%3]++;
-    }
-
-    int off[4];
-    off[0] = basis.get_geo_off(kp[0],   kp[1],   kp[2]);
-    off[1] = basis.get_geo_off(kp[0]+1, kp[1],   kp[2]);
-    off[2] = basis.get_geo_off(kp[0],   kp[1]+1, kp[2]);
-    off[3] = basis.get_geo_off(kp[0],   kp[1],   kp[2]+1);
-
-    for (int i = 0; i < aoc_num; i++)
-    {
-        for (int islice = 0; islice < num_slices; islice++)
-        {
-            int iuoff = off[islice];
-            int icoff = islice*basis.num_ao;
-
-            int iu = AO_BLOCK_LENGTH*(iuoff + aoc_index[i]);
-            int ic = AO_BLOCK_LENGTH*(icoff + i);
-
-            std::copy(&ao[iu], &ao[iu + AO_BLOCK_LENGTH], &aoc[ic]);
-        }
     }
 }
 
