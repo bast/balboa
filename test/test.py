@@ -12,16 +12,15 @@ def context(request):
     Add context to test functions.
     """
     from aoeval import lib
-    ctx = None
-#   ctx = lib.aoeval_new()
+    ctx = lib.aoeval_new()
 
-#   def cleanup():
-#       """
-#       Clean up the context.
-#       """
-#       lib.aoeval_free(ctx)
+    def cleanup():
+        """
+        Clean up the context.
+        """
+        lib.aoeval_free(ctx)
 
-#   request.addfinalizer(cleanup)
+    request.addfinalizer(cleanup)
     return ctx
 
 

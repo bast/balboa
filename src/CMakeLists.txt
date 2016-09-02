@@ -1,8 +1,11 @@
 include_directories(${PROJECT_SOURCE_DIR}/src)
+include_directories(${PROJECT_SOURCE_DIR}/api)
 
 add_library(
     aoeval
     SHARED
+    Main.cpp
+    Main.h
     MemAllocator.cpp
     MemAllocator.h
     AOBatch.cpp
