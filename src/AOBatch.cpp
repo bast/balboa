@@ -249,28 +249,6 @@ void AOBatch::compress(const Basis       &basis,
 }
 
 
-void AOBatch::distribute_matrix_undiff(const int    mat_dim,
-                                            const bool   use_gradient,
-                                            const bool   use_tau,
-                                            const double prefactors[],
-                                            const double u[],
-                                                  double fmat[])
-{
-    distribute_matrix(mat_dim,
-                      use_gradient,
-                      use_tau,
-                      prefactors,
-                      u,
-                      fmat,
-                      ao_compressed_num,
-                      ao_compressed_index,
-                      ao_compressed,
-                      ao_compressed_num,
-                      ao_compressed_index,
-                      ao_compressed);
-}
-
-
 bool AOBatch::is_same_center(const int              c,
                                   const std::vector<int> &carray) const
 // returns true if carray is empty (no derivatives)

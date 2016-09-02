@@ -30,13 +30,6 @@ class AOBatch
                           const int        max_ao_geo_order,
                           const double     p[]);
 
-        void distribute_matrix_undiff(const int    mat_dim,
-                                      const bool   use_gradient,
-                                      const bool   use_tau,
-                                      const double prefactors[],
-                                      const double u[],
-                                            double fmat[]);
-
         void distribute_matrix(const int    mat_dim,
                                const bool   use_gradient,
                                const bool   use_tau,
