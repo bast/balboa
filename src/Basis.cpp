@@ -90,10 +90,10 @@ void Basis::init(const int    in_basis_type,
 
     switch (in_basis_type)
     {
-        case XCINT_BASIS_SPHERICAL:
+        case 0:  // FIXME changed to named integer parameters
             is_spherical = true;
             break;
-        case XCINT_BASIS_CARTESIAN:
+        case 1:
             is_spherical = false;
             fprintf(stderr, "ERROR: XCINT_BASIS_CARTESIAN not tested.\n");
             exit(-1);
