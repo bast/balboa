@@ -29,6 +29,17 @@ typedef struct aoeval_context_s aoeval_context_t;
 AOEVAL_API aoeval_context_t *aoeval_new();
 AOEVAL_API void aoeval_free(aoeval_context_t *context);
 
+AOEVAL_API int aoeval_set_basis(aoeval_context_t *context,
+                                const int        basis_type,
+                                const int        num_centers,
+                                const double     center_coordinates[],
+                                const int        num_shells,
+                                const int        shell_centers[],
+                                const int        shell_l_quantum_numbers[],
+                                const int        shell_num_primitives[],
+                                const double     primitive_exponents[],
+                                const double     contraction_coefficients[]);
+
 #ifdef __cplusplus
 }
 #endif
