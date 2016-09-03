@@ -30,6 +30,8 @@ class AOBatch
                           const int        max_ao_geo_order,
                           const double     p[]);
 
+        double *ao;
+
     private:
 
         AOBatch(const AOBatch &rhs);            // not implemented
@@ -43,7 +45,6 @@ class AOBatch
         void nullify();
 
         int     ao_length;
-        double *ao;
 };
 
 #endif // AOBatch_h_

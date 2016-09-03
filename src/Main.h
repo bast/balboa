@@ -2,6 +2,7 @@
 #define GRID_H_INCLUDED
 
 #include "Basis.h"
+#include "AOBatch.h"
 
 class Main
 {
@@ -20,6 +21,12 @@ class Main
                       const double primitive_exponents[],
                       const double contraction_coefficients[]);
 
+        double *get_ao(const bool   use_gradient,
+                   const int    max_ao_geo_order,
+                   const int    block_length,
+                   const double p[]);
+               //  const double p[]) const;
+
 //      int get_num_points() const;
 //      double *get_grid() const;
 
@@ -29,6 +36,7 @@ class Main
         Main &operator=(const Main &rhs); // not implemented
 
         Basis basis;
+        AOBatch aobatch;
 //      void nullify();
 
 //      int get_closest_num_angular(int n) const;
