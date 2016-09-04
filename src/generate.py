@@ -283,21 +283,21 @@ def write_aocalls(file_name):
 
     f = open(file_name, 'w')
 
-    s1 = '''              basis.shell_l_quantum_numbers[ishell],
-              basis.shell_num_primitives[ishell],
-              basis.is_spherical,
-              &basis.primitive_exponents[n],
-              &basis.contraction_coefficients[n],
+    s1 = '''              shell_l_quantum_numbers[ishell],
+              shell_num_primitives[ishell],
+              is_spherical,
+              &primitive_exponents[n],
+              &contraction_coefficients[n],
               s,
               buffer,
-              &basis.shell_centers_coordinates[3*ishell],
-              basis.shell_extent_squared[ishell],
+              &shell_centers_coordinates[3*ishell],
+              shell_extent_squared[ishell],
               p,
               px,
               py,
               pz,
               p2,
-              &ao_local[basis.shell_off[ishell]*%i]''' % AO_BLOCK_LENGTH
+              &ao_local[shell_off[ishell]*%i]''' % AO_BLOCK_LENGTH
     s3 = '''
              );
     break;'''
@@ -313,7 +313,7 @@ def write_aocalls(file_name):
             for _g in range(1, g+1):
                 for geo in get_ijk_list(_g):
                     j += 1
-                    s2 += ',\n              &ao_local[(basis.shell_off[ishell] + %i*basis.num_ao)*%i]' % (j, AO_BLOCK_LENGTH)
+                    s2 += ',\n              &ao_local[(shell_off[ishell] + %i*num_ao)*%i]' % (j, AO_BLOCK_LENGTH)
 
         f.write(s2)
         f.write(s3)

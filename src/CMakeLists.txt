@@ -19,9 +19,6 @@ add_library(
     Main.h
     MemAllocator.cpp
     MemAllocator.h
-    Basis.cpp
-    Basis.h
-    CMakeLists.txt
     ao_vector.cpp
     ao_vector.h
     ${_generated_files}
