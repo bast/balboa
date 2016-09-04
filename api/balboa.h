@@ -40,12 +40,11 @@ BALBOA_API int balboa_set_basis(balboa_context_t *context,
                                 const double primitive_exponents[],
                                 const double contraction_coefficients[]);
 
-//BALBOA_API double *balboa_get_ao(const balboa_context_t *context,
-BALBOA_API double *balboa_get_ao(      balboa_context_t *context,
-                             const bool   use_gradient,
-                             const int    max_ao_geo_order,
-                             const int    block_length,
-                             const double p[]);
+BALBOA_API double *balboa_get_ao(balboa_context_t *context,
+                                 const bool   use_gradient,
+                                 const int    max_ao_geo_order,
+                                 const int    block_length,
+                                 const double p[]);
 
 #ifdef __cplusplus
 }

@@ -21,11 +21,13 @@ class Main
                       const double primitive_exponents[],
                       const double contraction_coefficients[]);
 
+        // function is not const because we modify aos
+        // consider allocating outside but then the python
+        // interface could get ugly
         double *get_ao(const bool   use_gradient,
-                   const int    max_ao_geo_order,
-                   const int    block_length,
-                   const double p[]);
-//                 const double p[]) const;
+                       const int    max_ao_geo_order,
+                       const int    block_length,
+                       const double p[]);
 
         double *ao;
 
@@ -53,15 +55,6 @@ class Main
 
         int ao_length;
 
-        void init(const int    in_basis_type,
-                  const int    in_num_centers,
-                  const double in_center_coordinates[],
-                  const int    in_num_shells,
-                  const int    in_shell_centers[],
-                  const int    in_shell_l_quantum_numbers[],
-                  const int    in_shell_num_primitives[],
-                  const double in_primitive_exponents[],
-                  const double in_contraction_coefficients[]);
         int  get_geo_off(const int i,
                          const int j,
                          const int k) const;

@@ -60,212 +60,15 @@ BALBOA_API int balboa_set_basis(balboa_context_t *context,
                                              primitive_exponents,
                                              contraction_coefficients);
 }
-int Main::set_basis(const int    basis_type,
-                    const int    num_centers,
-                    const double center_coordinates[],
-                    const int    num_shells,
-                    const int    shell_centers[],
-                    const int    shell_l_quantum_numbers[],
-                    const int    shell_num_primitives[],
-                    const double primitive_exponents[],
-                    const double contraction_coefficients[])
-{
-    init(basis_type,
-         num_centers,
-         center_coordinates,
-         num_shells,
-         shell_centers,
-         shell_l_quantum_numbers,
-         shell_num_primitives,
-         primitive_exponents,
-         contraction_coefficients);
-
-    return 0;
-}
-
-
-//BALBOA_API double *balboa_get_ao(const balboa_context_t *context,
-BALBOA_API double *balboa_get_ao(      balboa_context_t *context,
-                             const bool   use_gradient,
-                             const int    max_ao_geo_order,
-                             const int    block_length,
-                             const double p[])
-{
- // return AS_CTYPE(Main, context)->get_ao(use_gradient,
-    return AS_TYPE(Main, context)->get_ao(use_gradient,
-                                           max_ao_geo_order,
-                                           block_length,
-                                           p);
-}
-double *Main::get_ao(const bool   use_gradient,
-                 const int    max_ao_geo_order,
-                 const int    block_length,
-                 const double p[])
-             //  const double p[]) const
-{
-    assert(max_ao_geo_order <= MAX_GEO_DIFF_ORDER);
-
-//  debug
-//  if (max_ao_geo_order == 1)
-//  {
-//      printf("use_gradient = %i\n", use_gradient);
-//      printf("max_ao_geo_order = %i\n", max_ao_geo_order);
-//      printf("block_length = %i\n", block_length);
-//      for (int ib = 0; ib < block_length; ib++)
-//      {
-//          printf("grid = %e %e %e %e\n", p[ib*4 + 0],
-//                                         p[ib*4 + 1],
-//                                         p[ib*4 + 2],
-//                                         p[ib*4 + 3]);
-//      }
-//  }
-
-    int l = AO_BLOCK_LENGTH*num_ao_slices*num_ao_cartesian;
-    if (l != ao_length) // FIXME
-    {
-        ao_length = l;
-
-        size_t block_size = l;
-
-        MemAllocator::deallocate(ao);
-        ao = (double*) MemAllocator::allocate(block_size*sizeof(double));
-    }
-
-    std::fill(&ao[0], &ao[ao_length], 0.0);
-
-    // FIXME can be optimized
-    // we do this because p can be shorter than 4*AO_BLOCK_LENGTH
-    // we pad it by very large numbers to let the code screen them away
-    double p_block[4*AO_BLOCK_LENGTH];
-    std::fill(&p_block[0], &p_block[4*AO_BLOCK_LENGTH], 1.0e50);
-    std::copy(&p[0], &p[4*block_length], &p_block[0]);
-
-    for (int ishell = 0; ishell < num_shells; ishell++)
-    {
-        get_ao_shell(ishell,
-                     ao,
-                     max_ao_geo_order,
-                     p_block);
-    }
-
-//  debug
-//  if (max_ao_geo_order == 1)
-//  {
-//      for (int islice = 0; islice < 4; islice++)
-//      {
-//          for (int iao = 0; iao < num_ao_cartesian; iao++)
-//          {
-//              for (int ib = 0; ib < AO_BLOCK_LENGTH; ib++)
-//              {
-//                  printf("%i %i %i %e\n", islice, iao, ib, ao[islice*AO_BLOCK_LENGTH*num_ao_cartesian + iao*AO_BLOCK_LENGTH + ib]);
-//              }
-//          }
-//      }
-//      exit(1);
-//  }
-
-    return ao;
-}
-
-
-void Main::nullify()
-{
-    ao_length = -1;
-    ao = NULL;
-
-    num_centers               = -1;
-    num_shells                = -1;
-    shell_l_quantum_numbers   = NULL;
-    center_coordinates        = NULL;
-    shell_centers             = NULL;
-    shell_centers_coordinates = NULL;
-    shell_extent_squared      = NULL;
-    cartesian_deg             = NULL;
-    shell_off                 = NULL;
-    spherical_deg             = NULL;
-    is_spherical              = false;
-    num_ao                    = -1;
-    num_ao_cartesian          = -1;
-    num_ao_spherical          = -1;
-    num_ao_slices             = -1;
-    ao_center                 = NULL;
-    shell_num_primitives      = NULL;
-    geo_diff_order            = -1;
-    geo_off                   = NULL;
-    primitive_exponents       = NULL;
-    contraction_coefficients  = NULL;
-    is_initialized            = 0;
-}
-
-
-void Main::get_ao_shell(const int        ishell,
-                                      double     ao_local[],
-                                const int        max_ao_geo_order,
-                                const double     p[])
-{
-    double px[AO_CHUNK_LENGTH];
-    double py[AO_CHUNK_LENGTH];
-    double pz[AO_CHUNK_LENGTH];
-    double p2[AO_CHUNK_LENGTH];
-    double s[AO_CHUNK_LENGTH];
-    double buffer[BUFFER_LENGTH];
-
-    int n = 0;
-    for (int jshell = 0; jshell < ishell; jshell++)
-    {
-        n += shell_num_primitives[jshell];
-    }
-
-    switch (max_ao_geo_order)
-    {
-        #include "aocalls.h"
-        default:
-            std::cout << "ERROR: get_ao order too high\n";
-            exit(1);
-            break;
-    }
-}
-
-
-bool Main::is_same_center(const int              c,
-                                  const std::vector<int> &carray) const
-// returns true if carray is empty (no derivatives)
-{
-    for (unsigned int i = 0; i < carray.size(); i++)
-    {
-        if (c != carray[i]) return false;
-    }
-    return true;
-}
-
-
-void Main::deallocate()
-{
-    MemAllocator::deallocate(shell_l_quantum_numbers);
-    MemAllocator::deallocate(center_coordinates);
-    MemAllocator::deallocate(shell_centers);
-    MemAllocator::deallocate(shell_centers_coordinates);
-    MemAllocator::deallocate(shell_extent_squared);
-    MemAllocator::deallocate(cartesian_deg);
-    MemAllocator::deallocate(shell_off);
-    MemAllocator::deallocate(spherical_deg);
-    MemAllocator::deallocate(ao_center);
-    MemAllocator::deallocate(shell_num_primitives);
-    MemAllocator::deallocate(geo_off);
-    MemAllocator::deallocate(primitive_exponents);
-    MemAllocator::deallocate(contraction_coefficients);
-}
-
-
-void Main::init(const int    in_basis_type,
-                const int    in_num_centers,
-                const double in_center_coordinates[],
-                const int    in_num_shells,
-                const int    in_shell_centers[],
-                const int    in_shell_l_quantum_numbers[],
-                const int    in_shell_num_primitives[],
-                const double in_primitive_exponents[],
-                const double in_contraction_coefficients[])
+int Main::set_basis(const int    in_basis_type,
+                    const int    in_num_centers,
+                    const double in_center_coordinates[],
+                    const int    in_num_shells,
+                    const int    in_shell_centers[],
+                    const int    in_shell_l_quantum_numbers[],
+                    const int    in_shell_num_primitives[],
+                    const double in_primitive_exponents[],
+                    const double in_contraction_coefficients[])
 {
     int i, l, deg, kc, ks;
     size_t block_size;
@@ -435,6 +238,178 @@ void Main::init(const int    in_basis_type,
     set_geo_off(MAX_GEO_DIFF_ORDER); // FIXME
 
     is_initialized = 12345678;
+
+    return 0;
+}
+
+
+BALBOA_API double *balboa_get_ao(balboa_context_t *context,
+                                 const bool   use_gradient,
+                                 const int    max_ao_geo_order,
+                                 const int    block_length,
+                                 const double p[])
+{
+    return AS_TYPE(Main, context)->get_ao(use_gradient,
+                                          max_ao_geo_order,
+                                          block_length,
+                                          p);
+}
+double *Main::get_ao(const bool   use_gradient,
+                     const int    max_ao_geo_order,
+                     const int    block_length,
+                     const double p[])
+{
+    assert(max_ao_geo_order <= MAX_GEO_DIFF_ORDER);
+
+//  debug
+//  if (max_ao_geo_order == 1)
+//  {
+//      printf("use_gradient = %i\n", use_gradient);
+//      printf("max_ao_geo_order = %i\n", max_ao_geo_order);
+//      printf("block_length = %i\n", block_length);
+//      for (int ib = 0; ib < block_length; ib++)
+//      {
+//          printf("grid = %e %e %e %e\n", p[ib*4 + 0],
+//                                         p[ib*4 + 1],
+//                                         p[ib*4 + 2],
+//                                         p[ib*4 + 3]);
+//      }
+//  }
+
+    int l = AO_BLOCK_LENGTH*num_ao_slices*num_ao_cartesian;
+    if (l != ao_length) // FIXME
+    {
+        ao_length = l;
+
+        size_t block_size = l;
+
+        MemAllocator::deallocate(ao);
+        ao = (double*) MemAllocator::allocate(block_size*sizeof(double));
+    }
+
+    std::fill(&ao[0], &ao[ao_length], 0.0);
+
+    // FIXME can be optimized
+    // we do this because p can be shorter than 4*AO_BLOCK_LENGTH
+    // we pad it by very large numbers to let the code screen them away
+    double p_block[4*AO_BLOCK_LENGTH];
+    std::fill(&p_block[0], &p_block[4*AO_BLOCK_LENGTH], 1.0e50);
+    std::copy(&p[0], &p[4*block_length], &p_block[0]);
+
+    for (int ishell = 0; ishell < num_shells; ishell++)
+    {
+        get_ao_shell(ishell,
+                     ao,
+                     max_ao_geo_order,
+                     p_block);
+    }
+
+//  debug
+//  if (max_ao_geo_order == 1)
+//  {
+//      for (int islice = 0; islice < 4; islice++)
+//      {
+//          for (int iao = 0; iao < num_ao_cartesian; iao++)
+//          {
+//              for (int ib = 0; ib < AO_BLOCK_LENGTH; ib++)
+//              {
+//                  printf("%i %i %i %e\n", islice, iao, ib, ao[islice*AO_BLOCK_LENGTH*num_ao_cartesian + iao*AO_BLOCK_LENGTH + ib]);
+//              }
+//          }
+//      }
+//      exit(1);
+//  }
+
+    return ao;
+}
+
+
+void Main::nullify()
+{
+    ao_length = -1;
+    ao = NULL;
+
+    num_centers               = -1;
+    num_shells                = -1;
+    shell_l_quantum_numbers   = NULL;
+    center_coordinates        = NULL;
+    shell_centers             = NULL;
+    shell_centers_coordinates = NULL;
+    shell_extent_squared      = NULL;
+    cartesian_deg             = NULL;
+    shell_off                 = NULL;
+    spherical_deg             = NULL;
+    is_spherical              = false;
+    num_ao                    = -1;
+    num_ao_cartesian          = -1;
+    num_ao_spherical          = -1;
+    num_ao_slices             = -1;
+    ao_center                 = NULL;
+    shell_num_primitives      = NULL;
+    geo_diff_order            = -1;
+    geo_off                   = NULL;
+    primitive_exponents       = NULL;
+    contraction_coefficients  = NULL;
+    is_initialized            = 0;
+}
+
+
+void Main::get_ao_shell(const int        ishell,
+                                      double     ao_local[],
+                                const int        max_ao_geo_order,
+                                const double     p[])
+{
+    double px[AO_CHUNK_LENGTH];
+    double py[AO_CHUNK_LENGTH];
+    double pz[AO_CHUNK_LENGTH];
+    double p2[AO_CHUNK_LENGTH];
+    double s[AO_CHUNK_LENGTH];
+    double buffer[BUFFER_LENGTH];
+
+    int n = 0;
+    for (int jshell = 0; jshell < ishell; jshell++)
+    {
+        n += shell_num_primitives[jshell];
+    }
+
+    switch (max_ao_geo_order)
+    {
+        #include "aocalls.h"
+        default:
+            std::cout << "ERROR: get_ao order too high\n";
+            exit(1);
+            break;
+    }
+}
+
+
+bool Main::is_same_center(const int              c,
+                                  const std::vector<int> &carray) const
+// returns true if carray is empty (no derivatives)
+{
+    for (unsigned int i = 0; i < carray.size(); i++)
+    {
+        if (c != carray[i]) return false;
+    }
+    return true;
+}
+
+
+void Main::deallocate()
+{
+    MemAllocator::deallocate(shell_l_quantum_numbers);
+    MemAllocator::deallocate(center_coordinates);
+    MemAllocator::deallocate(shell_centers);
+    MemAllocator::deallocate(shell_centers_coordinates);
+    MemAllocator::deallocate(shell_extent_squared);
+    MemAllocator::deallocate(cartesian_deg);
+    MemAllocator::deallocate(shell_off);
+    MemAllocator::deallocate(spherical_deg);
+    MemAllocator::deallocate(ao_center);
+    MemAllocator::deallocate(shell_num_primitives);
+    MemAllocator::deallocate(geo_off);
+    MemAllocator::deallocate(primitive_exponents);
+    MemAllocator::deallocate(contraction_coefficients);
 }
 
 
