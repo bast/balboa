@@ -127,8 +127,6 @@ def test_aoeval():
         error = aos[i] - ref_ao
         if abs(ref_ao) > 1.0e-20:
             error /= ref_ao
-      # if abs(error) > 1.0e-5:
-      #     print(aos[i], ref_ao)
-        assert abs(error) < 1.0e-5
+        assert abs(error) < 1.0e-7
 
     lib.aoeval_free(context)
