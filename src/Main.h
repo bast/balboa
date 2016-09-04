@@ -34,6 +34,9 @@ class Main
         Main(const Main &rhs);            // not implemented
         Main &operator=(const Main &rhs); // not implemented
 
+        void nullify();
+        void deallocate();
+
         void get_ao_shell(const int        ishell,
                                 double     ao_local[],
                           const int        max_ao_geo_order,
@@ -47,8 +50,6 @@ class Main
                             const std::vector<int> &carray) const;
 
         void transform_basis() const;
-
-        void nullify();
 
         int ao_length;
 
@@ -71,15 +72,13 @@ class Main
                          const int k) const;
         void set_geo_off(const int geo_diff_order);
 
-        int     num_centers; // FIXME
-        int     num_shells; // FIXME
-        int    *shell_l_quantum_numbers; // FIXME
-        int    *shell_num_primitives; // FIXME
-        double *primitive_exponents; // FIXME
-        double *center_coordinates; // FIXME
-        int    *shell_centers; // FIXME
-
-        void    deallocate();
+        int     num_centers;
+        int     num_shells;
+        int    *shell_l_quantum_numbers;
+        int    *shell_num_primitives;
+        double *primitive_exponents;
+        double *center_coordinates;
+        int    *shell_centers;
 
         double *shell_centers_coordinates;
         double *shell_extent_squared;

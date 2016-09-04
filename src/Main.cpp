@@ -129,8 +129,6 @@ double *Main::get_ao(const bool   use_gradient,
 
         MemAllocator::deallocate(ao);
         ao = (double*) MemAllocator::allocate(block_size*sizeof(double));
-
-        block_size = num_ao;
     }
 
     std::fill(&ao[0], &ao[ao_length], 0.0);
