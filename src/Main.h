@@ -1,8 +1,10 @@
-#ifndef GRID_H_INCLUDED
-#define GRID_H_INCLUDED
+#ifndef MAIN_H_INCLUDED
+#define MAIN_H_INCLUDED
+
+#include <stdlib.h>
+#include <vector>
 
 #include "Basis.h"
-#include "AOBatch.h"
 
 class Main
 {
@@ -27,8 +29,7 @@ class Main
                    const double p[]);
                //  const double p[]) const;
 
-//      int get_num_points() const;
-//      double *get_grid() const;
+        double *ao;
 
     private:
 
@@ -36,14 +37,32 @@ class Main
         Main &operator=(const Main &rhs); // not implemented
 
         Basis basis;
-        AOBatch aobatch;
-//      void nullify();
 
-//      int get_closest_num_angular(int n) const;
-//      int get_angular_order(int n) const;
+        void get_ao(const Basis &basis,
+                    const bool   use_gradient,
+                    const int    max_ao_geo_order,
+                    const int    block_length,
+                    const double p[]);
 
-//      int num_points;
-//      double *xyzw;
+        void get_ao_shell(const int        ishell,
+                          const Basis &basis,
+                                double     ao_local[],
+                          const int        max_ao_geo_order,
+                          const double     p[]);
+
+        void get_ao_shell(const int        ishell,
+                          const Basis &basis,
+                          const int        max_ao_geo_order,
+                          const double     p[]);
+
+        bool is_same_center(const int c,
+                            const std::vector<int> &carray) const;
+
+        void transform_basis(const Basis &basis) const;
+
+        void nullify();
+
+        int ao_length;
 };
 
 #endif

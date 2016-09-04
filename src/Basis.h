@@ -3,7 +3,7 @@
 
 class Basis
 {
-    friend class AOBatch;
+    friend class Main;
 
     public:
 

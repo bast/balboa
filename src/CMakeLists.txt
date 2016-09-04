@@ -19,8 +19,6 @@ add_library(
     Main.h
     MemAllocator.cpp
     MemAllocator.h
-    AOBatch.cpp
-    AOBatch.h
     Basis.cpp
     Basis.h
     CMakeLists.txt
