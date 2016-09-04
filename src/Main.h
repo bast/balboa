@@ -62,11 +62,6 @@ class Main
                   const int    in_shell_num_primitives[],
                   const double in_primitive_exponents[],
                   const double in_contraction_coefficients[]);
-        int  get_num_centers() const;
-        int  get_num_ao_slices() const;
-        int  get_num_ao() const;
-        int  get_num_ao_cartesian() const;
-        int  get_ao_center(const int i) const;
         int  get_geo_off(const int i,
                          const int j,
                          const int k) const;

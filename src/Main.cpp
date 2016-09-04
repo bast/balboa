@@ -482,33 +482,3 @@ int Main::get_geo_off(const int i, const int j, const int k) const
     id += i;
     return geo_off[id];
 }
-
-
-int Main::get_num_centers() const
-{
-    return num_centers;
-}
-
-
-int Main::get_num_ao_slices() const
-{
-    return num_ao_slices;
-}
-
-
-int Main::get_num_ao() const
-{
-    return num_ao;
-}
-
-
-int Main::get_num_ao_cartesian() const
-{
-    return num_ao_cartesian;
-}
-
-
-int Main::get_ao_center(const int i) const
-{
-    return ao_center[i];
-}
