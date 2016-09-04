@@ -1,20 +1,20 @@
-#ifndef AOEVAL_H_INCLUDED
-#define AOEVAL_H_INCLUDED
+#ifndef BALBOA_H_INCLUDED
+#define BALBOA_H_INCLUDED
 
-#ifndef AOEVAL_API
+#ifndef BALBOA_API
 #  ifdef _WIN32
-#    if defined(AOEVAL_BUILD_SHARED) /* build dll */
-#      define AOEVAL_API __declspec(dllexport)
-#    elif !defined(AOEVAL_BUILD_STATIC) /* use dll */
-#      define AOEVAL_API __declspec(dllimport)
+#    if defined(BALBOA_BUILD_SHARED) /* build dll */
+#      define BALBOA_API __declspec(dllexport)
+#    elif !defined(BALBOA_BUILD_STATIC) /* use dll */
+#      define BALBOA_API __declspec(dllimport)
 #    else /* static library */
-#      define AOEVAL_API
+#      define BALBOA_API
 #    endif
 #  else
 #    if __GNUC__ >= 4
-#      define AOEVAL_API __attribute__((visibility("default")))
+#      define BALBOA_API __attribute__((visibility("default")))
 #    else
-#      define AOEVAL_API
+#      define BALBOA_API
 #    endif
 #  endif
 #endif
@@ -23,13 +23,13 @@
 extern "C" {
 #endif
 
-struct aoeval_context_s;
-typedef struct aoeval_context_s aoeval_context_t;
+struct balboa_context_s;
+typedef struct balboa_context_s balboa_context_t;
 
-AOEVAL_API aoeval_context_t *aoeval_new();
-AOEVAL_API void aoeval_free(aoeval_context_t *context);
+BALBOA_API balboa_context_t *balboa_new();
+BALBOA_API void balboa_free(balboa_context_t *context);
 
-AOEVAL_API int aoeval_set_basis(aoeval_context_t *context,
+BALBOA_API int balboa_set_basis(balboa_context_t *context,
                                 const int    basis_type,
                                 const int    num_centers,
                                 const double center_coordinates[],
@@ -40,8 +40,8 @@ AOEVAL_API int aoeval_set_basis(aoeval_context_t *context,
                                 const double primitive_exponents[],
                                 const double contraction_coefficients[]);
 
-//AOEVAL_API double *aoeval_get_ao(const aoeval_context_t *context,
-AOEVAL_API double *aoeval_get_ao(      aoeval_context_t *context,
+//BALBOA_API double *balboa_get_ao(const balboa_context_t *context,
+BALBOA_API double *balboa_get_ao(      balboa_context_t *context,
                              const bool   use_gradient,
                              const int    max_ao_geo_order,
                              const int    block_length,
@@ -51,4 +51,4 @@ AOEVAL_API double *aoeval_get_ao(      aoeval_context_t *context,
 }
 #endif
 
-#endif /* AOEVAL_H_INCLUDED */
+#endif /* BALBOA_H_INCLUDED */

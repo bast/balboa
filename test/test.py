@@ -2,8 +2,8 @@ import sys
 import os
 
 
-def test_aoeval():
-    from aoeval import lib
+def test_balboa():
+    from balboa import lib
 
     num_centers = 2
     center_coordinates = [
@@ -88,9 +88,9 @@ def test_aoeval():
         9.56881e-01,
     ]
 
-    context = lib.aoeval_new()
+    context = lib.balboa_new()
 
-    ierr = lib.aoeval_set_basis(context,
+    ierr = lib.balboa_set_basis(context,
                                 0,
                                 num_centers,
                                 center_coordinates,
@@ -117,7 +117,7 @@ def test_aoeval():
     max_ao_geo_order = 0
     block_length = num_points
 
-    aos = lib.aoeval_get_ao(context,
+    aos = lib.balboa_get_ao(context,
                             use_gradient,
                             max_ao_geo_order,
                             block_length,
@@ -129,4 +129,4 @@ def test_aoeval():
             error /= ref_ao
         assert abs(error) < 1.0e-7
 
-    lib.aoeval_free(context)
+    lib.balboa_free(context)

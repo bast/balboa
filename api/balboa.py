@@ -34,8 +34,8 @@ def get_lib_handle(definitions, header, library, build_dir, include_dir):
 build_dir = get_env('PROJECT_BUILD_DIR')
 include_dir = get_env('PROJECT_INCLUDE_DIR')
 
-lib = get_lib_handle(['-DAOEVAL_API=', '-DAOEVAL_NOINCLUDE'],
-                     'aoeval.h',
-                     'aoeval',
+lib = get_lib_handle(['-DBALBOA_API=', '-DBALBOA_NOINCLUDE'],
+                     'balboa.h',
+                     'balboa',
                      build_dir,
                      include_dir)

@@ -1,14 +1,13 @@
 #include "Main.h"
-#include "aoeval.h"
-//#include "AOBatch.h"
+#include "balboa.h"
 
 #define AS_TYPE(Type, Obj) reinterpret_cast<Type *>(Obj)
 #define AS_CTYPE(Type, Obj) reinterpret_cast<const Type *>(Obj)
 
 
-aoeval_context_t *aoeval_new()
+balboa_context_t *balboa_new()
 {
-    return AS_TYPE(aoeval_context_t, new Main());
+    return AS_TYPE(balboa_context_t, new Main());
 }
 Main::Main()
 {
@@ -16,7 +15,7 @@ Main::Main()
 }
 
 
-void aoeval_free(aoeval_context_t *context)
+void balboa_free(balboa_context_t *context)
 {
     if (!context) return;
     delete AS_TYPE(Main, context);
@@ -28,7 +27,7 @@ Main::~Main()
 }
 
 
-AOEVAL_API int aoeval_set_basis(aoeval_context_t *context,
+BALBOA_API int balboa_set_basis(balboa_context_t *context,
                                 const int    basis_type,
                                 const int    num_centers,
                                 const double center_coordinates[],
@@ -73,8 +72,8 @@ int Main::set_basis(const int    basis_type,
 }
 
 
-//AOEVAL_API double *aoeval_get_ao(const aoeval_context_t *context,
-AOEVAL_API double *aoeval_get_ao(      aoeval_context_t *context,
+//BALBOA_API double *balboa_get_ao(const balboa_context_t *context,
+BALBOA_API double *balboa_get_ao(      balboa_context_t *context,
                              const bool   use_gradient,
                              const int    max_ao_geo_order,
                              const int    block_length,

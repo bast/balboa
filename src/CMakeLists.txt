@@ -13,7 +13,7 @@ set(_generated_files
 set_source_files_properties(${_generated_files} PROPERTIES GENERATED TRUE)
 
 add_library(
-    aoeval
+    balboa
     SHARED
     Main.cpp
     Main.h
@@ -29,6 +29,6 @@ add_library(
     ${_generated_files}
     )
 
-add_dependencies(aoeval generate)
+add_dependencies(balboa generate)
 
-install(TARGETS aoeval LIBRARY DESTINATION lib)
+install(TARGETS balboa LIBRARY DESTINATION lib)
