@@ -103,12 +103,15 @@ def test_balboa():
 
     dir_path = os.path.dirname(os.path.realpath(__file__))
 
-    with open(os.path.join(dir_path, 'test.txt'), 'r') as f:
-        num_points = int(f.readline())
+    with open(os.path.join(dir_path, 'grid.txt'), 'r') as f:
+        num_points = 0
         p = []
-        for _ in range(num_points):
-            for xyzw in f.readline().split():
+        for line in f.readlines():
+            num_points += 1
+            for xyzw in line.split():
                 p.append(float(xyzw))
+
+    with open(os.path.join(dir_path, 'result.txt'), 'r') as f:
         ref_aos = []
         for line in f.readlines():
             ref_aos.append(float(line))
