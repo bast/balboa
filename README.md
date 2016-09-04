@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/bast/balboa.svg?branch=master)](https://travis-ci.org/bast/balboa/builds)
+
 # balboa
 
 Experimental code. Under heavy development, nothing is stable.
