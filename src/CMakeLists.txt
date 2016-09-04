@@ -29,6 +29,6 @@ add_library(
     ${_generated_files}
     )
 
-add_dependencies(aoeval generate_ave)
+add_dependencies(aoeval generate)
 
 install(TARGETS aoeval LIBRARY DESTINATION lib)
