@@ -124,6 +124,7 @@ def test_balboa():
 
     # allocate a numpy array of length l and zero it out
     buf = np.zeros(l, dtype=np.float64)
+
     # cast a pointer which points to the numpy array data
     ffi = FFI()
     p_buf = ffi.cast("double *", buf.ctypes.data)
