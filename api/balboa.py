@@ -31,11 +31,19 @@ def get_lib_handle(definitions, header, library, build_dir, include_dir):
     return lib
 
 
-build_dir = get_env('PROJECT_BUILD_DIR')
-include_dir = get_env('PROJECT_INCLUDE_DIR')
+_build_dir = get_env('PROJECT_BUILD_DIR')
+_include_dir = get_env('PROJECT_INCLUDE_DIR')
 
-lib = get_lib_handle(['-DBALBOA_API=', '-DBALBOA_NOINCLUDE'],
-                     'balboa.h',
-                     'balboa',
-                     build_dir,
-                     include_dir)
+_lib = get_lib_handle(['-DBALBOA_API=', '-DBALBOA_NOINCLUDE'],
+                      'balboa.h',
+                      'balboa',
+                      _build_dir,
+                      _include_dir)
+
+
+# outward facing API
+new_context = _lib.new_context
+free_context = _lib.free_context
+set_basis = _lib.set_basis
+get_buffer_len = _lib.get_buffer_len
+get_ao = _lib.get_ao

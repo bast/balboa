@@ -3,7 +3,7 @@ import os
 
 
 def test_balboa():
-    from balboa import lib
+    import balboa
     import numpy as np
     from cffi import FFI
 
@@ -90,18 +90,18 @@ def test_balboa():
         9.56881e-01,
     ]
 
-    context = lib.balboa_new()
+    context = balboa.new_context()
 
-    ierr = lib.balboa_set_basis(context,
-                                0,
-                                num_centers,
-                                center_coordinates,
-                                num_shells,
-                                shell_centers,
-                                shell_l_quantum_numbers,
-                                shell_num_primitives,
-                                primitive_exponents,
-                                contraction_coefficients)
+    ierr = balboa.set_basis(context,
+                            0,
+                            num_centers,
+                            center_coordinates,
+                            num_shells,
+                            shell_centers,
+                            shell_l_quantum_numbers,
+                            shell_num_primitives,
+                            primitive_exponents,
+                            contraction_coefficients)
 
     dir_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -120,17 +120,19 @@ def test_balboa():
 
     max_geo_order = 0
 
-    l = lib.balboa_get_buffer_len(context, max_geo_order, num_points)
+    l = balboa.get_buffer_len(context, max_geo_order, num_points)
 
+    # allocate a numpy array of length l and zero it out
     buf = np.zeros(l, dtype=np.float64)
+    # cast a pointer which points to the numpy array data
     ffi = FFI()
     p_buf = ffi.cast("double *", buf.ctypes.data)
 
-    ierr = lib.balboa_get_ao(context,
-                             max_geo_order,
-                             num_points,
-                             p,
-                             p_buf)
+    ierr = balboa.get_ao(context,
+                         max_geo_order,
+                         num_points,
+                         p,
+                         p_buf)
 
     for i, ref_ao in enumerate(ref_aos):
         error = buf[i] - ref_ao
@@ -138,4 +140,4 @@ def test_balboa():
             error /= ref_ao
         assert abs(error) < 1.0e-14
 
-    lib.balboa_free(context)
+    balboa.free_context(context)
