@@ -22,12 +22,12 @@ class Main
                       const double contraction_coefficients[]);
 
         int get_ao(const int    max_geo_order,
-                   const int    block_length,
+                   const int    num_points,
                    const double p[],
                          double buf[]) const;
 
         int get_buffer_len(const int max_geo_order,
-                           const int block_length) const;
+                           const int num_points) const;
 
         double *ao;
 

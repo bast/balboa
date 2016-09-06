@@ -41,13 +41,13 @@ Main::~Main()
 
 BALBOA_API int balboa_get_buffer_len(const balboa_context_t *context,
                                      const int max_geo_order,
-                                     const int block_length)
+                                     const int num_points)
 {
     return AS_CTYPE(Main, context)->get_buffer_len(max_geo_order,
-                                                   block_length);
+                                                   num_points);
 }
 int Main::get_buffer_len(const int  max_geo_order,
-                         const int  block_length) const
+                         const int  num_points) const
 {
     return AO_BLOCK_LENGTH*num_ao_slices*num_ao_cartesian;
 }
@@ -259,17 +259,17 @@ int Main::set_basis(const int    in_basis_type,
 
 BALBOA_API int balboa_get_ao(const balboa_context_t *context,
                              const int    max_geo_order,
-                             const int    block_length,
+                             const int    num_points,
                              const double p[],
                                    double buf[])
 {
     return AS_CTYPE(Main, context)->get_ao(max_geo_order,
-                                           block_length,
+                                           num_points,
                                            p,
                                            buf);
 }
 int Main::get_ao(const int    max_geo_order,
-                 const int    block_length,
+                 const int    num_points,
                  const double p[],
                        double buf[]) const
 {
@@ -283,7 +283,7 @@ int Main::get_ao(const int    max_geo_order,
     // we pad it by very large numbers to let the code screen them away
     double p_block[4*AO_BLOCK_LENGTH];
     std::fill(&p_block[0], &p_block[4*AO_BLOCK_LENGTH], 1.0e50);
-    std::copy(&p[0], &p[4*block_length], &p_block[0]);
+    std::copy(&p[0], &p[4*num_points], &p_block[0]);
 
     for (int ishell = 0; ishell < num_shells; ishell++)
     {
