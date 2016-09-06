@@ -21,13 +21,14 @@ class Main
                       const double primitive_exponents[],
                       const double contraction_coefficients[]);
 
+        int get_buffer_len(const int max_geo_order,
+                           const int num_points) const;
+
+        // buffer is not zeroed out inside get_ao
         int get_ao(const int    max_geo_order,
                    const int    num_points,
                    const double p[],
-                         double buf[]) const;
-
-        int get_buffer_len(const int max_geo_order,
-                           const int num_points) const;
+                         double buffer[]) const;
 
         double *ao;
 

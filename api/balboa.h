@@ -48,7 +48,7 @@ BALBOA_API int balboa_get_ao(const balboa_context_t *context,
                              const int    max_geo_order,
                              const int    num_points,
                              const double p[],
-                                   double buf[]);
+                                   double buffer[]);
 
 #ifdef __cplusplus
 }

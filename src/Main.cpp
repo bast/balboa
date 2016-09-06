@@ -46,10 +46,21 @@ BALBOA_API int balboa_get_buffer_len(const balboa_context_t *context,
     return AS_CTYPE(Main, context)->get_buffer_len(max_geo_order,
                                                    num_points);
 }
-int Main::get_buffer_len(const int  max_geo_order,
-                         const int  num_points) const
+int Main::get_buffer_len(const int max_geo_order,
+                         const int num_points) const
 {
-    return AO_BLOCK_LENGTH*num_ao_slices*num_ao_cartesian;
+    int m = 0;
+    for (int l = 0; l <= max_geo_order; l++)
+    {
+        for (int a = 1; a <= (l + 1); a++)
+        {
+            for (int b = 1; b <= a; b++)
+            {
+                m++;
+            }
+        }
+    }
+    return m*num_points*num_ao_cartesian;
 }
 
 
@@ -261,22 +272,19 @@ BALBOA_API int balboa_get_ao(const balboa_context_t *context,
                              const int    max_geo_order,
                              const int    num_points,
                              const double p[],
-                                   double buf[])
+                                   double buffer[])
 {
     return AS_CTYPE(Main, context)->get_ao(max_geo_order,
                                            num_points,
                                            p,
-                                           buf);
+                                           buffer);
 }
 int Main::get_ao(const int    max_geo_order,
                  const int    num_points,
                  const double p[],
-                       double buf[]) const
+                       double buffer[]) const
 {
     assert(max_geo_order <= MAX_GEO_DIFF_ORDER);
-
-    int l = AO_BLOCK_LENGTH*num_ao_slices*num_ao_cartesian;
-    std::fill(&buf[0], &buf[l], 0.0);
 
     // FIXME can be optimized
     // we do this because p can be shorter than 4*AO_BLOCK_LENGTH
@@ -288,7 +296,7 @@ int Main::get_ao(const int    max_geo_order,
     for (int ishell = 0; ishell < num_shells; ishell++)
     {
         get_ao_shell(ishell,
-                     buf,
+                     buffer,
                      max_geo_order,
                      p_block);
     }
@@ -315,7 +323,6 @@ void Main::nullify()
     num_ao                    = -1;
     num_ao_cartesian          = -1;
     num_ao_spherical          = -1;
-    num_ao_slices             = -1;
     ao_center                 = NULL;
     shell_num_primitives      = NULL;
     geo_diff_order            = -1;
@@ -416,7 +423,7 @@ void Main::set_geo_off(const int g)
             }
         }
     }
-    num_ao_slices = m;
+//  num_ao_slices = m;
 }
 
 

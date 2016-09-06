@@ -120,7 +120,8 @@ def test_balboa():
 
     max_geo_order = 0
 
-    l = lib.balboa_get_buffer_len(context, max_geo_order, num_points)  # FIXME args unused
+    l = lib.balboa_get_buffer_len(context, max_geo_order, num_points)
+
     buf = np.zeros(l, dtype=np.float64)
     ffi = FFI()
     p_buf = ffi.cast("double *", buf.ctypes.data)
