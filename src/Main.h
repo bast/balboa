@@ -21,13 +21,13 @@ class Main
                       const double primitive_exponents[],
                       const double contraction_coefficients[]);
 
-        // function is not const because we modify aos
-        // consider allocating outside but then the python
-        // interface could get ugly
-        double *get_ao(const bool   use_gradient,
-                       const int    max_ao_geo_order,
-                       const int    block_length,
-                       const double p[]);
+        int get_ao(const int    max_ao_geo_order,
+                   const int    block_length,
+                   const double p[],
+                         double buf[]) const;
+
+        int get_buffer_len(const int max_ao_geo_order,
+                           const int block_length) const;
 
         double *ao;
 
@@ -42,18 +42,16 @@ class Main
         void get_ao_shell(const int        ishell,
                                 double     ao_local[],
                           const int        max_ao_geo_order,
-                          const double     p[]);
+                          const double     p[]) const;
 
         void get_ao_shell(const int        ishell,
                           const int        max_ao_geo_order,
-                          const double     p[]);
+                          const double     p[]) const;
 
         bool is_same_center(const int c,
                             const std::vector<int> &carray) const;
 
         void transform_basis() const;
-
-        int ao_length;
 
         int  get_geo_off(const int i,
                          const int j,

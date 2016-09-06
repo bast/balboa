@@ -39,6 +39,20 @@ Main::~Main()
 }
 
 
+BALBOA_API int balboa_get_buffer_len(const balboa_context_t *context,
+                                     const int max_ao_geo_order,
+                                     const int block_length)
+{
+    return AS_CTYPE(Main, context)->get_buffer_len(max_ao_geo_order,
+                                                   block_length);
+}
+int Main::get_buffer_len(const int  max_ao_geo_order,
+                         const int  block_length) const
+{
+    return AO_BLOCK_LENGTH*num_ao_slices*num_ao_cartesian;
+}
+
+
 BALBOA_API int balboa_set_basis(balboa_context_t *context,
                                 const int    basis_type,
                                 const int    num_centers,
@@ -243,51 +257,26 @@ int Main::set_basis(const int    in_basis_type,
 }
 
 
-BALBOA_API double *balboa_get_ao(balboa_context_t *context,
-                                 const bool   use_gradient,
-                                 const int    max_ao_geo_order,
-                                 const int    block_length,
-                                 const double p[])
+BALBOA_API int balboa_get_ao(const balboa_context_t *context,
+                             const int    max_ao_geo_order,
+                             const int    block_length,
+                             const double p[],
+                                   double buf[])
 {
-    return AS_TYPE(Main, context)->get_ao(use_gradient,
-                                          max_ao_geo_order,
-                                          block_length,
-                                          p);
+    return AS_CTYPE(Main, context)->get_ao(max_ao_geo_order,
+                                           block_length,
+                                           p,
+                                           buf);
 }
-double *Main::get_ao(const bool   use_gradient,
-                     const int    max_ao_geo_order,
-                     const int    block_length,
-                     const double p[])
+int Main::get_ao(const int    max_ao_geo_order,
+                 const int    block_length,
+                 const double p[],
+                       double buf[]) const
 {
     assert(max_ao_geo_order <= MAX_GEO_DIFF_ORDER);
 
-//  debug
-//  if (max_ao_geo_order == 1)
-//  {
-//      printf("use_gradient = %i\n", use_gradient);
-//      printf("max_ao_geo_order = %i\n", max_ao_geo_order);
-//      printf("block_length = %i\n", block_length);
-//      for (int ib = 0; ib < block_length; ib++)
-//      {
-//          printf("grid = %e %e %e %e\n", p[ib*4 + 0],
-//                                         p[ib*4 + 1],
-//                                         p[ib*4 + 2],
-//                                         p[ib*4 + 3]);
-//      }
-//  }
-
     int l = AO_BLOCK_LENGTH*num_ao_slices*num_ao_cartesian;
-    if (l != ao_length) // FIXME
-    {
-        ao_length = l;
-
-        size_t block_size = l;
-
-        MemAllocator::deallocate(ao);
-        ao = (double*) MemAllocator::allocate(block_size*sizeof(double));
-    }
-
-    std::fill(&ao[0], &ao[ao_length], 0.0);
+    std::fill(&buf[0], &buf[l], 0.0);
 
     // FIXME can be optimized
     // we do this because p can be shorter than 4*AO_BLOCK_LENGTH
@@ -299,34 +288,17 @@ double *Main::get_ao(const bool   use_gradient,
     for (int ishell = 0; ishell < num_shells; ishell++)
     {
         get_ao_shell(ishell,
-                     ao,
+                     buf,
                      max_ao_geo_order,
                      p_block);
     }
 
-//  debug
-//  if (max_ao_geo_order == 1)
-//  {
-//      for (int islice = 0; islice < 4; islice++)
-//      {
-//          for (int iao = 0; iao < num_ao_cartesian; iao++)
-//          {
-//              for (int ib = 0; ib < AO_BLOCK_LENGTH; ib++)
-//              {
-//                  printf("%i %i %i %e\n", islice, iao, ib, ao[islice*AO_BLOCK_LENGTH*num_ao_cartesian + iao*AO_BLOCK_LENGTH + ib]);
-//              }
-//          }
-//      }
-//      exit(1);
-//  }
-
-    return ao;
+    return 0;
 }
 
 
 void Main::nullify()
 {
-    ao_length = -1;
     ao = NULL;
 
     num_centers               = -1;
@@ -357,7 +329,7 @@ void Main::nullify()
 void Main::get_ao_shell(const int        ishell,
                                       double     ao_local[],
                                 const int        max_ao_geo_order,
-                                const double     p[])
+                                const double     p[]) const
 {
     double px[AO_CHUNK_LENGTH];
     double py[AO_CHUNK_LENGTH];

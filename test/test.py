@@ -4,6 +4,8 @@ import os
 
 def test_balboa():
     from balboa import lib
+    import numpy as np
+    from cffi import FFI
 
     num_centers = 2
     center_coordinates = [
@@ -116,18 +118,22 @@ def test_balboa():
         for line in f.readlines():
             ref_aos.append(float(line))
 
-    use_gradient = False
     max_ao_geo_order = 0
     block_length = num_points
 
-    aos = lib.balboa_get_ao(context,
-                            use_gradient,
-                            max_ao_geo_order,
-                            block_length,
-                            p)
+    l = lib.balboa_get_buffer_len(context, 0, 0)  # FIXME args unused
+    buf = np.zeros(l, dtype=np.float64)
+    ffi = FFI()
+    p_buf = ffi.cast("double *", buf.ctypes.data)
+
+    ierr = lib.balboa_get_ao(context,
+                             max_ao_geo_order,
+                             block_length,
+                             p,
+                             p_buf)
 
     for i, ref_ao in enumerate(ref_aos):
-        error = aos[i] - ref_ao
+        error = buf[i] - ref_ao
         if abs(ref_ao) > 1.0e-20:
             error /= ref_ao
         assert abs(error) < 1.0e-14
