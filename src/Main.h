@@ -30,8 +30,6 @@ class Main
                    const double p[],
                          double buffer[]) const;
 
-        double *ao;
-
     private:
 
         Main(const Main &rhs);            // not implemented

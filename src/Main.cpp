@@ -33,7 +33,6 @@ void balboa_free(balboa_context_t *context)
 }
 Main::~Main()
 {
-    MemAllocator::deallocate(ao);
     deallocate();
     nullify();
 }
@@ -307,8 +306,6 @@ int Main::get_ao(const int    max_geo_order,
 
 void Main::nullify()
 {
-    ao = NULL;
-
     num_centers               = -1;
     num_shells                = -1;
     shell_l_quantum_numbers   = NULL;
