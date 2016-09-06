@@ -118,16 +118,16 @@ def test_balboa():
         for line in f.readlines():
             ref_aos.append(float(line))
 
-    max_ao_geo_order = 0
+    max_geo_order = 0
     block_length = num_points
 
-    l = lib.balboa_get_buffer_len(context, 0, 0)  # FIXME args unused
+    l = lib.balboa_get_buffer_len(context, max_geo_order, 0)  # FIXME args unused
     buf = np.zeros(l, dtype=np.float64)
     ffi = FFI()
     p_buf = ffi.cast("double *", buf.ctypes.data)
 
     ierr = lib.balboa_get_ao(context,
-                             max_ao_geo_order,
+                             max_geo_order,
                              block_length,
                              p,
                              p_buf)

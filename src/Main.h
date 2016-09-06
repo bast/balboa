@@ -21,12 +21,12 @@ class Main
                       const double primitive_exponents[],
                       const double contraction_coefficients[]);
 
-        int get_ao(const int    max_ao_geo_order,
+        int get_ao(const int    max_geo_order,
                    const int    block_length,
                    const double p[],
                          double buf[]) const;
 
-        int get_buffer_len(const int max_ao_geo_order,
+        int get_buffer_len(const int max_geo_order,
                            const int block_length) const;
 
         double *ao;
@@ -41,11 +41,11 @@ class Main
 
         void get_ao_shell(const int        ishell,
                                 double     ao_local[],
-                          const int        max_ao_geo_order,
+                          const int        max_geo_order,
                           const double     p[]) const;
 
         void get_ao_shell(const int        ishell,
-                          const int        max_ao_geo_order,
+                          const int        max_geo_order,
                           const double     p[]) const;
 
         bool is_same_center(const int c,

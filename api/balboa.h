@@ -41,11 +41,11 @@ BALBOA_API int balboa_set_basis(balboa_context_t *context,
                                 const double contraction_coefficients[]);
 
 BALBOA_API int balboa_get_buffer_len(const balboa_context_t *context,
-                                     const int max_ao_geo_order,
+                                     const int max_geo_order,
                                      const int block_length);
 
 BALBOA_API int balboa_get_ao(const balboa_context_t *context,
-                             const int    max_ao_geo_order,
+                             const int    max_geo_order,
                              const int    block_length,
                              const double p[],
                                    double buf[]);

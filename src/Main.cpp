@@ -40,13 +40,13 @@ Main::~Main()
 
 
 BALBOA_API int balboa_get_buffer_len(const balboa_context_t *context,
-                                     const int max_ao_geo_order,
+                                     const int max_geo_order,
                                      const int block_length)
 {
-    return AS_CTYPE(Main, context)->get_buffer_len(max_ao_geo_order,
+    return AS_CTYPE(Main, context)->get_buffer_len(max_geo_order,
                                                    block_length);
 }
-int Main::get_buffer_len(const int  max_ao_geo_order,
+int Main::get_buffer_len(const int  max_geo_order,
                          const int  block_length) const
 {
     return AO_BLOCK_LENGTH*num_ao_slices*num_ao_cartesian;
@@ -258,22 +258,22 @@ int Main::set_basis(const int    in_basis_type,
 
 
 BALBOA_API int balboa_get_ao(const balboa_context_t *context,
-                             const int    max_ao_geo_order,
+                             const int    max_geo_order,
                              const int    block_length,
                              const double p[],
                                    double buf[])
 {
-    return AS_CTYPE(Main, context)->get_ao(max_ao_geo_order,
+    return AS_CTYPE(Main, context)->get_ao(max_geo_order,
                                            block_length,
                                            p,
                                            buf);
 }
-int Main::get_ao(const int    max_ao_geo_order,
+int Main::get_ao(const int    max_geo_order,
                  const int    block_length,
                  const double p[],
                        double buf[]) const
 {
-    assert(max_ao_geo_order <= MAX_GEO_DIFF_ORDER);
+    assert(max_geo_order <= MAX_GEO_DIFF_ORDER);
 
     int l = AO_BLOCK_LENGTH*num_ao_slices*num_ao_cartesian;
     std::fill(&buf[0], &buf[l], 0.0);
@@ -289,7 +289,7 @@ int Main::get_ao(const int    max_ao_geo_order,
     {
         get_ao_shell(ishell,
                      buf,
-                     max_ao_geo_order,
+                     max_geo_order,
                      p_block);
     }
 
@@ -328,7 +328,7 @@ void Main::nullify()
 
 void Main::get_ao_shell(const int        ishell,
                                       double     ao_local[],
-                                const int        max_ao_geo_order,
+                                const int        max_geo_order,
                                 const double     p[]) const
 {
     double px[AO_CHUNK_LENGTH];
@@ -344,7 +344,7 @@ void Main::get_ao_shell(const int        ishell,
         n += shell_num_primitives[jshell];
     }
 
-    switch (max_ao_geo_order)
+    switch (max_geo_order)
     {
         #include "aocalls.h"
         default:
