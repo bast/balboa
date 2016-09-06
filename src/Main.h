@@ -2,7 +2,6 @@
 #define MAIN_H_INCLUDED
 
 #include <stdlib.h>
-#include <vector>
 
 class Main
 {
@@ -46,9 +45,6 @@ class Main
         void get_ao_shell(const int        ishell,
                           const int        max_geo_order,
                           const double     p[]) const;
-
-        bool is_same_center(const int c,
-                            const std::vector<int> &carray) const;
 
         void transform_basis() const;
 

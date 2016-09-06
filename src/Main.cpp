@@ -105,7 +105,7 @@ int Main::set_basis(const int    in_basis_type,
 
     switch (in_basis_type)
     {
-        case 0:  // FIXME changed to named integer parameters
+        case 0:  // FIXME change to named integer parameters
             is_spherical = true;
             break;
         case 1:
@@ -359,18 +359,6 @@ void Main::get_ao_shell(const int        ishell,
 }
 
 
-bool Main::is_same_center(const int              c,
-                                  const std::vector<int> &carray) const
-// returns true if carray is empty (no derivatives)
-{
-    for (unsigned int i = 0; i < carray.size(); i++)
-    {
-        if (c != carray[i]) return false;
-    }
-    return true;
-}
-
-
 void Main::deallocate()
 {
     MemAllocator::deallocate(shell_l_quantum_numbers);
@@ -420,7 +408,6 @@ void Main::set_geo_off(const int g)
             }
         }
     }
-//  num_ao_slices = m;
 }
 
 
