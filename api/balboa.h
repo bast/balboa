@@ -23,13 +23,13 @@
 extern "C" {
 #endif
 
-struct balboa_context_s;
-typedef struct balboa_context_s balboa_context_t;
+struct context_s;
+typedef struct context_s context_t;
 
-BALBOA_API balboa_context_t *new_context();
-BALBOA_API void free_context(balboa_context_t *context);
+BALBOA_API context_t *new_context();
+BALBOA_API void free_context(context_t *context);
 
-BALBOA_API int set_basis(balboa_context_t *context,
+BALBOA_API int set_basis(context_t *context,
                          const int    basis_type,
                          const int    num_centers,
                          const double center_coordinates[],
@@ -40,11 +40,11 @@ BALBOA_API int set_basis(balboa_context_t *context,
                          const double primitive_exponents[],
                          const double contraction_coefficients[]);
 
-BALBOA_API int get_buffer_len(const balboa_context_t *context,
+BALBOA_API int get_buffer_len(const context_t *context,
                               const int max_geo_order,
                               const int num_points);
 
-BALBOA_API int get_ao(const balboa_context_t *context,
+BALBOA_API int get_ao(const context_t *context,
                       const int    max_geo_order,
                       const int    num_points,
                       const double p[],

@@ -15,9 +15,9 @@
 #define AS_CTYPE(Type, Obj) reinterpret_cast<const Type *>(Obj)
 
 
-balboa_context_t *new_context()
+context_t *new_context()
 {
-    return AS_TYPE(balboa_context_t, new Main());
+    return AS_TYPE(context_t, new Main());
 }
 Main::Main()
 {
@@ -26,7 +26,7 @@ Main::Main()
 }
 
 
-void free_context(balboa_context_t *context)
+void free_context(context_t *context)
 {
     if (!context) return;
     delete AS_TYPE(Main, context);
@@ -38,7 +38,7 @@ Main::~Main()
 }
 
 
-BALBOA_API int get_buffer_len(const balboa_context_t *context,
+BALBOA_API int get_buffer_len(const context_t *context,
                               const int max_geo_order,
                               const int num_points)
 {
@@ -63,7 +63,7 @@ int Main::get_buffer_len(const int max_geo_order,
 }
 
 
-BALBOA_API int set_basis(balboa_context_t *context,
+BALBOA_API int set_basis(context_t *context,
                          const int    basis_type,
                          const int    num_centers,
                          const double center_coordinates[],
@@ -267,7 +267,7 @@ int Main::set_basis(const int    in_basis_type,
 }
 
 
-BALBOA_API int get_ao(const balboa_context_t *context,
+BALBOA_API int get_ao(const context_t *context,
                       const int    max_geo_order,
                       const int    num_points,
                       const double p[],
