@@ -1,21 +1,18 @@
 
 
-import math
-
-#-------------------------------------------------------------------------------
-
 def zero_array(n):
     a = []
     for i in range(n):
         a.append(0.0)
     return a
 
-#-------------------------------------------------------------------------------
 
 # see: http://blog.plover.com/math/choose.html
 def binom(n, k):
-    if k == 0: return 1
-    if n == 0: return 0
+    if k == 0:
+        return 1
+    if n == 0:
+        return 0
     m = n
     b = 1
     for j in range(k):
@@ -24,7 +21,6 @@ def binom(n, k):
         m -= 1
     return b
 
-#-------------------------------------------------------------------------------
 
 # float to prevent overflow
 def fac(n):
@@ -33,7 +29,6 @@ def fac(n):
         r *= float(i + 1)
     return r
 
-#-------------------------------------------------------------------------------
 
 # float to prevent overflow
 def fac2(n):
@@ -54,9 +49,9 @@ def fac2(n):
             i -= 2
         return r
 
-#-------------------------------------------------------------------------------
 
 def get_cs_trans(max_l_value):
+    import math
 
     n = 0
     for l in range(2, max_l_value + 1):
@@ -95,7 +90,7 @@ def get_cs_trans(max_l_value):
                 cm = math.sqrt(2.0*fac(l - m)/fac(l + m))
             cm = cm/math.sqrt(fac2(2*l - 1))
 
-            k = (l - m)%2
+            k = (l - m) % 2
             while k <= (l - m):
                 if m > 0:
                     legendre_coef[k] = float(k + 1)*legendre_coef[k+1]
@@ -108,10 +103,10 @@ def get_cs_trans(max_l_value):
                         for n in range(m + 1):
                             ix = l - 2*j - m + n
                             ix = ix*(ix + 1)/2 + l + 1 - m - 2*i
-                            if n%2 == 1:
-                               ilm = 1 + l - m
+                            if n % 2 == 1:
+                                ilm = 1 + l - m
                             else:
-                               ilm = 1 + l + m
+                                ilm = 1 + l + m
                             tmat[int((ilm - 1)*nc + ix - 1)] += cmkij*cossin_coef[n*(l+1) + m]
                     i += 1
                 k += 2
