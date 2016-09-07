@@ -8,11 +8,9 @@ AO_CHUNK_LENGTH = 32
 MAX_GEO_DIFF_ORDER = 5
 MAX_L_VALUE = 5
 
-#-------------------------------------------------------------------------------
 
 cs = cs_trans.get_cs_trans(MAX_L_VALUE)
 
-#-------------------------------------------------------------------------------
 
 def get_ijk_list(m):
     l = []
@@ -24,26 +22,22 @@ def get_ijk_list(m):
             l.append([i, j, k])
     return l
 
-#-------------------------------------------------------------------------------
 
 exp_offset = {}
-for l in range(0, MAX_L_VALUE+1):
+for l in range(0, MAX_L_VALUE + 1):
     k = 0
     for exp in get_ijk_list(l):
         exp_offset[tuple(exp)] = k
         k += 1
 
-#-------------------------------------------------------------------------------
 
 def get_exp_offset(exp):
     return exp_offset[tuple(exp)]
 
-#-------------------------------------------------------------------------------
 
 def get_ao_pointer_prefix(geo):
     return 'ao_%i%i%i' % (geo[0], geo[1], geo[2])
 
-#-------------------------------------------------------------------------------
 
 def write_parameters(file_name):
     with open(file_name, 'w') as f:
@@ -52,7 +46,6 @@ def write_parameters(file_name):
         f.write('const int MAX_GEO_DIFF_ORDER = %i;\n' % MAX_GEO_DIFF_ORDER)
         f.write('const int MAX_L_VALUE = %i;\n' % MAX_L_VALUE)
 
-#-------------------------------------------------------------------------------
 
 def print_line(exp, geo, m, r):
 
@@ -74,15 +67,14 @@ def print_line(exp, geo, m, r):
     else:
         return '            get_pa(&%s, %s, &%s);\n' % (vec_a, vec_p, vec_r)
 
-#-------------------------------------------------------------------------------
 
 def write_offsets(file_name):
 
     s = '#ifndef offsets_h_\n#define offsets_h_\n\n'
     offset = 0
-    for l in range(0, MAX_L_VALUE+1):
+    for l in range(0, MAX_L_VALUE + 1):
         for exp in get_ijk_list(l):
-            for g in range(0, MAX_GEO_DIFF_ORDER+1):
+            for g in range(0, MAX_GEO_DIFF_ORDER + 1):
                 for geo in get_ijk_list(g):
                     s_geo = '%i%i%i' % (geo[0], geo[1], geo[2])
                     s += '#define OFFSET_%02d_%02d_%02d_%s %i\n' % (exp[0], exp[1], exp[2], s_geo, offset)
@@ -92,7 +84,6 @@ def write_offsets(file_name):
     with open(file_name, 'w') as f:
         f.write(s)
 
-#-------------------------------------------------------------------------------
 
 def write_routine(_maxg, file_name):
 
@@ -126,12 +117,12 @@ def write_routine(_maxg, file_name):
                      double p2[],\n''' % _maxg
 
     l = []
-    for g in range(0, _maxg+1):
+    for g in range(0, _maxg + 1):
         for geo in get_ijk_list(g):
             l.append('double ao_%i%i%i[]' % (geo[0], geo[1], geo[2]))
 
     for i in range(len(l)):
-        if i < len(l)-1:
+        if i < len(l) - 1:
             s += '                     %s,\n' % l[i]
         else:
             s += '                     %s)' % l[i]
@@ -164,7 +155,7 @@ def write_routine(_maxg, file_name):
 
     array = 'buffer[OFFSET_00_00_00_000]'
     sfoo += '        memset(&%s, 0, %i*sizeof(double));\n' % (array, AO_CHUNK_LENGTH)
-    for g in range(1, _maxg+1):
+    for g in range(1, _maxg + 1):
         for geo in get_ijk_list(g):
             array = 'buffer[OFFSET_00_00_00_%i%i%i]' % (geo[0], geo[1], geo[2])
             sfoo += '        memset(&%s, 0, %i*sizeof(double));\n' % (array, AO_CHUNK_LENGTH)
@@ -196,18 +187,18 @@ def write_routine(_maxg, file_name):
                 buffer[OFFSET_00_00_00_001 + k] += fz_1*s[k];
                   \n'''
 
-    for g in range(2, _maxg+1):
-        sfoo += '                fx_%i = fx_%i*fx_1 + %i.0*a*fx_%i;\n' % (int(g), int(g-1), int(g-1)*2, int(g-2))
-        sfoo += '                fy_%i = fy_%i*fy_1 + %i.0*a*fy_%i;\n' % (int(g), int(g-1), int(g-1)*2, int(g-2))
-        sfoo += '                fz_%i = fz_%i*fz_1 + %i.0*a*fz_%i;\n' % (int(g), int(g-1), int(g-1)*2, int(g-2))
+    for g in range(2, _maxg + 1):
+        sfoo += '                fx_%i = fx_%i*fx_1 + %i.0*a*fx_%i;\n' % (int(g), int(g - 1), int(g - 1) * 2, int(g - 2))
+        sfoo += '                fy_%i = fy_%i*fy_1 + %i.0*a*fy_%i;\n' % (int(g), int(g - 1), int(g - 1) * 2, int(g - 2))
+        sfoo += '                fz_%i = fz_%i*fz_1 + %i.0*a*fz_%i;\n' % (int(g), int(g - 1), int(g - 1) * 2, int(g - 2))
         for geo in get_ijk_list(g):
             sfoo += '                buffer[OFFSET_00_00_00_%i%i%i + k] += fx_%i*fy_%i*fz_%i*s[k];\n' \
-                                                    % (geo[0], geo[1], geo[2], \
-                                                       geo[0], geo[1], geo[2])
+                    % (geo[0], geo[1], geo[2],
+                       geo[0], geo[1], geo[2])
     sfoo += '            }\n'
     sfoo += '        }\n'
 
-    for l in range(0, MAX_L_VALUE+1):
+    for l in range(0, MAX_L_VALUE + 1):
         sfoo += '\n        if (shell_l_quantum_numbers == ' + '%i)\n' % l
         sfoo += '        {\n'
         if l < 2:
@@ -216,7 +207,7 @@ def write_routine(_maxg, file_name):
                 for s in range(len(cs[l][c])):
                     f = cs[l][c][s]
                     if abs(f) > 0.0:
-                        for g in range(0, _maxg+1):
+                        for g in range(0, _maxg + 1):
                             for geo in get_ijk_list(g):
                                 s_geo = '%i%i%i' % (geo[0], geo[1], geo[2])
                                 sfoo += '            memcpy(&%s[%i*%i + koff], &buffer[OFFSET_%02d_%02d_%02d_%s], %i*sizeof(double));\n' % (get_ao_pointer_prefix(geo), s, AO_BLOCK_LENGTH, exp[0], exp[1], exp[2], s_geo, AO_CHUNK_LENGTH)
@@ -229,20 +220,17 @@ def write_routine(_maxg, file_name):
                 for s in range(len(cs[l][c])):
                     f = cs[l][c][s]
                     if abs(f) > 0.0:
-                        for g in range(0, _maxg+1):
+                        for g in range(0, _maxg + 1):
                             for geo in get_ijk_list(g):
                                 s_geo = '%i%i%i' % (geo[0], geo[1], geo[2])
-                                sfoo += '                vec_daxpy(%20.16e, &buffer[OFFSET_%02d_%02d_%02d_%s], &%s[%i*%i + koff]);\n' % (f,
-                                                                                                                                 exp[0], exp[1], exp[2], s_geo,
-                                                                                                                                 get_ao_pointer_prefix(geo),
-                                                                                                                                 s, AO_BLOCK_LENGTH)
+                                sfoo += '                vec_daxpy(%20.16e, &buffer[OFFSET_%02d_%02d_%02d_%s], &%s[%i*%i + koff]);\n' % (f, exp[0], exp[1], exp[2], s_geo, get_ao_pointer_prefix(geo), s, AO_BLOCK_LENGTH)
                 c += 1
             sfoo += '            }\n'
             sfoo += '            else\n'
             sfoo += '            {\n'
             s = 0
             for exp in get_ijk_list(l):
-                for g in range(0, _maxg+1):
+                for g in range(0, _maxg + 1):
                     for geo in get_ijk_list(g):
                         s_geo = '%i%i%i' % (geo[0], geo[1], geo[2])
                         sfoo += '                memcpy(&%s[%i*%i + koff], &buffer[OFFSET_%02d_%02d_%02d_%s], %i*sizeof(double));\n' % (get_ao_pointer_prefix(geo), s, AO_BLOCK_LENGTH, exp[0], exp[1], exp[2], s_geo, AO_CHUNK_LENGTH)
@@ -252,9 +240,9 @@ def write_routine(_maxg, file_name):
         sfoo += '        }\n'
         sfoo += '        else\n'
         sfoo += '        {\n'
-        if l+1 < MAX_L_VALUE+1:
-            for exp in get_ijk_list(l+1):
-                for g in range(0, _maxg+1):
+        if l + 1 < MAX_L_VALUE + 1:
+            for exp in get_ijk_list(l + 1):
+                for g in range(0, _maxg + 1):
                     for geo in get_ijk_list(g):
                         if exp[0] > 0:
                             sfoo += print_line(exp, geo, 0, 'px')
@@ -274,7 +262,6 @@ def write_routine(_maxg, file_name):
     with open(file_name, 'w') as f:
         f.write(sfoo)
 
-#-------------------------------------------------------------------------------
 
 def write_aocalls(file_name):
 
@@ -299,7 +286,7 @@ def write_aocalls(file_name):
                  );
         break;'''
 
-        for g in range(0, MAX_GEO_DIFF_ORDER+1):
+        for g in range(0, MAX_GEO_DIFF_ORDER + 1):
 
             f.write('\ncase %i:\n' % g)
             f.write('    get_ao_g%i(\n' % g)
@@ -307,7 +294,7 @@ def write_aocalls(file_name):
             s2 = s1
             if g > 0:
                 j = 0
-                for _g in range(1, g+1):
+                for _g in range(1, g + 1):
                     for geo in get_ijk_list(_g):
                         j += 1
                         s2 += ',\n              &ao_local[(shell_off[ishell] + %i*num_ao)*%i]' % (j, AO_BLOCK_LENGTH)
@@ -315,7 +302,6 @@ def write_aocalls(file_name):
             f.write(s2)
             f.write(s3)
 
-#-------------------------------------------------------------------------------
 
 def write_header(file_name):
 
@@ -324,7 +310,7 @@ def write_header(file_name):
         f.write('#ifndef AUTOGENERATED_H_INCLUDED\n')
         f.write('#define AUTOGENERATED_H_INCLUDED\n\n')
 
-        for g in range(0, MAX_GEO_DIFF_ORDER+1):
+        for g in range(0, MAX_GEO_DIFF_ORDER + 1):
             f.write('void get_ao_g%i(const int    shell_l_quantum_numbers,\n' % g)
             f.write('               const int    num_primitives,\n')
             f.write('               const bool   is_spherical,\n')
@@ -341,7 +327,7 @@ def write_header(file_name):
             f.write('                     double p2[]')
 
             s = ''
-            for _g in range(g+1):
+            for _g in range(g + 1):
                 for geo in get_ijk_list(_g):
                     s += ',\n                     double ao_%i%i%i[]' % (geo[0], geo[1], geo[2])
 
@@ -350,17 +336,15 @@ def write_header(file_name):
 
         f.write('\n#endif // AUTOGENERATED_H_INCLUDED\n')
 
-#-------------------------------------------------------------------------------
 
 def main(output_directory):
     write_parameters(os.path.join(output_directory, 'parameters.h'))
     write_offsets(os.path.join(output_directory, 'offsets.h'))
-    for g in range(0, MAX_GEO_DIFF_ORDER+1):
+    for g in range(0, MAX_GEO_DIFF_ORDER + 1):
         write_routine(g, os.path.join(output_directory, 'autogenerated_%i.cpp' % g))
     write_aocalls(os.path.join(output_directory, 'aocalls.h'))
     write_header(os.path.join(output_directory, 'autogenerated.h'))
 
-#-------------------------------------------------------------------------------
 
 if __name__ == '__main__':
     main(sys.argv[1])
