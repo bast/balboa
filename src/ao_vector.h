@@ -1,5 +1,5 @@
-#ifndef ao_vector_h_
-#define ao_vector_h_
+#ifndef AO_VECTOR_H_INCLUDED
+#define AO_VECTOR_H_INCLUDED
 
 // vec r = vec p * vec a
 void get_pa(const double* __restrict__ a,
@@ -38,4 +38,4 @@ void get_p2(const double* __restrict__ shell_centers_coordinates,
 bool calculate_chunk(const double  extent_squared,
                      const double* __restrict__ p2);
 
-#endif // ao_vector_h_
+#endif // AO_VECTOR_H_INCLUDED

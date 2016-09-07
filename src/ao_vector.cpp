@@ -1,7 +1,4 @@
-
-
 #include <math.h>
-
 
 #include "ao_vector.h"
 #include "parameters.h"
