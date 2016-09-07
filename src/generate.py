@@ -46,12 +46,11 @@ def get_ao_pointer_prefix(geo):
 #-------------------------------------------------------------------------------
 
 def write_parameters(file_name):
-    f = open(file_name, 'w')
-    f.write('const int AO_BLOCK_LENGTH = %i;\n' % AO_BLOCK_LENGTH)
-    f.write('const int AO_CHUNK_LENGTH = %i;\n' % AO_CHUNK_LENGTH)
-    f.write('const int MAX_GEO_DIFF_ORDER = %i;\n' % MAX_GEO_DIFF_ORDER)
-    f.write('const int MAX_L_VALUE = %i;\n' % MAX_L_VALUE)
-    f.close()
+    with open(file_name, 'w') as f:
+        f.write('const int AO_BLOCK_LENGTH = %i;\n' % AO_BLOCK_LENGTH)
+        f.write('const int AO_CHUNK_LENGTH = %i;\n' % AO_CHUNK_LENGTH)
+        f.write('const int MAX_GEO_DIFF_ORDER = %i;\n' % MAX_GEO_DIFF_ORDER)
+        f.write('const int MAX_L_VALUE = %i;\n' % MAX_L_VALUE)
 
 #-------------------------------------------------------------------------------
 
@@ -90,9 +89,8 @@ def write_offsets(file_name):
                     offset += AO_CHUNK_LENGTH
     s += '\n#define BUFFER_LENGTH %i\n' % offset
     s += '\n#endif // offsets_h_\n'
-    f = open(file_name, 'w')
-    f.write(s)
-    f.close()
+    with open(file_name, 'w') as f:
+        f.write(s)
 
 #-------------------------------------------------------------------------------
 
@@ -273,52 +271,49 @@ def write_routine(_maxg, file_name):
     sfoo += '    }\n'
     sfoo += '\n}\n'
 
-    f = open(file_name, 'w')
-    f.write(sfoo)
-    f.close()
+    with open(file_name, 'w') as f:
+        f.write(sfoo)
 
 #-------------------------------------------------------------------------------
 
 def write_aocalls(file_name):
 
-    f = open(file_name, 'w')
+    with open(file_name, 'w') as f:
 
-    s1 = '''              shell_l_quantum_numbers[ishell],
-              shell_num_primitives[ishell],
-              is_spherical,
-              &primitive_exponents[n],
-              &contraction_coefficients[n],
-              s,
-              buffer,
-              &shell_centers_coordinates[3*ishell],
-              shell_extent_squared[ishell],
-              p,
-              px,
-              py,
-              pz,
-              p2,
-              &ao_local[shell_off[ishell]*%i]''' % AO_BLOCK_LENGTH
-    s3 = '''
-             );
-    break;'''
+        s1 = '''              shell_l_quantum_numbers[ishell],
+                  shell_num_primitives[ishell],
+                  is_spherical,
+                  &primitive_exponents[n],
+                  &contraction_coefficients[n],
+                  s,
+                  buffer,
+                  &shell_centers_coordinates[3*ishell],
+                  shell_extent_squared[ishell],
+                  p,
+                  px,
+                  py,
+                  pz,
+                  p2,
+                  &ao_local[shell_off[ishell]*%i]''' % AO_BLOCK_LENGTH
+        s3 = '''
+                 );
+        break;'''
 
-    for g in range(0, MAX_GEO_DIFF_ORDER+1):
+        for g in range(0, MAX_GEO_DIFF_ORDER+1):
 
-        f.write('\ncase %i:\n' % g)
-        f.write('    get_ao_g%i(\n' % g)
+            f.write('\ncase %i:\n' % g)
+            f.write('    get_ao_g%i(\n' % g)
 
-        s2 = s1
-        if g > 0:
-            j = 0
-            for _g in range(1, g+1):
-                for geo in get_ijk_list(_g):
-                    j += 1
-                    s2 += ',\n              &ao_local[(shell_off[ishell] + %i*num_ao)*%i]' % (j, AO_BLOCK_LENGTH)
+            s2 = s1
+            if g > 0:
+                j = 0
+                for _g in range(1, g+1):
+                    for geo in get_ijk_list(_g):
+                        j += 1
+                        s2 += ',\n              &ao_local[(shell_off[ishell] + %i*num_ao)*%i]' % (j, AO_BLOCK_LENGTH)
 
-        f.write(s2)
-        f.write(s3)
-
-    f.close()
+            f.write(s2)
+            f.write(s3)
 
 #-------------------------------------------------------------------------------
 
