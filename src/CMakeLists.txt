@@ -17,8 +17,6 @@ add_library(
     SHARED
     Main.cpp
     Main.h
-    MemAllocator.cpp
-    MemAllocator.h
     ao_vector.cpp
     ao_vector.h
     ${_generated_files}
