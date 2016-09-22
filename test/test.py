@@ -123,20 +123,20 @@ def test_balboa():
     l = balboa.get_buffer_len(context, max_geo_order, num_points)
 
     # allocate a numpy array of length l and zero it out
-    buf = np.zeros(l, dtype=np.float64)
+    ao = np.zeros(l, dtype=np.float64)
 
     # cast a pointer which points to the numpy array data
     ffi = FFI()
-    p_buf = ffi.cast("double *", buf.ctypes.data)
+    ao_p = ffi.cast("double *", ao.ctypes.data)
 
     ierr = balboa.get_ao(context,
                          max_geo_order,
                          num_points,
                          p,
-                         p_buf)
+                         ao_p)
 
     for i, ref_ao in enumerate(ref_aos):
-        error = buf[i] - ref_ao
+        error = ao[i] - ref_ao
         if abs(ref_ao) > 1.0e-20:
             error /= ref_ao
         assert abs(error) < 1.0e-14
