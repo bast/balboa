@@ -118,25 +118,29 @@ def test_balboa():
         for line in f.readlines():
             ref_aos.append(float(line))
 
-    max_geo_order = 0
+    max_geo_order = 1
 
     l = balboa.get_buffer_len(context, max_geo_order, num_points)
 
     # allocate a numpy array of length l and zero it out
-    ao = np.zeros(l, dtype=np.float64)
+    aos = np.zeros(l, dtype=np.float64)
 
     # cast a pointer which points to the numpy array data
     ffi = FFI()
-    ao_p = ffi.cast("double *", ao.ctypes.data)
+    aos_p = ffi.cast("double *", aos.ctypes.data)
 
     ierr = balboa.get_ao(context,
                          max_geo_order,
                          num_points,
                          p,
-                         ao_p)
+                         aos_p)
+
+#   with open(os.path.join(dir_path, 'result.txt'), 'w') as f:
+#       for ao in aos:
+#           f.write('{0}\n'.format(ao))
 
     for i, ref_ao in enumerate(ref_aos):
-        error = ao[i] - ref_ao
+        error = aos[i] - ref_ao
         if abs(ref_ao) > 1.0e-20:
             error /= ref_ao
         assert abs(error) < 1.0e-14
