@@ -17,11 +17,11 @@ PROJECT_BUILD_DIR=$PWD/build PROJECT_INCLUDE_DIR=$PWD/api PYTHONPATH=$PWD/api py
 
 ### Ordering of AOs
 
-Let us assume that we have N basis functions and a block size of B:
+Let us assume that we have N basis functions and P points.
 
 
 ```
-[   geo_000                          ][ geo_100 ][ geo_010 ][ geo_001 ] ...
-[   ao_1  ][   ao_2  ] ... [   ao_N  ]
-[ 1 ... B ][ 1 ... B ] ... [ 1 ... B ]
+[ geo_000 (undifferentiated)         ][ geo_100 ][ geo_010 ][ geo_001 ] ...
+[ ao_1    ][ ao_2    ] ... [ ao_3    ]
+[ 1 ... P ][ 1 ... P ] ... [ 1 ... P ]
 ```
