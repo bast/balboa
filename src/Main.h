@@ -48,11 +48,6 @@ class Main
 
         void transform_basis() const;
 
-        int  get_geo_off(const int i,
-                         const int j,
-                         const int k) const;
-        void set_geo_off(const int geo_diff_order);
-
         int     num_centers;
         int     num_shells;
         int    *shell_l_quantum_numbers;
@@ -72,8 +67,6 @@ class Main
         int     num_ao_spherical;
         int     num_ao_slices;
         int    *ao_center;
-        int     geo_diff_order;
-        int    *geo_off;
         double *contraction_coefficients;
         int     is_initialized;
 };

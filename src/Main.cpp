@@ -248,8 +248,6 @@ int Main::set_basis(const int    in_basis_type,
        i += deg;
     }
 
-    set_geo_off(MAX_GEO_DIFF_ORDER); // FIXME
-
     is_initialized = 12345678;
 
     return 0;
@@ -311,8 +309,6 @@ void Main::nullify()
     num_ao_spherical          = -1;
     ao_center                 = NULL;
     shell_num_primitives      = NULL;
-    geo_diff_order            = -1;
-    geo_off                   = NULL;
     primitive_exponents       = NULL;
     contraction_coefficients  = NULL;
     is_initialized            = 0;
@@ -360,50 +356,6 @@ void Main::deallocate()
     delete[] spherical_deg;
     delete[] ao_center;
     delete[] shell_num_primitives;
-    delete[] geo_off;
     delete[] primitive_exponents;
     delete[] contraction_coefficients;
-}
-
-
-void Main::set_geo_off(const int g)
-{
-    int i, j, k, m, id;
-    int array_length = (int)pow(g + 1, 3);
-
-    geo_diff_order = g;
-
-    geo_off = new int[array_length];
-
-    m = 0;
-    for (int l = 0; l <= g; l++)
-    {
-        for (int a = 1; a <= (l + 1); a++)
-        {
-            for (int b = 1; b <= a; b++)
-            {
-                i = l + 1 - a;
-                j = a - b;
-                k = b - 1;
-
-                id  = (g + 1)*(g + 1)*k;
-                id += (g + 1)*j;
-                id += i;
-                geo_off[id] = m*num_ao;
-
-                m++;
-            }
-        }
-    }
-}
-
-
-int Main::get_geo_off(const int i, const int j, const int k) const
-{
-    int id;
-    // FIXME add guard against going past the array
-    id  = (geo_diff_order + 1)*(geo_diff_order + 1)*k;
-    id += (geo_diff_order + 1)*j;
-    id += i;
-    return geo_off[id];
 }
