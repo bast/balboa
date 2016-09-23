@@ -23,8 +23,8 @@ start building some hurtin' bombs!" [Rocky Balboa]
 ### Requirements and dependencies
 
 - C and C++ compilers
-- CMake
-- Python
+- [CMake](https://cmake.org)
+- [Python](https://www.python.org)
 
 For testing:
 
