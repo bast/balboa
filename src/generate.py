@@ -28,7 +28,7 @@ def test_get_exp_offset_dict():
 
 
 def get_ao_pointer_prefix(geo):
-    return 'ao_%i%i%i' % (geo[0], geo[1], geo[2])
+    return 'ao_{0}{1}{2}'.format(geo[0], geo[1], geo[2])
 
 
 def print_line(exp, geo, m, r):
