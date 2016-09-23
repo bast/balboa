@@ -247,7 +247,7 @@ def write_aocalls(file_name, max_geo_diff_order):
                   buffer,
                   &shell_centers_coordinates[3*ishell],
                   shell_extent_squared[ishell],
-                  &p[4*koff],
+                  p_block,
                   px,
                   py,
                   pz,
