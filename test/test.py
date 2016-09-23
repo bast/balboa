@@ -120,6 +120,8 @@ def test_balboa():
 
     max_geo_order = 1
 
+    # buffer length is adjusted for number of cartesian aos
+    # so possibly longer than the number of spherical aos
     l = balboa.get_buffer_len(context, max_geo_order, num_points)
 
     # allocate a numpy array of length l and zero it out
