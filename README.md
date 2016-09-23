@@ -5,8 +5,6 @@
 Balboa computes Gaussian basis functions and their geometric derivatives for a
 batch of points in space.
 
-Experimental code. Under heavy development, nothing is stable.
-
 ```
 "You know all there is to know about fighting, so there's no sense us going down
 that same old road again. To beat this guy, you need speed - you don't have it.
@@ -18,6 +16,13 @@ have to hurt so much they'll rattle his ancestors. Every time you hit him with
 a shot, it's gotta feel like he tried kissing the express train. Yeah! Let's
 start building some hurtin' bombs!" [Rocky Balboa]
 ```
+
+
+### Status
+
+Experimental code.
+Under heavy development.
+Nothing is stable.
 
 
 ### Requirements and dependencies
