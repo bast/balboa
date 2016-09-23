@@ -21,7 +21,6 @@ context_t *new_context()
 Main::Main()
 {
     nullify();
-    assert(AO_BLOCK_LENGTH%AO_CHUNK_LENGTH == 0);
 }
 
 
@@ -333,18 +332,11 @@ void Main::get_ao_shell(const int    ishell,
         n += shell_num_primitives[jshell];
     }
 
-    int num_points_batch;
     int num_points_left = num_points;
+
     for (int koff = 0; koff < num_points; koff += AO_CHUNK_LENGTH)
     {
-        if (num_points_left >= AO_CHUNK_LENGTH)
-        {
-            num_points_batch = AO_CHUNK_LENGTH;
-        }
-        else
-        {
-            num_points_batch = num_points_left;
-        }
+        int num_points_batch = std::min(AO_CHUNK_LENGTH, num_points_left);
 
         num_points_left -= num_points_batch;
 
