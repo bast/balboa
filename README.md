@@ -16,6 +16,7 @@ a shot, it's gotta feel like he tried kissing the express train. Yeah! Let's
 start building some hurtin' bombs!" [Rocky Balboa]
 ```
 
+
 ### Requirements and dependencies
 
 - C and C++ compilers
@@ -29,6 +30,18 @@ For testing:
 - [Numpy](http://www.numpy.org)
 
 
+### Installation
+
+```
+virtualenv venv
+source venv/bin/activate
+pip install -r requirements.txt
+./setup
+cd build
+make
+```
+
+
 ### Testing
 
 ```
@@ -38,7 +51,8 @@ PROJECT_BUILD_DIR=$PWD/build PROJECT_INCLUDE_DIR=$PWD/api PYTHONPATH=$PWD/api py
 ### TODO
 
 - Get rid of AO_BLOCK_LENGTH; make block length flexible
-- Describe installation, configuration, and API
+- Document API
+
 
 ### Ordering of AOs
 
