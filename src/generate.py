@@ -9,6 +9,10 @@ def get_ijk_list(m):
     return l
 
 
+def test_get_ijk_list():
+    assert get_ijk_list(3) == [[3, 0, 0], [2, 1, 0], [2, 0, 1], [1, 2, 0], [1, 1, 1], [1, 0, 2], [0, 3, 0], [0, 2, 1], [0, 1, 2], [0, 0, 3]]
+
+
 def get_exp_offset(exp):
     return exp_offset[tuple(exp)]
 
