@@ -333,13 +333,16 @@ void Main::get_ao_shell(const int    ishell,
         n += shell_num_primitives[jshell];
     }
 
-    switch (max_geo_order)
+    for (int koff = 0; koff < AO_BLOCK_LENGTH; koff += AO_CHUNK_LENGTH)
     {
-        #include "aocalls.h"
-        default:
-            std::cout << "ERROR: get_ao order too high\n";
-            exit(1);
-            break;
+        switch (max_geo_order)
+        {
+            #include "aocalls.h"
+            default:
+                std::cout << "ERROR: get_ao order too high\n";
+                exit(1);
+                break;
+        }
     }
 }
 

@@ -113,18 +113,15 @@ def write_routine(_maxg, file_name, max_l_value, ao_chunk_length, ao_block_lengt
     sfoo += '    double a;\n'
     sfoo += '    double c;\n\n'
 
-    sfoo += '    for (int koff = 0; koff < %i; koff += %i)\n' % (ao_block_length, ao_chunk_length)
-    sfoo += '    {\n'
-
     sfoo += '        get_p2(shell_centers_coordinates,\n'
-    sfoo += '               &pw[4*koff],\n'
+    sfoo += '               pw,\n'
     sfoo += '               px,\n'
     sfoo += '               py,\n'
     sfoo += '               pz,\n'
     sfoo += '               p2);\n\n'
 
     sfoo += '        // screening\n'
-    sfoo += '        if (not calculate_chunk(extent_squared, p2)) continue;\n\n'
+    sfoo += '        if (not calculate_chunk(extent_squared, p2)) return;\n\n'
 
     array = 'buffer[OFFSET_00_00_00_000]'
     sfoo += '        memset(&%s, 0, %i*sizeof(double));\n' % (array, ao_chunk_length)
@@ -183,7 +180,7 @@ def write_routine(_maxg, file_name, max_l_value, ao_chunk_length, ao_block_lengt
                         for g in range(0, _maxg + 1):
                             for geo in get_ijk_list(g):
                                 s_geo = '%i%i%i' % (geo[0], geo[1], geo[2])
-                                sfoo += '            memcpy(&%s[%i*%i + koff], &buffer[OFFSET_%02d_%02d_%02d_%s], %i*sizeof(double));\n' % (get_ao_pointer_prefix(geo), s, ao_block_length, exp[0], exp[1], exp[2], s_geo, ao_chunk_length)
+                                sfoo += '            memcpy(&%s[%i*%i], &buffer[OFFSET_%02d_%02d_%02d_%s], %i*sizeof(double));\n' % (get_ao_pointer_prefix(geo), s, ao_block_length, exp[0], exp[1], exp[2], s_geo, ao_chunk_length)
                 c += 1
         else:
             sfoo += '            if (is_spherical)\n'
@@ -196,7 +193,7 @@ def write_routine(_maxg, file_name, max_l_value, ao_chunk_length, ao_block_lengt
                         for g in range(0, _maxg + 1):
                             for geo in get_ijk_list(g):
                                 s_geo = '%i%i%i' % (geo[0], geo[1], geo[2])
-                                sfoo += '                vec_daxpy(%20.16e, &buffer[OFFSET_%02d_%02d_%02d_%s], &%s[%i*%i + koff]);\n' % (f, exp[0], exp[1], exp[2], s_geo, get_ao_pointer_prefix(geo), s, ao_block_length)
+                                sfoo += '                vec_daxpy(%20.16e, &buffer[OFFSET_%02d_%02d_%02d_%s], &%s[%i*%i]);\n' % (f, exp[0], exp[1], exp[2], s_geo, get_ao_pointer_prefix(geo), s, ao_block_length)
                 c += 1
             sfoo += '            }\n'
             sfoo += '            else\n'
@@ -206,10 +203,10 @@ def write_routine(_maxg, file_name, max_l_value, ao_chunk_length, ao_block_lengt
                 for g in range(0, _maxg + 1):
                     for geo in get_ijk_list(g):
                         s_geo = '%i%i%i' % (geo[0], geo[1], geo[2])
-                        sfoo += '                memcpy(&%s[%i*%i + koff], &buffer[OFFSET_%02d_%02d_%02d_%s], %i*sizeof(double));\n' % (get_ao_pointer_prefix(geo), s, ao_block_length, exp[0], exp[1], exp[2], s_geo, ao_chunk_length)
+                        sfoo += '                memcpy(&%s[%i*%i], &buffer[OFFSET_%02d_%02d_%02d_%s], %i*sizeof(double));\n' % (get_ao_pointer_prefix(geo), s, ao_block_length, exp[0], exp[1], exp[2], s_geo, ao_chunk_length)
                 s += 1
             sfoo += '            }\n'
-        sfoo += '            continue;\n'
+        sfoo += '            return;\n'
         sfoo += '        }\n'
         sfoo += '        else\n'
         sfoo += '        {\n'
@@ -229,7 +226,6 @@ def write_routine(_maxg, file_name, max_l_value, ao_chunk_length, ao_block_lengt
             sfoo += '             std::cout << "error: order too high";\n'
             sfoo += '             exit(1);\n'
         sfoo += '        }\n'
-    sfoo += '    }\n'
     sfoo += '\n}\n'
 
     with open(file_name, 'w') as f:
@@ -249,12 +245,12 @@ def write_aocalls(file_name, ao_block_length, max_geo_diff_order):
                   buffer,
                   &shell_centers_coordinates[3*ishell],
                   shell_extent_squared[ishell],
-                  p,
+                  &p[4*koff],
                   px,
                   py,
                   pz,
                   p2,
-                  &ao_local[shell_off[ishell]*%i]''' % ao_block_length
+                  &ao_local[koff + shell_off[ishell]*%i]''' % ao_block_length
         s3 = '''
                  );
         break;'''
@@ -270,7 +266,7 @@ def write_aocalls(file_name, ao_block_length, max_geo_diff_order):
                 for _g in range(1, g + 1):
                     for geo in get_ijk_list(_g):
                         j += 1
-                        s2 += ',\n              &ao_local[(shell_off[ishell] + %i*num_ao)*%i]' % (j, ao_block_length)
+                        s2 += ',\n              &ao_local[koff + (shell_off[ishell] + %i*num_ao)*%i]' % (j, ao_block_length)
 
             f.write(s2)
             f.write(s3)
