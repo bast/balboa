@@ -24,6 +24,7 @@ script:
   - cd ..
   - pep8 test/test.py
   - PROJECT_BUILD_DIR=$PWD/build PROJECT_INCLUDE_DIR=$PWD/api PYTHONPATH=$PWD/api py.test -s -vv test/test.py
+  - py.test -s -vv src/generate.py
 
 notifications:
   email: false
