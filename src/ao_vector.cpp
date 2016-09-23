@@ -5,9 +5,24 @@
 
 
 // vec r = vec p * vec a
-void get_pa(const double* __restrict__ a,
+void get_pa(const int num_points,
+            const double* __restrict__ a,
             const double* __restrict__ p,
                   double* __restrict__ r)
+{
+    #pragma ivdep
+    #pragma vector aligned
+    for (int k = 0; k < num_points; k++)
+    {
+        r[k] = p[k]*a[k];
+    }
+}
+
+
+// vec r = vec p * vec a
+void get_pa_block(const double* __restrict__ a,
+                  const double* __restrict__ p,
+                        double* __restrict__ r)
 {
     #pragma ivdep
     #pragma vector aligned
@@ -19,10 +34,26 @@ void get_pa(const double* __restrict__ a,
 
 
 // vec r = vec p * vec a + vec b
-void get_pa_plus_b(const double* __restrict__ a,
+void get_pa_plus_b(const int num_points,
+                   const double* __restrict__ a,
                    const double* __restrict__ p,
                    const double* __restrict__ b,
                          double* __restrict__ r)
+{
+    #pragma ivdep
+    #pragma vector aligned
+    for (int k = 0; k < num_points; k++)
+    {
+        r[k] = p[k]*a[k] + b[k];
+    }
+}
+
+
+// vec r = vec p * vec a + vec b
+void get_pa_plus_b_block(const double* __restrict__ a,
+                         const double* __restrict__ p,
+                         const double* __restrict__ b,
+                               double* __restrict__ r)
 {
     #pragma ivdep
     #pragma vector aligned
@@ -34,11 +65,28 @@ void get_pa_plus_b(const double* __restrict__ a,
 
 
 // vec r = vec p * vec a + s * vec b
-void get_pa_plus_sb(const double* __restrict__ a,
+void get_pa_plus_sb(const int num_points,
+                    const double* __restrict__ a,
                     const double* __restrict__ p,
                     const double  s,
                     const double* __restrict__ b,
                           double* __restrict__ r)
+{
+    #pragma ivdep
+    #pragma vector aligned
+    for (int k = 0; k < num_points; k++)
+    {
+        r[k] = p[k]*a[k] + s*b[k];
+    }
+}
+
+
+// vec r = vec p * vec a + s * vec b
+void get_pa_plus_sb_block(const double* __restrict__ a,
+                          const double* __restrict__ p,
+                          const double  s,
+                          const double* __restrict__ b,
+                                double* __restrict__ r)
 {
     #pragma ivdep
     #pragma vector aligned
@@ -49,10 +97,29 @@ void get_pa_plus_sb(const double* __restrict__ a,
 }
 
 
-void get_exp(const double* __restrict__ p2,
+void get_exp(const int num_points,
+             const double* __restrict__ p2,
              const double  c,
              const double  a,
                    double* __restrict__ s)
+{
+    double b1, b2;
+
+    #pragma ivdep
+    #pragma vector aligned
+    for (int k = 0; k < num_points; k++)
+    {
+        b1 = a*p2[k];
+        b2 = exp(b1);
+        s[k] = c*b2;
+    }
+}
+
+
+void get_exp_block(const double* __restrict__ p2,
+                   const double  c,
+                   const double  a,
+                         double* __restrict__ s)
 {
     double b1, b2;
 
@@ -67,9 +134,23 @@ void get_exp(const double* __restrict__ p2,
 }
 
 
-void vec_daxpy(const double  s,
+void vec_daxpy(const int num_points,
+               const double  s,
                const double* __restrict__ a,
                      double* __restrict__ r)
+{
+    #pragma ivdep
+    #pragma vector aligned
+    for (int k = 0; k < num_points; k++)
+    {
+        r[k] += s*a[k];
+    }
+}
+
+
+void vec_daxpy_block(const double  s,
+                     const double* __restrict__ a,
+                           double* __restrict__ r)
 {
     #pragma ivdep
     #pragma vector aligned
@@ -80,12 +161,32 @@ void vec_daxpy(const double  s,
 }
 
 
-void get_p2(const double* __restrict__ shell_centers_coordinates,
+void get_p2(const int num_points,
+            const double* __restrict__ shell_centers_coordinates,
             const double* __restrict__ pw,
                   double* __restrict__ px,
                   double* __restrict__ py,
                   double* __restrict__ pz,
                   double* __restrict__ p2)
+{
+    #pragma ivdep
+    #pragma vector aligned
+    for (int k = 0; k < num_points; k++)
+    {
+        px[k] = pw[k*4    ] - shell_centers_coordinates[0];
+        py[k] = pw[k*4 + 1] - shell_centers_coordinates[1];
+        pz[k] = pw[k*4 + 2] - shell_centers_coordinates[2];
+        p2[k] = px[k]*px[k] + py[k]*py[k] + pz[k]*pz[k];
+    }
+}
+
+
+void get_p2_block(const double* __restrict__ shell_centers_coordinates,
+                  const double* __restrict__ pw,
+                        double* __restrict__ px,
+                        double* __restrict__ py,
+                        double* __restrict__ pz,
+                        double* __restrict__ p2)
 {
     #pragma ivdep
     #pragma vector aligned
@@ -99,8 +200,23 @@ void get_p2(const double* __restrict__ shell_centers_coordinates,
 }
 
 
-bool calculate_chunk(const double  extent_squared,
+bool calculate_chunk(const int num_points,
+                     const double  extent_squared,
                      const double* __restrict__ p2)
+{
+    for (int k = 0; k < num_points; k++)
+    {
+        if (p2[k] < extent_squared)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+bool calculate_chunk_block(const double  extent_squared,
+                           const double* __restrict__ p2)
 {
     for (int k = 0; k < AO_CHUNK_LENGTH; k++)
     {

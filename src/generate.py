@@ -31,11 +31,11 @@ def print_line(exp, geo, m, r):
         geo_right[m] -= 1
         vec_b = 'buffer[OFFSET_%02d_%02d_%02d_%i%i%i]' % (exp_right[0], exp_right[1], exp_right[2], geo_right[0], geo_right[1], geo_right[2])
         if geo[m] > 1:
-            return '            get_pa_plus_sb(&%s, %s, %i.0, &%s, &%s);\n' % (vec_a, vec_p, geo[m], vec_b, vec_r)
+            return '            get_pa_plus_sb_block(&%s, %s, %i.0, &%s, &%s);\n' % (vec_a, vec_p, geo[m], vec_b, vec_r)
         else:
-            return '            get_pa_plus_b(&%s, %s, &%s, &%s);\n' % (vec_a, vec_p, vec_b, vec_r)
+            return '            get_pa_plus_b_block(&%s, %s, &%s, &%s);\n' % (vec_a, vec_p, vec_b, vec_r)
     else:
-        return '            get_pa(&%s, %s, &%s);\n' % (vec_a, vec_p, vec_r)
+        return '            get_pa_block(&%s, %s, &%s);\n' % (vec_a, vec_p, vec_r)
 
 
 def write_offsets(file_name, max_l_value, ao_chunk_length, max_geo_diff_order):
@@ -114,15 +114,15 @@ def write_routine(_maxg, file_name, max_l_value, ao_chunk_length, max_geo_diff_o
     sfoo += '    double a;\n'
     sfoo += '    double c;\n\n'
 
-    sfoo += '        get_p2(shell_centers_coordinates,\n'
-    sfoo += '               pw,\n'
-    sfoo += '               px,\n'
-    sfoo += '               py,\n'
-    sfoo += '               pz,\n'
-    sfoo += '               p2);\n\n'
+    sfoo += '        get_p2_block(shell_centers_coordinates,\n'
+    sfoo += '                     pw,\n'
+    sfoo += '                     px,\n'
+    sfoo += '                     py,\n'
+    sfoo += '                     pz,\n'
+    sfoo += '                     p2);\n\n'
 
     sfoo += '        // screening\n'
-    sfoo += '        if (not calculate_chunk(extent_squared, p2)) return;\n\n'
+    sfoo += '        if (not calculate_chunk_block(extent_squared, p2)) return;\n\n'
 
     array = 'buffer[OFFSET_00_00_00_000]'
     sfoo += '        memset(&%s, 0, %i*sizeof(double));\n' % (array, ao_chunk_length)
@@ -137,7 +137,7 @@ def write_routine(_maxg, file_name, max_l_value, ao_chunk_length, max_geo_diff_o
             a = -primitive_exponents[i];
             c = contraction_coefficients[i];
 
-            get_exp(p2, c, a, s);
+            get_exp_block(p2, c, a, s);
 
             #pragma ivdep
             #pragma vector aligned
@@ -194,7 +194,7 @@ def write_routine(_maxg, file_name, max_l_value, ao_chunk_length, max_geo_diff_o
                         for g in range(0, _maxg + 1):
                             for geo in get_ijk_list(g):
                                 s_geo = '%i%i%i' % (geo[0], geo[1], geo[2])
-                                sfoo += '                vec_daxpy(%20.16e, &buffer[OFFSET_%02d_%02d_%02d_%s], &%s[%i*num_points]);\n' % (f, exp[0], exp[1], exp[2], s_geo, get_ao_pointer_prefix(geo), s)
+                                sfoo += '                vec_daxpy_block(%20.16e, &buffer[OFFSET_%02d_%02d_%02d_%s], &%s[%i*num_points]);\n' % (f, exp[0], exp[1], exp[2], s_geo, get_ao_pointer_prefix(geo), s)
                 c += 1
             sfoo += '            }\n'
             sfoo += '            else\n'
