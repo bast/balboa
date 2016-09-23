@@ -16,6 +16,19 @@ a shot, it's gotta feel like he tried kissing the express train. Yeah! Let's
 start building some hurtin' bombs!" [Rocky Balboa]
 ```
 
+### Requirements and dependencies
+
+- C and C++ compilers
+- CMake
+- Python
+
+For testing:
+
+- [CFFI](https://cffi.readthedocs.io)
+- [Pytest](http://doc.pytest.org)
+- [Numpy](http://www.numpy.org)
+
+
 ### Testing
 
 ```
@@ -30,7 +43,6 @@ PROJECT_BUILD_DIR=$PWD/build PROJECT_INCLUDE_DIR=$PWD/api PYTHONPATH=$PWD/api py
 ### Ordering of AOs
 
 Let us assume that we have N basis functions and P points.
-
 
 ```
 [ geo_000 (undifferentiated)         ][ geo_100 ][ geo_010 ][ geo_001 ] ...
