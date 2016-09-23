@@ -57,9 +57,9 @@ def get_ao_pointer_prefix(geo):
     return 'ao_{0}{1}{2}'.format(geo[0], geo[1], geo[2])
 
 
-def write_offsets(max_l_value, ao_chunk_length, max_geo_diff_order):
+def get_offsets(max_l_value, ao_chunk_length, max_geo_diff_order):
 
-    s = '#ifndef offsets_h_\n#define offsets_h_\n\n'
+    s = '#ifndef OFFSETS_H_INCLUDED\n#define offsets_h_\n\n'
     offset = 0
     for l in range(0, max_l_value + 1):
         for exp in get_ijk_list(l):
@@ -69,7 +69,7 @@ def write_offsets(max_l_value, ao_chunk_length, max_geo_diff_order):
                     s += '#define OFFSET_%02d_%02d_%02d_%s %i\n' % (exp[0], exp[1], exp[2], s_geo, offset)
                     offset += ao_chunk_length
     s += '\n#define BUFFER_LENGTH %i\n' % offset
-    s += '\n#endif // offsets_h_\n'
+    s += '\n#endif // OFFSETS_H_INCLUDED\n'
     return s
 
 
@@ -333,7 +333,7 @@ def main(output_directory, max_l_value, ao_chunk_length, max_geo_diff_order):
     exp_offset = get_exp_offset_dict(max_l_value)
 
     with open(os.path.join(output_directory, 'offsets.h'), 'w') as f:
-        f.write(write_offsets(max_l_value, ao_chunk_length, max_geo_diff_order))
+        f.write(get_offsets(max_l_value, ao_chunk_length, max_geo_diff_order))
 
 
     for g in range(0, max_geo_diff_order + 1):
