@@ -55,7 +55,7 @@ def write_offsets(file_name, max_l_value, ao_chunk_length, max_geo_diff_order):
         f.write(s)
 
 
-def write_routine(_maxg, file_name, max_l_value, ao_chunk_length, ao_block_length, max_geo_diff_order):
+def write_routine(_maxg, file_name, max_l_value, ao_chunk_length, max_geo_diff_order):
     import cs_trans
 
     cs = cs_trans.get_cs_trans(max_l_value)
@@ -79,6 +79,7 @@ def write_routine(_maxg, file_name, max_l_value, ao_chunk_length, ao_block_lengt
                const bool   is_spherical,
                const double primitive_exponents[],
                const double contraction_coefficients[],
+               const int    num_points,
                      double s[],
                      double buffer[],
                const double shell_centers_coordinates[],
@@ -180,7 +181,7 @@ def write_routine(_maxg, file_name, max_l_value, ao_chunk_length, ao_block_lengt
                         for g in range(0, _maxg + 1):
                             for geo in get_ijk_list(g):
                                 s_geo = '%i%i%i' % (geo[0], geo[1], geo[2])
-                                sfoo += '            memcpy(&%s[%i*%i], &buffer[OFFSET_%02d_%02d_%02d_%s], %i*sizeof(double));\n' % (get_ao_pointer_prefix(geo), s, ao_block_length, exp[0], exp[1], exp[2], s_geo, ao_chunk_length)
+                                sfoo += '            memcpy(&%s[%i*num_points], &buffer[OFFSET_%02d_%02d_%02d_%s], %i*sizeof(double));\n' % (get_ao_pointer_prefix(geo), s, exp[0], exp[1], exp[2], s_geo, ao_chunk_length)
                 c += 1
         else:
             sfoo += '            if (is_spherical)\n'
@@ -193,7 +194,7 @@ def write_routine(_maxg, file_name, max_l_value, ao_chunk_length, ao_block_lengt
                         for g in range(0, _maxg + 1):
                             for geo in get_ijk_list(g):
                                 s_geo = '%i%i%i' % (geo[0], geo[1], geo[2])
-                                sfoo += '                vec_daxpy(%20.16e, &buffer[OFFSET_%02d_%02d_%02d_%s], &%s[%i*%i]);\n' % (f, exp[0], exp[1], exp[2], s_geo, get_ao_pointer_prefix(geo), s, ao_block_length)
+                                sfoo += '                vec_daxpy(%20.16e, &buffer[OFFSET_%02d_%02d_%02d_%s], &%s[%i*num_points]);\n' % (f, exp[0], exp[1], exp[2], s_geo, get_ao_pointer_prefix(geo), s)
                 c += 1
             sfoo += '            }\n'
             sfoo += '            else\n'
@@ -203,7 +204,7 @@ def write_routine(_maxg, file_name, max_l_value, ao_chunk_length, ao_block_lengt
                 for g in range(0, _maxg + 1):
                     for geo in get_ijk_list(g):
                         s_geo = '%i%i%i' % (geo[0], geo[1], geo[2])
-                        sfoo += '                memcpy(&%s[%i*%i], &buffer[OFFSET_%02d_%02d_%02d_%s], %i*sizeof(double));\n' % (get_ao_pointer_prefix(geo), s, ao_block_length, exp[0], exp[1], exp[2], s_geo, ao_chunk_length)
+                        sfoo += '                memcpy(&%s[%i*num_points], &buffer[OFFSET_%02d_%02d_%02d_%s], %i*sizeof(double));\n' % (get_ao_pointer_prefix(geo), s, exp[0], exp[1], exp[2], s_geo, ao_chunk_length)
                 s += 1
             sfoo += '            }\n'
         sfoo += '            return;\n'
@@ -232,7 +233,7 @@ def write_routine(_maxg, file_name, max_l_value, ao_chunk_length, ao_block_lengt
         f.write(sfoo)
 
 
-def write_aocalls(file_name, ao_block_length, max_geo_diff_order):
+def write_aocalls(file_name, max_geo_diff_order):
 
     with open(file_name, 'w') as f:
 
@@ -241,6 +242,7 @@ def write_aocalls(file_name, ao_block_length, max_geo_diff_order):
                   is_spherical,
                   &primitive_exponents[n],
                   &contraction_coefficients[n],
+                  num_points,
                   s,
                   buffer,
                   &shell_centers_coordinates[3*ishell],
@@ -250,7 +252,7 @@ def write_aocalls(file_name, ao_block_length, max_geo_diff_order):
                   py,
                   pz,
                   p2,
-                  &ao_local[koff + shell_off[ishell]*%i]''' % ao_block_length
+                  &ao_local[koff + shell_off[ishell]*num_points]'''
         s3 = '''
                  );
         break;'''
@@ -266,7 +268,7 @@ def write_aocalls(file_name, ao_block_length, max_geo_diff_order):
                 for _g in range(1, g + 1):
                     for geo in get_ijk_list(_g):
                         j += 1
-                        s2 += ',\n              &ao_local[koff + (shell_off[ishell] + %i*num_ao)*%i]' % (j, ao_block_length)
+                        s2 += ',\n              &ao_local[koff + (shell_off[ishell] + %i*num_ao)*num_points]' % j
 
             f.write(s2)
             f.write(s3)
@@ -285,6 +287,7 @@ def write_header(file_name, max_geo_diff_order):
             f.write('               const bool   is_spherical,\n')
             f.write('               const double primitive_exponents[],\n')
             f.write('               const double contraction_coefficients[],\n')
+            f.write('               const int    num_points,\n')
             f.write('                     double s[],\n')
             f.write('                     double buffer[],\n')
             f.write('               const double shell_centers_coordinates[],\n')
@@ -306,7 +309,7 @@ def write_header(file_name, max_geo_diff_order):
         f.write('\n#endif // AUTOGENERATED_H_INCLUDED\n')
 
 
-def main(output_directory, max_l_value, ao_chunk_length, ao_block_length, max_geo_diff_order):
+def main(output_directory, max_l_value, ao_chunk_length, max_geo_diff_order):
     import os
 
     exp_offset = {}
@@ -318,11 +321,11 @@ def main(output_directory, max_l_value, ao_chunk_length, ao_block_length, max_ge
 
     write_offsets(os.path.join(output_directory, 'offsets.h'), max_l_value, ao_chunk_length, max_geo_diff_order)
     for g in range(0, max_geo_diff_order + 1):
-        write_routine(g, os.path.join(output_directory, 'autogenerated_%i.cpp' % g), max_l_value, ao_chunk_length, ao_block_length, max_geo_diff_order)
-    write_aocalls(os.path.join(output_directory, 'aocalls.h'), ao_block_length, max_geo_diff_order)
+        write_routine(g, os.path.join(output_directory, 'autogenerated_%i.cpp' % g), max_l_value, ao_chunk_length, max_geo_diff_order)
+    write_aocalls(os.path.join(output_directory, 'aocalls.h'), max_geo_diff_order)
     write_header(os.path.join(output_directory, 'autogenerated.h'), max_geo_diff_order)
 
 
 if __name__ == '__main__':
     import sys
-    main(sys.argv[1], int(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4]), int(sys.argv[5]))
+    main(sys.argv[1], int(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4]))

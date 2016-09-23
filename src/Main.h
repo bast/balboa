@@ -38,6 +38,7 @@ class Main
         void deallocate();
 
         void get_ao_shell(const int    ishell,
+                          const int    num_points,
                                 double ao_local[],
                           const int    max_geo_order,
                           const double p[]) const;

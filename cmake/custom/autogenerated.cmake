@@ -13,7 +13,6 @@ add_custom_command(
                              ${PROJECT_BINARY_DIR}/generated
                              ${MAX_L_VALUE}
                              ${AO_CHUNK_LENGTH}
-                             ${AO_BLOCK_LENGTH}
                              ${MAX_GEO_DIFF_ORDER}
     WORKING_DIRECTORY
         ${PROJECT_SOURCE_DIR}/src

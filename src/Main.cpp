@@ -282,6 +282,7 @@ int Main::get_ao(const int    max_geo_order,
     for (int ishell = 0; ishell < num_shells; ishell++)
     {
         get_ao_shell(ishell,
+                     num_points,
                      buffer,
                      max_geo_order,
                      p_block);
@@ -316,6 +317,7 @@ void Main::nullify()
 
 
 void Main::get_ao_shell(const int    ishell,
+                        const int    num_points,
                               double ao_local[],
                         const int    max_geo_order,
                         const double p[]) const
