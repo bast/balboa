@@ -2,6 +2,9 @@
 
 # balboa
 
+Balboa computes Gaussian basis functions and their geometric derivatives for a
+batch of points in space.
+
 Experimental code. Under heavy development, nothing is stable.
 
 ```
