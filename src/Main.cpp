@@ -333,10 +333,23 @@ void Main::get_ao_shell(const int    ishell,
         n += shell_num_primitives[jshell];
     }
 
-    for (int koff = 0; koff < AO_BLOCK_LENGTH; koff += AO_CHUNK_LENGTH)
+    int num_points_batch;
+    int num_points_left = num_points;
+    for (int koff = 0; koff < num_points; koff += AO_CHUNK_LENGTH)
     {
+        if (num_points_left >= AO_CHUNK_LENGTH)
+        {
+            num_points_batch = AO_CHUNK_LENGTH;
+        }
+        else
+        {
+            num_points_batch = num_points_left;
+        }
+
+        num_points_left -= num_points_batch;
+
         std::fill(&p_block[0], &p_block[4*AO_CHUNK_LENGTH], 1.0e50);
-        std::copy(&p[4*koff], &p[4*koff + 4*num_points], &p_block[0]);
+        std::copy(&p[4*koff], &p[4*koff + 4*num_points_batch], &p_block[0]);
 
         switch (max_geo_order)
         {
