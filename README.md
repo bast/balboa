@@ -50,8 +50,13 @@ make
 ### Testing
 
 ```
-PROJECT_BUILD_DIR=$PWD/build PROJECT_INCLUDE_DIR=$PWD/api PYTHONPATH=$PWD/api py.test -vv test/test.py
+make test
 ```
+Or more explicitly:
+```
+PROJECT_BUILD_DIR=$PWD PROJECT_INCLUDE_DIR=$PWD/../api PYTHONPATH=$PWD/../api py.test -vv -s ../test/test.py
+```
+
 
 ### Ordering of AOs
 
