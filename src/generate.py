@@ -77,6 +77,33 @@ def get_offsets(max_l_value, ao_chunk_length, max_geo_diff_order):
     return '\n'.join(s)
 
 
+def test_get_offsets():
+    s = '''#ifndef OFFSETS_H_INCLUDED
+#define OFFSETS_H_INCLUDED
+
+#define OFFSET_00_00_00_000 0
+#define OFFSET_00_00_00_100 32
+#define OFFSET_00_00_00_010 64
+#define OFFSET_00_00_00_001 96
+#define OFFSET_01_00_00_000 128
+#define OFFSET_01_00_00_100 160
+#define OFFSET_01_00_00_010 192
+#define OFFSET_01_00_00_001 224
+#define OFFSET_00_01_00_000 256
+#define OFFSET_00_01_00_100 288
+#define OFFSET_00_01_00_010 320
+#define OFFSET_00_01_00_001 352
+#define OFFSET_00_00_01_000 384
+#define OFFSET_00_00_01_100 416
+#define OFFSET_00_00_01_010 448
+#define OFFSET_00_00_01_001 480
+
+#define BUFFER_LENGTH 512
+
+#endif // OFFSETS_H_INCLUDED'''
+    assert get_offsets(1, 32, 1) == s
+
+
 def write_routine(_maxg, file_name, max_l_value, ao_chunk_length, max_geo_diff_order):
     import cs_trans
 
