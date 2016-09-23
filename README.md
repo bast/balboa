@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/bast/balboa.svg?branch=master)](https://travis-ci.org/bast/balboa/builds)
+[![License](https://img.shields.io/badge/license-%20BSD--3-blue.svg)](../master/LICENSE)
 
 # balboa
 
