@@ -37,14 +37,10 @@ class Main
         void nullify();
         void deallocate();
 
-        void get_ao_shell(const int        ishell,
-                                double     ao_local[],
-                          const int        max_geo_order,
-                          const double     p[]) const;
-
-        void get_ao_shell(const int        ishell,
-                          const int        max_geo_order,
-                          const double     p[]) const;
+        void get_ao_shell(const int    ishell,
+                                double ao_local[],
+                          const int    max_geo_order,
+                          const double p[]) const;
 
         void transform_basis() const;
 

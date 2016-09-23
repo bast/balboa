@@ -315,10 +315,10 @@ void Main::nullify()
 }
 
 
-void Main::get_ao_shell(const int        ishell,
-                                      double     ao_local[],
-                                const int        max_geo_order,
-                                const double     p[]) const
+void Main::get_ao_shell(const int    ishell,
+                              double ao_local[],
+                        const int    max_geo_order,
+                        const double p[]) const
 {
     double px[AO_CHUNK_LENGTH];
     double py[AO_CHUNK_LENGTH];
