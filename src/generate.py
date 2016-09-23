@@ -58,19 +58,23 @@ def get_ao_pointer_prefix(geo):
 
 
 def get_offsets(max_l_value, ao_chunk_length, max_geo_diff_order):
-
-    s = '#ifndef OFFSETS_H_INCLUDED\n#define offsets_h_\n\n'
+    s = []
+    s.append('#ifndef OFFSETS_H_INCLUDED')
+    s.append('#define OFFSETS_H_INCLUDED')
+    s.append('')
     offset = 0
     for l in range(0, max_l_value + 1):
         for exp in get_ijk_list(l):
             for g in range(0, max_geo_diff_order + 1):
                 for geo in get_ijk_list(g):
                     s_geo = '%i%i%i' % (geo[0], geo[1], geo[2])
-                    s += '#define OFFSET_%02d_%02d_%02d_%s %i\n' % (exp[0], exp[1], exp[2], s_geo, offset)
+                    s.append('#define OFFSET_%02d_%02d_%02d_%s %i' % (exp[0], exp[1], exp[2], s_geo, offset))
                     offset += ao_chunk_length
-    s += '\n#define BUFFER_LENGTH %i\n' % offset
-    s += '\n#endif // OFFSETS_H_INCLUDED\n'
-    return s
+    s.append('')
+    s.append('#define BUFFER_LENGTH {0}'.format(offset))
+    s.append('')
+    s.append('#endif // OFFSETS_H_INCLUDED')
+    return '\n'.join(s)
 
 
 def write_routine(_maxg, file_name, max_l_value, ao_chunk_length, max_geo_diff_order):
