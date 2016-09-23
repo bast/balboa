@@ -70,6 +70,6 @@ Let us assume that we have N basis functions and P points.
 
 ```
 [ geo_000 (undifferentiated)         ][ geo_100 ][ geo_010 ][ geo_001 ] ...
-[ ao_1    ][ ao_2    ] ... [ ao_3    ]
+[ ao_1    ][ ao_2    ] ... [ ao_N    ]
 [ 1 ... P ][ 1 ... P ] ... [ 1 ... P ]
 ```
