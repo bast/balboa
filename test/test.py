@@ -138,13 +138,25 @@ def test_balboa():
                          aos_p)
 
 #   with open(os.path.join(dir_path, 'result.txt'), 'w') as f:
-#       for ao in aos:
-#           f.write('{0}\n'.format(ao))
+#       k = 0
+#       for _diff in [0, 1, 2, 3]:
+#           for _ao in range(20):
+#               for _point in range(128):
+#                   if _point > 0:
+#                       f.write("{0}\n".format(ref_aos[k]))
+#                   k += 1
 
-    for i, ref_ao in enumerate(ref_aos):
-        error = aos[i] - ref_ao
-        if abs(ref_ao) > 1.0e-20:
-            error /= ref_ao
-        assert abs(error) < 1.0e-14
+    k = 0
+    kr = 0
+    for _diff in [0, 1, 2, 3]:
+        for _ao in range(20):
+            for _point in range(128):
+                if _point > 0:
+                    error = aos[k] - ref_aos[kr]
+                    if abs(ref_aos[kr]) > 1.0e-20:
+                        error /= ref_aos[kr]
+                    assert abs(error) < 1.0e-14
+                    kr += 1
+                k += 1
 
     balboa.free_context(context)
