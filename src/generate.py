@@ -105,32 +105,7 @@ def write_routine(_maxg, file_name, max_l_value, ao_chunk_length, max_geo_diff_o
 #include "ao_vector.h"
           \n'''
 
-    s = '''void get_ao_g%i(const int    shell_l_quantum_numbers,
-               const int    num_primitives,
-               const bool   is_spherical,
-               const double primitive_exponents[],
-               const double contraction_coefficients[],
-               const int    num_points,
-                     double s[],
-                     double buffer[],
-               const double shell_centers_coordinates[],
-               const double extent_squared,
-               const double pw[],
-                     double px[],
-                     double py[],
-                     double pz[],
-                     double p2[],\n''' % _maxg
-
-    l = []
-    for g in range(0, _maxg + 1):
-        for geo in get_ijk_list(g):
-            l.append('double ao_%i%i%i[]' % (geo[0], geo[1], geo[2]))
-
-    for i in range(len(l)):
-        if i < len(l) - 1:
-            s += '                     %s,\n' % l[i]
-        else:
-            s += '                     %s)' % l[i]
+    s = get_signature(_maxg) + '\n    )'
 
     sfoo += '''
 %s
@@ -305,6 +280,34 @@ def write_aocalls(file_name, max_geo_diff_order):
             f.write(s3)
 
 
+def get_signature(g):
+
+    s = []
+
+    s.append('void get_ao_g{0}('.format(g))
+    s.append('    const int    shell_l_quantum_numbers,')
+    s.append('    const int    num_primitives,')
+    s.append('    const bool   is_spherical,')
+    s.append('    const double primitive_exponents[],')
+    s.append('    const double contraction_coefficients[],')
+    s.append('    const int    num_points,')
+    s.append('          double s[],')
+    s.append('          double buffer[],')
+    s.append('    const double shell_centers_coordinates[],')
+    s.append('    const double extent_squared,')
+    s.append('    const double pw[],')
+    s.append('          double px[],')
+    s.append('          double py[],')
+    s.append('          double pz[],')
+    s.append('          double p2[]')
+
+    for _g in range(g + 1):
+        for geo in get_ijk_list(_g):
+            s.append('         ,double ao_%i%i%i[]' % (geo[0], geo[1], geo[2]))
+
+    return '\n'.join(s)
+
+
 def get_header(max_geo_diff_order):
 
     s = []
@@ -314,26 +317,7 @@ def get_header(max_geo_diff_order):
     s.append('')
 
     for g in range(0, max_geo_diff_order + 1):
-        s.append('void get_ao_g{0}('.format(g))
-        s.append('    const int    shell_l_quantum_numbers,')
-        s.append('    const int    num_primitives,')
-        s.append('    const bool   is_spherical,')
-        s.append('    const double primitive_exponents[],')
-        s.append('    const double contraction_coefficients[],')
-        s.append('    const int    num_points,')
-        s.append('          double s[],')
-        s.append('          double buffer[],')
-        s.append('    const double shell_centers_coordinates[],')
-        s.append('    const double extent_squared,')
-        s.append('    const double pw[],')
-        s.append('          double px[],')
-        s.append('          double py[],')
-        s.append('          double pz[],')
-        s.append('          double p2[]')
-
-        for _g in range(g + 1):
-            for geo in get_ijk_list(_g):
-                s.append('         ,double ao_%i%i%i[]' % (geo[0], geo[1], geo[2]))
+        s.append(get_signature(g))
 
         s.append('    );')
         s.append('')
