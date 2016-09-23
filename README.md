@@ -53,12 +53,6 @@ make
 PROJECT_BUILD_DIR=$PWD/build PROJECT_INCLUDE_DIR=$PWD/api PYTHONPATH=$PWD/api py.test -vv test/test.py
 ```
 
-### TODO
-
-- Get rid of AO_BLOCK_LENGTH; make block length flexible
-- Document API
-
-
 ### Ordering of AOs
 
 Let us assume that we have N basis functions and P points.
