@@ -27,10 +27,6 @@ def test_get_exp_offset_dict():
     assert get_exp_offset_dict(2) == {(0, 1, 1): 4, (1, 1, 0): 1, (0, 0, 0): 0, (0, 0, 2): 5, (0, 2, 0): 3, (1, 0, 0): 0, (0, 1, 0): 1, (0, 0, 1): 2, (2, 0, 0): 0, (1, 0, 1): 2}
 
 
-def get_exp_offset(exp):
-    return exp_offset[tuple(exp)]
-
-
 def get_ao_pointer_prefix(geo):
     return 'ao_%i%i%i' % (geo[0], geo[1], geo[2])
 
