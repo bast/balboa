@@ -33,23 +33,28 @@ def get_ao_pointer_prefix(geo):
 
 def print_line(exp, geo, m, r):
 
-    exp_right = exp[:]
-    exp_right[m] -= 1
+    _exp = exp[:]
+    _exp[m] -= 1
 
     vec_r = 'buffer[OFFSET_%02d_%02d_%02d_%i%i%i]' % (exp[0], exp[1], exp[2], geo[0], geo[1], geo[2])
     vec_p = '%s' % r
-    vec_a = 'buffer[OFFSET_%02d_%02d_%02d_%i%i%i]' % (exp_right[0], exp_right[1], exp_right[2], geo[0], geo[1], geo[2])
+    vec_a = 'buffer[OFFSET_%02d_%02d_%02d_%i%i%i]' % (_exp[0], _exp[1], _exp[2], geo[0], geo[1], geo[2])
 
     if (geo[m] > 0):
         geo_right = geo[:]
         geo_right[m] -= 1
-        vec_b = 'buffer[OFFSET_%02d_%02d_%02d_%i%i%i]' % (exp_right[0], exp_right[1], exp_right[2], geo_right[0], geo_right[1], geo_right[2])
+        vec_b = 'buffer[OFFSET_%02d_%02d_%02d_%i%i%i]' % (_exp[0], _exp[1], _exp[2], geo_right[0], geo_right[1], geo_right[2])
         if geo[m] > 1:
-            return '            get_pa_plus_sb_block(&%s, %s, %i.0, &%s, &%s);\n' % (vec_a, vec_p, geo[m], vec_b, vec_r)
+            return 'get_pa_plus_sb_block(&{0}, {1}, {2}.0, &{3}, &{4});'.format(vec_a, vec_p, geo[m], vec_b, vec_r)
         else:
-            return '            get_pa_plus_b_block(&%s, %s, &%s, &%s);\n' % (vec_a, vec_p, vec_b, vec_r)
+            return 'get_pa_plus_b_block(&{0}, {1}, &{2}, &{3});'.format(vec_a, vec_p, vec_b, vec_r)
     else:
-        return '            get_pa_block(&%s, %s, &%s);\n' % (vec_a, vec_p, vec_r)
+        return 'get_pa_block(&{0}, {1}, &{2});'.format(vec_a, vec_p, vec_r)
+
+
+def test_print_line():
+    s = print_line([1, 1, 1], [1, 1, 1], 2, 'py')
+    assert s == 'get_pa_plus_b_block(&buffer[OFFSET_01_01_00_111], py, &buffer[OFFSET_01_01_00_110], &buffer[OFFSET_01_01_01_111]);'
 
 
 def write_offsets(file_name, max_l_value, ao_chunk_length, max_geo_diff_order):
@@ -230,13 +235,13 @@ def write_routine(_maxg, file_name, max_l_value, ao_chunk_length, max_geo_diff_o
                 for g in range(0, _maxg + 1):
                     for geo in get_ijk_list(g):
                         if exp[0] > 0:
-                            sfoo += print_line(exp, geo, 0, 'px')
+                            sfoo += print_line(exp, geo, 0, 'px') + '\n'
                         else:
                             if exp[1] > 0:
-                                sfoo += print_line(exp, geo, 1, 'py')
+                                sfoo += print_line(exp, geo, 1, 'py') + '\n'
                             else:
                                 if exp[2] > 0:
-                                    sfoo += print_line(exp, geo, 2, 'pz')
+                                    sfoo += print_line(exp, geo, 2, 'pz') + '\n'
         else:
             sfoo += '             std::cout << "error: order too high";\n'
             sfoo += '             exit(1);\n'
