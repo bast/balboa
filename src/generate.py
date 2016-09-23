@@ -13,6 +13,20 @@ def test_get_ijk_list():
     assert get_ijk_list(3) == [[3, 0, 0], [2, 1, 0], [2, 0, 1], [1, 2, 0], [1, 1, 1], [1, 0, 2], [0, 3, 0], [0, 2, 1], [0, 1, 2], [0, 0, 3]]
 
 
+def get_exp_offset_dict(max_l_value):
+    exp_offset = {}
+    for l in range(0, max_l_value + 1):
+        k = 0
+        for exp in get_ijk_list(l):
+            exp_offset[tuple(exp)] = k
+            k += 1
+    return exp_offset
+
+
+def test_get_exp_offset_dict():
+    assert get_exp_offset_dict(2) == {(0, 1, 1): 4, (1, 1, 0): 1, (0, 0, 0): 0, (0, 0, 2): 5, (0, 2, 0): 3, (1, 0, 0): 0, (0, 1, 0): 1, (0, 0, 1): 2, (2, 0, 0): 0, (1, 0, 1): 2}
+
+
 def get_exp_offset(exp):
     return exp_offset[tuple(exp)]
 
@@ -316,12 +330,7 @@ def write_header(file_name, max_geo_diff_order):
 def main(output_directory, max_l_value, ao_chunk_length, max_geo_diff_order):
     import os
 
-    exp_offset = {}
-    for l in range(0, max_l_value + 1):
-        k = 0
-        for exp in get_ijk_list(l):
-            exp_offset[tuple(exp)] = k
-            k += 1
+    exp_offset = get_exp_offset_dict(max_l_value)
 
     write_offsets(os.path.join(output_directory, 'offsets.h'), max_l_value, ao_chunk_length, max_geo_diff_order)
     for g in range(0, max_geo_diff_order + 1):
