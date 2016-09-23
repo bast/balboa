@@ -22,11 +22,13 @@ start building some hurtin' bombs!" [Rocky Balboa]
 
 ### Requirements and dependencies
 
+You need the following to install the code:
+
 - C and C++ compilers
 - [CMake](https://cmake.org)
 - [Python](https://www.python.org)
 
-For testing:
+For testing you need:
 
 - [CFFI](https://cffi.readthedocs.io)
 - [Pytest](http://doc.pytest.org)
