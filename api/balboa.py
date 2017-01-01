@@ -2,7 +2,7 @@ import sys
 import os
 
 
-def get_env(v):
+def _get_env(v):
     _v = os.getenv(v)
     if _v is None:
         sys.stderr.write('Error: Environment variable {0} is undefined\n'.format(v))
@@ -10,14 +10,14 @@ def get_env(v):
     return _v
 
 
-def get_library_suffix():
+def _get_library_suffix():
     if sys.platform == "darwin":
         return 'dylib'
     else:
         return 'so'
 
 
-def get_lib_handle(definitions, header, library, build_dir, include_dir):
+def _get_lib_handle(definitions, header, library, build_dir, include_dir):
     from subprocess import Popen, PIPE
     from cffi import FFI
     ffi = FFI()
@@ -26,19 +26,21 @@ def get_lib_handle(definitions, header, library, build_dir, include_dir):
                       stdout=PIPE).communicate()[0].decode("utf-8")
     ffi.cdef(interface)
 
-    suffix = get_library_suffix()
+    suffix = _get_library_suffix()
     lib = ffi.dlopen(os.path.join(build_dir, 'lib', 'lib{0}.{1}'.format(library, suffix)))
     return lib
 
 
-_build_dir = get_env('PROJECT_BUILD_DIR')
-_include_dir = get_env('PROJECT_INCLUDE_DIR')
+_build_dir = _get_env('PROJECT_BUILD_DIR')
+_include_dir = _get_env('PROJECT_INCLUDE_DIR')
 
-_lib = get_lib_handle(['-DBALBOA_API=', '-DBALBOA_NOINCLUDE'],
-                      'balboa.h',
-                      'balboa',
-                      _build_dir,
-                      _include_dir)
+_lib = _get_lib_handle(
+    ['-DBALBOA_API=', '-DBALBOA_NOINCLUDE'],
+    'balboa.h',
+    'balboa',
+    _build_dir,
+    _include_dir
+)
 
 
 # outward facing API
