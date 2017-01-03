@@ -267,17 +267,46 @@ BALBOA_API int get_ao(const context_t *context,
 int Main::get_ao(const int    max_geo_order,
                  const int    num_points,
                  const double p[],
-                       double buffer[]) const
+                       double ao_local[]) const
 {
+    double px[AO_CHUNK_LENGTH];
+    double py[AO_CHUNK_LENGTH];
+    double pz[AO_CHUNK_LENGTH];
+    double p2[AO_CHUNK_LENGTH];
+    double s[AO_CHUNK_LENGTH];
+    double buffer[BUFFER_LENGTH];
+
+    // FIXME can be optimized
+    // we do this because p can be shorter than 4*AO_CHUNK_LENGTH
+    // we pad it by very large numbers to let the code screen them away
+    double p_block[4*AO_CHUNK_LENGTH];
+
     assert(max_geo_order <= MAX_GEO_DIFF_ORDER);
 
+    int n = 0;
     for (int ishell = 0; ishell < num_shells; ishell++)
     {
-        get_ao_shell(ishell,
-                     num_points,
-                     buffer,
-                     max_geo_order,
-                     p);
+        int num_points_left = num_points;
+
+        for (int koff = 0; koff < num_points; koff += AO_CHUNK_LENGTH)
+        {
+            int num_points_batch = std::min(AO_CHUNK_LENGTH, num_points_left);
+
+            num_points_left -= num_points_batch;
+
+            std::fill(&p_block[0], &p_block[4*AO_CHUNK_LENGTH], 1.0e50);
+            std::copy(&p[4*koff], &p[4*koff + 4*num_points_batch], &p_block[0]);
+
+            switch (max_geo_order)
+            {
+                #include "aocalls.h"
+                default:
+                    std::cout << "ERROR: get_ao order too high\n";
+                    exit(1);
+                    break;
+            }
+        }
+        n += shell_num_primitives[ishell];
     }
 
     return 0;
@@ -305,53 +334,6 @@ void Main::nullify()
     primitive_exponents       = NULL;
     contraction_coefficients  = NULL;
     is_initialized            = 0;
-}
-
-
-void Main::get_ao_shell(const int    ishell,
-                        const int    num_points,
-                              double ao_local[],
-                        const int    max_geo_order,
-                        const double p[]) const
-{
-    double px[AO_CHUNK_LENGTH];
-    double py[AO_CHUNK_LENGTH];
-    double pz[AO_CHUNK_LENGTH];
-    double p2[AO_CHUNK_LENGTH];
-    double s[AO_CHUNK_LENGTH];
-    double buffer[BUFFER_LENGTH];
-
-    // FIXME can be optimized
-    // we do this because p can be shorter than 4*AO_CHUNK_LENGTH
-    // we pad it by very large numbers to let the code screen them away
-    double p_block[4*AO_CHUNK_LENGTH];
-
-    int n = 0;
-    for (int jshell = 0; jshell < ishell; jshell++)
-    {
-        n += shell_num_primitives[jshell];
-    }
-
-    int num_points_left = num_points;
-
-    for (int koff = 0; koff < num_points; koff += AO_CHUNK_LENGTH)
-    {
-        int num_points_batch = std::min(AO_CHUNK_LENGTH, num_points_left);
-
-        num_points_left -= num_points_batch;
-
-        std::fill(&p_block[0], &p_block[4*AO_CHUNK_LENGTH], 1.0e50);
-        std::copy(&p[4*koff], &p[4*koff + 4*num_points_batch], &p_block[0]);
-
-        switch (max_geo_order)
-        {
-            #include "aocalls.h"
-            default:
-                std::cout << "ERROR: get_ao order too high\n";
-                exit(1);
-                break;
-        }
-    }
 }
 
 
