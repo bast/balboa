@@ -1,11 +1,11 @@
-import sys
-import os
-
-
-def test_balboa():
+def sub(num_points):
     import balboa
     import numpy as np
     from cffi import FFI
+    import sys
+    import os
+
+    assert num_points < 129
 
     num_centers = 2
     center_coordinates = [
@@ -106,10 +106,8 @@ def test_balboa():
     dir_path = os.path.dirname(os.path.realpath(__file__))
 
     with open(os.path.join(dir_path, 'grid.txt'), 'r') as f:
-        num_points = 0
         p = []
         for line in f.readlines():
-            num_points += 1
             for xyzw in line.split():
                 p.append(float(xyzw))
 
@@ -141,7 +139,7 @@ def test_balboa():
 #       k = 0
 #       for _diff in [0, 1, 2, 3]:
 #           for _ao in range(20):
-#               for _point in range(128):
+#               for _point in range(num_points):
 #                   if _point > 0:
 #                       f.write("{0}\n".format(ref_aos[k]))
 #                   k += 1
@@ -150,7 +148,7 @@ def test_balboa():
     kr = 0
     for _diff in [0, 1, 2, 3]:
         for _ao in range(20):
-            for _point in range(128):
+            for _point in range(num_points):
                 if _point > 0:
                     error = aos[k] - ref_aos[kr]
                     if abs(ref_aos[kr]) > 1.0e-20:
@@ -158,5 +156,22 @@ def test_balboa():
                     assert abs(error) < 1.0e-14
                     kr += 1
                 k += 1
+            # reference has been created for 128 points
+            kr += 128 - num_points
 
     balboa.free_context(context)
+
+
+def test_128():
+    sub(num_points=128)
+
+
+def test_64():
+    sub(num_points=64)
+
+
+def test_65():
+    """
+    Here we test a number of points which is not a multiple of 32.
+    """
+    sub(num_points=65)
