@@ -297,6 +297,9 @@ int Main::get_ao(const int    max_geo_order,
             std::fill(&p_block[0], &p_block[4*AO_CHUNK_LENGTH], 1.0e50);
             std::copy(&p[4*koff], &p[4*koff + 4*num_points_batch], &p_block[0]);
 
+            int zoff = koff + shell_off[ishell]*num_points;
+            int xoff = num_ao*num_points;
+
             switch (max_geo_order)
             {
                 #include "aocalls.h"
