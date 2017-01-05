@@ -13,7 +13,6 @@ def sub(num_points,
     assert num_points <= num_points_reference
     max_geo_order = 2
     num_slices = 10
-    num_aos = 20  # FIXME get from API
 
     num_centers = 2
     center_coordinates = [
@@ -110,6 +109,8 @@ def sub(num_points,
                             shell_num_primitives,
                             primitive_exponents,
                             contraction_coefficients)
+
+    num_aos = balboa.get_num_aos(context)
 
     dir_path = os.path.dirname(os.path.realpath(__file__))
 

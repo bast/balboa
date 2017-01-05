@@ -49,3 +49,4 @@ free_context = _lib.free_context
 set_basis = _lib.set_basis
 get_buffer_len = _lib.get_buffer_len
 get_ao = _lib.get_ao
+get_num_aos = _lib.get_num_aos

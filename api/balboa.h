@@ -47,6 +47,9 @@ int set_basis(
     );
 
 BALBOA_API
+int get_num_aos(const context_t *context);
+
+BALBOA_API
 int get_buffer_len(
     const context_t *context,
     const int max_geo_order,

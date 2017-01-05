@@ -37,6 +37,16 @@ Main::~Main()
 }
 
 
+BALBOA_API int get_num_aos(const context_t *context)
+{
+    return AS_CTYPE(Main, context)->get_num_aos();
+}
+int Main::get_num_aos() const
+{
+    return num_ao;
+}
+
+
 BALBOA_API int get_buffer_len(const context_t *context,
                               const int max_geo_order,
                               const int num_points)

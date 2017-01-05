@@ -21,6 +21,8 @@ class Main
         int get_buffer_len(const int max_geo_order,
                            const int num_points) const;
 
+        int get_num_aos() const;
+
         // buffer is not zeroed out inside get_ao
         int get_ao(const int    max_geo_order,
                    const int    num_points,
