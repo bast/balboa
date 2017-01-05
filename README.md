@@ -56,10 +56,20 @@ make test
 
 ### Ordering of AOs
 
-Let us assume that we have N basis functions and P points.
+We use he following naming:
 
 ```
-[ geo_000 (undifferentiated)         ][ geo_100 (1st-order derivative wrt x)][ geo_010 ][ geo_001 ][ geo_200 ] ...
+geo_000: undifferentiated
+geo_100: 1st-order derivative wrt x
+geo_010: 1st-order derivative wrt y
+...
+
+```
+
+For N basis functions and P points the ordering is given by:
+
+```
+[ geo_000                            ][ geo_100 ][ geo_010 ][ geo_001 ][ geo_200 ] ...
 [ ao_1    ][ ao_2    ] ... [ ao_N    ]
 [ 1 ... P ][ 1 ... P ] ... [ 1 ... P ]
 ```
