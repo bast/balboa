@@ -29,14 +29,14 @@ def print_line(exp, geo, m, r, suffix):
     _exp = exp[:]
     _exp[m] -= 1
 
-    vec_r = 'buffer[OFFSET_{0:02d}_{1:02d}_{2:02d}_{3}{4}{5}]'.format(*exp, *geo)
+    vec_r = 'buffer[OFFSET_{0:02d}_{1:02d}_{2:02d}_{3}{4}{5}]'.format(exp[0], exp[1], exp[2], geo[0], geo[1], geo[2])
     vec_p = r
-    vec_a = 'buffer[OFFSET_{0:02d}_{1:02d}_{2:02d}_{3}{4}{5}]'.format(*_exp, *geo)
+    vec_a = 'buffer[OFFSET_{0:02d}_{1:02d}_{2:02d}_{3}{4}{5}]'.format(_exp[0], _exp[1], _exp[2], geo[0], geo[1], geo[2])
 
     if (geo[m] > 0):
         geo_right = geo[:]
         geo_right[m] -= 1
-        vec_b = 'buffer[OFFSET_{0:02d}_{1:02d}_{2:02d}_{3}{4}{5}]'.format(*_exp, *geo_right)
+        vec_b = 'buffer[OFFSET_{0:02d}_{1:02d}_{2:02d}_{3}{4}{5}]'.format(_exp[0], _exp[1], _exp[2], geo_right[0], geo_right[1], geo_right[2])
         if geo[m] > 1:
             if suffix == 'block':
                 return 'get_pa_plus_sb_block(&{0}, {1}, {2}.0, &{3}, &{4});'.format(vec_a, vec_p, geo[m], vec_b, vec_r)
@@ -69,7 +69,7 @@ def get_offsets(max_l_value, ao_chunk_length, max_geo_diff_order):
         for exp in get_ijk_list(l):
             for g in range(max_geo_diff_order + 1):
                 for geo in get_ijk_list(g):
-                    s.append('#define OFFSET_{0:02d}_{1:02d}_{2:02d}_{3}{4}{5} {6}'.format(*exp, *geo, offset))
+                    s.append('#define OFFSET_{0:02d}_{1:02d}_{2:02d}_{3}{4}{5} {6}'.format(exp[0], exp[1], exp[2], geo[0], geo[1], geo[2], offset))
                     offset += ao_chunk_length
     s.append('')
     s.append('#define BUFFER_LENGTH {0}'.format(offset))
@@ -219,7 +219,7 @@ def write_routine(_maxg,
         s += '                fy_%i = fy_%i*fy_1 + %i.0*a*fy_%i;\n' % (int(g), int(g - 1), int(g - 1) * 2, int(g - 2))
         s += '                fz_%i = fz_%i*fz_1 + %i.0*a*fz_%i;\n' % (int(g), int(g - 1), int(g - 1) * 2, int(g - 2))
         for geo in get_ijk_list(g):
-            s += '                buffer[OFFSET_00_00_00_%i%i%i + k] += fx_%i*fy_%i*fz_%i*s[k];\n' % (*geo, *geo)
+            s += '                buffer[OFFSET_00_00_00_%i%i%i + k] += fx_%i*fy_%i*fz_%i*s[k];\n' % (geo[0], geo[1], geo[2], geo[0], geo[1], geo[2])
     s += '            }\n'
     s += '        }\n'
 
