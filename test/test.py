@@ -1,10 +1,17 @@
-def sub(num_points):
+def sub(num_points,
+        num_points_reference,
+        generate_reference=False):
+
     import balboa
     import numpy as np
     from cffi import FFI
     import os
+    import random
 
-    assert num_points < 129
+    assert num_points <= num_points_reference
+    max_geo_order = 2
+    num_slices = 10
+    num_aos = 20  # FIXME get from API
 
     num_centers = 2
     center_coordinates = [
@@ -104,22 +111,36 @@ def sub(num_points):
 
     dir_path = os.path.dirname(os.path.realpath(__file__))
 
-    with open(os.path.join(dir_path, 'coordinates.txt'), 'r') as f:
+    if generate_reference:
+        random.seed(1)
         x_coordinates_bohr = []
         y_coordinates_bohr = []
         z_coordinates_bohr = []
-        for line in f.readlines():
-            (x, y, z) = line.split()
-            x_coordinates_bohr.append(float(x))
-            y_coordinates_bohr.append(float(y))
-            z_coordinates_bohr.append(float(z))
-
-    with open(os.path.join(dir_path, 'result.txt'), 'r') as f:
-        ref_aos = []
-        for line in f.readlines():
-            ref_aos.append(float(line))
-
-    max_geo_order = 1
+        s = []
+        for _ in range(num_points_reference):
+            x = random.uniform(-2.0, 2.0)
+            y = random.uniform(-2.0, 2.0)
+            z = random.uniform(-2.0, 2.0)
+            x_coordinates_bohr.append(x)
+            y_coordinates_bohr.append(y)
+            z_coordinates_bohr.append(z)
+            s.append('{0} {1} {2}'.format(x, y, z))
+        with open(os.path.join(dir_path, 'coordinates.txt'), 'w') as f:
+            f.write('\n'.join(s))
+    else:
+        with open(os.path.join(dir_path, 'coordinates.txt'), 'r') as f:
+            x_coordinates_bohr = []
+            y_coordinates_bohr = []
+            z_coordinates_bohr = []
+            for line in f.readlines():
+                (x, y, z) = line.split()
+                x_coordinates_bohr.append(float(x))
+                y_coordinates_bohr.append(float(y))
+                z_coordinates_bohr.append(float(z))
+        with open(os.path.join(dir_path, 'result.txt'), 'r') as f:
+            ref_aos = []
+            for line in f.readlines():
+                ref_aos.append(float(line))
 
     # buffer length is adjusted for number of cartesian aos
     # so possibly longer than the number of spherical aos
@@ -140,43 +161,42 @@ def sub(num_points):
                          z_coordinates_bohr,
                          aos_p)
 
-#   with open(os.path.join(dir_path, 'result.txt'), 'w') as f:
-#       k = 0
-#       for _diff in [0, 1, 2, 3]:
-#           for _ao in range(20):
-#               for _point in range(num_points):
-#                   if _point > 0:
-#                       f.write("{0}\n".format(ref_aos[k]))
-#                   k += 1
-
-    k = 0
-    kr = 0
-    for _diff in [0, 1, 2, 3]:
-        for _ao in range(20):
-            for _point in range(num_points):
-                if _point > 0:
+    if generate_reference:
+        with open(os.path.join(dir_path, 'result.txt'), 'w') as f:
+            k = 0
+            for _diff in range(num_slices):
+                for _ao in range(num_aos):
+                    for _point in range(num_points):
+                        f.write("{0}\n".format(aos_p[k]))
+                        k += 1
+    else:
+        k = 0
+        kr = 0
+        for _diff in range(num_slices):
+            for _ao in range(num_aos):
+                for _point in range(num_points):
                     error = aos[k] - ref_aos[kr]
                     if abs(ref_aos[kr]) > 1.0e-20:
                         error /= ref_aos[kr]
-                    assert abs(error) < 1.0e-14
+                    assert abs(error) < 1.0e-8
                     kr += 1
-                k += 1
-            # reference has been created for 128 points
-            kr += 128 - num_points
+                    k += 1
+                kr += num_points_reference - num_points
 
     balboa.free_context(context)
 
 
-def test_128():
-    sub(num_points=128)
+def test_32():
+    sub(num_points=32,
+        num_points_reference=33)
 
 
-def test_64():
-    sub(num_points=64)
+def test_33():
+    sub(num_points=33,
+        num_points_reference=33)
 
 
-def test_65():
-    """
-    Here we test a number of points which is not a multiple of 32.
-    """
-    sub(num_points=65)
+if __name__ == '__main__':
+    sub(num_points=33,
+        num_points_reference=33,
+        generate_reference=True)
