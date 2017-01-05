@@ -1,8 +1,6 @@
 #ifndef MAIN_H_INCLUDED
 #define MAIN_H_INCLUDED
 
-#include <stdlib.h>
-
 class Main
 {
     public:
@@ -26,7 +24,9 @@ class Main
         // buffer is not zeroed out inside get_ao
         int get_ao(const int    max_geo_order,
                    const int    num_points,
-                   const double p[],
+                   const double x_coordinates_bohr[],
+                   const double y_coordinates_bohr[],
+                   const double z_coordinates_bohr[],
                          double buffer[]) const;
 
     private:

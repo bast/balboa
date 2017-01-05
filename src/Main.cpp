@@ -257,17 +257,23 @@ int Main::set_basis(const int    in_basis_type,
 BALBOA_API int get_ao(const context_t *context,
                       const int    max_geo_order,
                       const int    num_points,
-                      const double p[],
+                      const double x_coordinates_bohr[],
+                      const double y_coordinates_bohr[],
+                      const double z_coordinates_bohr[],
                             double buffer[])
 {
     return AS_CTYPE(Main, context)->get_ao(max_geo_order,
                                            num_points,
-                                           p,
+                                           x_coordinates_bohr,
+                                           y_coordinates_bohr,
+                                           z_coordinates_bohr,
                                            buffer);
 }
 int Main::get_ao(const int    max_geo_order,
                  const int    num_points,
-                 const double p[],
+                 const double x_coordinates_bohr[],
+                 const double y_coordinates_bohr[],
+                 const double z_coordinates_bohr[],
                        double ao_local[]) const
 {
     double px[AO_CHUNK_LENGTH];
@@ -307,7 +313,9 @@ int Main::get_ao(const int    max_geo_order,
                  buffer,
                  &shell_centers_coordinates[3*ishell],
                  shell_extent_squared[ishell],
-                 &p[4*koff],
+                 &x_coordinates_bohr[koff],
+                 &y_coordinates_bohr[koff],
+                 &z_coordinates_bohr[koff],
                  px,
                  py,
                  pz,

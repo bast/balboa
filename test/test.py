@@ -2,7 +2,6 @@ def sub(num_points):
     import balboa
     import numpy as np
     from cffi import FFI
-    import sys
     import os
 
     assert num_points < 129
@@ -105,11 +104,15 @@ def sub(num_points):
 
     dir_path = os.path.dirname(os.path.realpath(__file__))
 
-    with open(os.path.join(dir_path, 'grid.txt'), 'r') as f:
-        p = []
+    with open(os.path.join(dir_path, 'coordinates.txt'), 'r') as f:
+        x_coordinates_bohr = []
+        y_coordinates_bohr = []
+        z_coordinates_bohr = []
         for line in f.readlines():
-            for xyzw in line.split():
-                p.append(float(xyzw))
+            (x, y, z) = line.split()
+            x_coordinates_bohr.append(float(x))
+            y_coordinates_bohr.append(float(y))
+            z_coordinates_bohr.append(float(z))
 
     with open(os.path.join(dir_path, 'result.txt'), 'r') as f:
         ref_aos = []
@@ -132,7 +135,9 @@ def sub(num_points):
     ierr = balboa.get_ao(context,
                          max_geo_order,
                          num_points,
-                         p,
+                         x_coordinates_bohr,
+                         y_coordinates_bohr,
+                         z_coordinates_bohr,
                          aos_p)
 
 #   with open(os.path.join(dir_path, 'result.txt'), 'w') as f:

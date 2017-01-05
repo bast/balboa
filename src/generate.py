@@ -146,7 +146,9 @@ def write_routine(_maxg,
         s += '        get_p2_block(shell_centers_coordinates,\n'
     else:
         s += '        get_p2(num_points_batch, shell_centers_coordinates,\n'
-    s += '                     pw,\n'
+    s += '                     x_coordinates_bohr,\n'
+    s += '                     y_coordinates_bohr,\n'
+    s += '                     z_coordinates_bohr,\n'
     s += '                     px,\n'
     s += '                     py,\n'
     s += '                     pz,\n'
@@ -316,7 +318,9 @@ def get_signature(g, suffix):
     s.append('          double buffer[],')
     s.append('    const double shell_centers_coordinates[],')
     s.append('    const double extent_squared,')
-    s.append('    const double pw[],')
+    s.append('    const double x_coordinates_bohr[],')
+    s.append('    const double y_coordinates_bohr[],')
+    s.append('    const double z_coordinates_bohr[],')
     s.append('          double px[],')
     s.append('          double py[],')
     s.append('          double pz[],')
@@ -380,7 +384,9 @@ def generate_dispatcher(output_directory, max_geo_diff_order):
           double buffer[],
     const double shell_centers_coordinates[],
     const double extent_squared,
-    const double pw[],
+    const double x_coordinates_bohr[],
+    const double y_coordinates_bohr[],
+    const double z_coordinates_bohr[],
           double px[],
           double py[],
           double pz[],

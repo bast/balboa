@@ -26,29 +26,43 @@ extern "C" {
 struct context_s;
 typedef struct context_s context_t;
 
-BALBOA_API context_t *new_context();
-BALBOA_API void free_context(context_t *context);
+BALBOA_API
+context_t *new_context();
 
-BALBOA_API int set_basis(context_t *context,
-                         const int    basis_type,
-                         const int    num_centers,
-                         const double center_coordinates[],
-                         const int    num_shells,
-                         const int    shell_centers[],
-                         const int    shell_l_quantum_numbers[],
-                         const int    shell_num_primitives[],
-                         const double primitive_exponents[],
-                         const double contraction_coefficients[]);
+BALBOA_API
+void free_context(context_t *context);
 
-BALBOA_API int get_buffer_len(const context_t *context,
-                              const int max_geo_order,
-                              const int num_points);
+BALBOA_API
+int set_basis(
+    context_t *context,
+    const int    basis_type,
+    const int    num_centers,
+    const double center_coordinates[],
+    const int    num_shells,
+    const int    shell_centers[],
+    const int    shell_l_quantum_numbers[],
+    const int    shell_num_primitives[],
+    const double primitive_exponents[],
+    const double contraction_coefficients[]
+    );
 
-BALBOA_API int get_ao(const context_t *context,
-                      const int    max_geo_order,
-                      const int    num_points,
-                      const double p[],
-                            double buffer[]);
+BALBOA_API
+int get_buffer_len(
+    const context_t *context,
+    const int max_geo_order,
+    const int num_points
+    );
+
+BALBOA_API
+int get_ao(
+    const context_t *context,
+    const int    max_geo_order,
+    const int    num_points,
+    const double x_coordinates_bohr[],
+    const double y_coordinates_bohr[],
+    const double z_coordinates_bohr[],
+          double buffer[]
+    );
 
 #ifdef __cplusplus
 }
