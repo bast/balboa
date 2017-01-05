@@ -41,7 +41,7 @@ For testing you need:
 - [Numpy](http://www.numpy.org)
 
 
-### Installation
+### Installation and testing
 
 ```
 virtualenv venv
@@ -50,17 +50,7 @@ pip install -r requirements.txt
 ./setup
 cd build
 make
-```
-
-
-### Testing
-
-```
 make test
-```
-Or more explicitly:
-```
-PROJECT_BUILD_DIR=$PWD PROJECT_INCLUDE_DIR=$PWD/../api PYTHONPATH=$PWD/../api py.test -vv -s ../test/test.py
 ```
 
 
