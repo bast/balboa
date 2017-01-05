@@ -86,7 +86,7 @@ def test_get_offsets():
     assert get_offsets(1, 32, 1) == s
 
 
-def write_routine(_maxg, file_name, max_l_value, ao_chunk_length, max_geo_diff_order, d_geo_ijk_slice):
+def write_routine(_maxg, file_name, max_l_value, ao_chunk_length, max_geo_diff_order, d_geo_ijk_slice, suffix):
     import cs_trans
 
     cs = cs_trans.get_cs_trans(max_l_value)
@@ -105,7 +105,7 @@ def write_routine(_maxg, file_name, max_l_value, ao_chunk_length, max_geo_diff_o
 #include "ao_vector.h"
           \n'''
 
-    s = get_signature(_maxg) + '\n    )'
+    s = get_signature(_maxg, suffix) + '\n    )'
 
     sfoo += '''
 %s
@@ -120,7 +120,10 @@ def write_routine(_maxg, file_name, max_l_value, ao_chunk_length, max_geo_diff_o
     sfoo += '    double a;\n'
     sfoo += '    double c;\n\n'
 
-    sfoo += '        get_p2_block(shell_centers_coordinates,\n'
+    if suffix == 'block':
+        sfoo += '        get_p2_block(shell_centers_coordinates,\n'
+    else:
+        sfoo += '        get_p2(num_points_batch, shell_centers_coordinates,\n'
     sfoo += '                     pw,\n'
     sfoo += '                     px,\n'
     sfoo += '                     py,\n'
@@ -128,29 +131,54 @@ def write_routine(_maxg, file_name, max_l_value, ao_chunk_length, max_geo_diff_o
     sfoo += '                     p2);\n\n'
 
     sfoo += '        // screening\n'
-    sfoo += '        if (not calculate_chunk_block(extent_squared, p2)) return;\n\n'
+    if suffix == 'block':
+        sfoo += '        if (not calculate_chunk_block(extent_squared, p2)) return;\n\n'
+    else:
+        sfoo += '        if (not calculate_chunk(num_points_batch, extent_squared, p2)) return;\n\n'
 
     array = 'buffer[OFFSET_00_00_00_000]'
-    sfoo += '        memset(&%s, 0, %i*sizeof(double));\n' % (array, ao_chunk_length)
+    if suffix == 'block':
+        sfoo += '        memset(&%s, 0, %i*sizeof(double));\n' % (array, ao_chunk_length)
+    else:
+        sfoo += '        memset(&%s, 0, num_points_batch*sizeof(double));\n' % (array)
     for g in range(1, _maxg + 1):
         for geo in get_ijk_list(g):
             array = 'buffer[OFFSET_00_00_00_%i%i%i]' % (geo[0], geo[1], geo[2])
-            sfoo += '        memset(&%s, 0, %i*sizeof(double));\n' % (array, ao_chunk_length)
+            if suffix == 'block':
+                sfoo += '        memset(&%s, 0, %i*sizeof(double));\n' % (array, ao_chunk_length)
+            else:
+                sfoo += '        memset(&%s, 0, num_points_batch*sizeof(double));\n' % (array)
 
-    sfoo += '''
-        for (int i = 0; i < num_primitives; i++)
-        {
-            a = -primitive_exponents[i];
-            c = contraction_coefficients[i];
-
-            get_exp_block(p2, c, a, s);
-
-            #pragma ivdep
-            #pragma vector aligned
-            for (int k = 0; k < %i; k++)
+    if suffix == 'block':
+        sfoo += '''
+            for (int i = 0; i < num_primitives; i++)
             {
-                buffer[OFFSET_00_00_00_000 + k] += s[k];
-              \n''' % ao_chunk_length
+                a = -primitive_exponents[i];
+                c = contraction_coefficients[i];
+       
+                get_exp_block(p2, c, a, s);
+       
+                #pragma ivdep
+                #pragma vector aligned
+                for (int k = 0; k < %i; k++)
+                {
+                    buffer[OFFSET_00_00_00_000 + k] += s[k];
+                  \n''' % ao_chunk_length
+    else:
+        sfoo += '''
+            for (int i = 0; i < num_primitives; i++)
+            {
+                a = -primitive_exponents[i];
+                c = contraction_coefficients[i];
+       
+                get_exp(num_points_batch, p2, c, a, s);
+       
+                #pragma ivdep
+                #pragma vector aligned
+                for (int k = 0; k < num_points_batch; k++)
+                {
+                    buffer[OFFSET_00_00_00_000 + k] += s[k];
+                  \n'''
 
     if (_maxg > 0):
         sfoo += '''                fx_0 = 1.0;
@@ -187,7 +215,10 @@ def write_routine(_maxg, file_name, max_l_value, ao_chunk_length, max_geo_diff_o
                         for g in range(0, _maxg + 1):
                             for geo in get_ijk_list(g):
                                 s_geo = '%i%i%i' % (geo[0], geo[1], geo[2])
-                                sfoo += '            memcpy(&ao_000[%i*xoff + %i*num_points], &buffer[OFFSET_%02d_%02d_%02d_%s], %i*sizeof(double));\n' % (d_geo_ijk_slice[tuple(geo)], s, exp[0], exp[1], exp[2], s_geo, ao_chunk_length)
+                                if suffix == 'block':
+                                    sfoo += '            memcpy(&ao_000[%i*xoff + %i*num_points], &buffer[OFFSET_%02d_%02d_%02d_%s], %i*sizeof(double));\n' % (d_geo_ijk_slice[tuple(geo)], s, exp[0], exp[1], exp[2], s_geo, ao_chunk_length)
+                                else:
+                                    sfoo += '            memcpy(&ao_000[%i*xoff + %i*num_points], &buffer[OFFSET_%02d_%02d_%02d_%s], num_points_batch*sizeof(double));\n' % (d_geo_ijk_slice[tuple(geo)], s, exp[0], exp[1], exp[2], s_geo)
                 c += 1
         else:
             sfoo += '            if (is_spherical)\n'
@@ -200,7 +231,10 @@ def write_routine(_maxg, file_name, max_l_value, ao_chunk_length, max_geo_diff_o
                         for g in range(0, _maxg + 1):
                             for geo in get_ijk_list(g):
                                 s_geo = '%i%i%i' % (geo[0], geo[1], geo[2])
-                                sfoo += '                vec_daxpy_block(%20.16e, &buffer[OFFSET_%02d_%02d_%02d_%s], &ao_000[%i*xoff + %i*num_points]);\n' % (f, exp[0], exp[1], exp[2], s_geo, d_geo_ijk_slice[tuple(geo)], s)
+                                if suffix == 'block':
+                                    sfoo += '                vec_daxpy_block(%20.16e, &buffer[OFFSET_%02d_%02d_%02d_%s], &ao_000[%i*xoff + %i*num_points]);\n' % (f, exp[0], exp[1], exp[2], s_geo, d_geo_ijk_slice[tuple(geo)], s)
+                                else:
+                                    sfoo += '                vec_daxpy(num_points_batch, %20.16e, &buffer[OFFSET_%02d_%02d_%02d_%s], &ao_000[%i*xoff + %i*num_points]);\n' % (f, exp[0], exp[1], exp[2], s_geo, d_geo_ijk_slice[tuple(geo)], s)
                 c += 1
             sfoo += '            }\n'
             sfoo += '            else\n'
@@ -210,7 +244,10 @@ def write_routine(_maxg, file_name, max_l_value, ao_chunk_length, max_geo_diff_o
                 for g in range(0, _maxg + 1):
                     for geo in get_ijk_list(g):
                         s_geo = '%i%i%i' % (geo[0], geo[1], geo[2])
-                        sfoo += '                memcpy(&ao_000[%i*xoff + %i*num_points], &buffer[OFFSET_%02d_%02d_%02d_%s], %i*sizeof(double));\n' % (d_geo_ijk_slice[tuple(geo)], s, exp[0], exp[1], exp[2], s_geo, ao_chunk_length)
+                        if suffix == 'block':
+                            sfoo += '                memcpy(&ao_000[%i*xoff + %i*num_points], &buffer[OFFSET_%02d_%02d_%02d_%s], %i*sizeof(double));\n' % (d_geo_ijk_slice[tuple(geo)], s, exp[0], exp[1], exp[2], s_geo, ao_chunk_length)
+                        else:
+                            sfoo += '                memcpy(&ao_000[%i*xoff + %i*num_points], &buffer[OFFSET_%02d_%02d_%02d_%s], num_points_batch*sizeof(double));\n' % (d_geo_ijk_slice[tuple(geo)], s, exp[0], exp[1], exp[2], s_geo)
                 s += 1
             sfoo += '            }\n'
         sfoo += '            return;\n'
@@ -239,17 +276,19 @@ def write_routine(_maxg, file_name, max_l_value, ao_chunk_length, max_geo_diff_o
         f.write(sfoo)
 
 
-def get_signature(g):
+def get_signature(g, suffix):
 
     s = []
 
-    s.append('void get_ao_g{0}('.format(g))
+    s.append('void get_ao_g{0}_{1}('.format(g, suffix))
     s.append('    const int    shell_l_quantum_numbers,')
     s.append('    const int    num_primitives,')
     s.append('    const bool   is_spherical,')
     s.append('    const double primitive_exponents[],')
     s.append('    const double contraction_coefficients[],')
     s.append('    const int    num_points,')
+    if suffix == 'explicit':
+        s.append('    const int    num_points_batch,')
     s.append('    const int    xoff,')
     s.append('          double s[],')
     s.append('          double buffer[],')
@@ -274,8 +313,10 @@ def get_header(max_geo_diff_order):
     s.append('')
 
     for g in range(0, max_geo_diff_order + 1):
-        s.append(get_signature(g))
-
+        s.append(get_signature(g, 'block'))
+        s.append('    );')
+        s.append('')
+        s.append(get_signature(g, 'explicit'))
         s.append('    );')
         s.append('')
 
@@ -298,6 +339,7 @@ void ao_dispatch(
     const double primitive_exponents[],
     const double contraction_coefficients[],
     const int    num_points,
+    const int    num_points_batch,
     const int    xoff,
           double s[],
           double buffer[],
@@ -316,6 +358,7 @@ void ao_dispatch(
 
 
 #include "autogenerated.h"
+#include "parameters.h"
 
 
 void ao_dispatch(
@@ -326,6 +369,7 @@ void ao_dispatch(
     const double primitive_exponents[],
     const double contraction_coefficients[],
     const int    num_points,
+    const int    num_points_batch,
     const int    xoff,
           double s[],
           double buffer[],
@@ -339,39 +383,78 @@ void ao_dispatch(
           double ao_000[]
     )
 {
-    switch (max_geo_order)
+    if (num_points_batch < AO_CHUNK_LENGTH)
     {
+        switch (max_geo_order)
+        {
 ''')
 
         for g in range(max_geo_diff_order + 1):
-            f.write('''        case {order}:
-            get_ao_g{order}(
-                shell_l_quantum_number,
-                num_primitives,
-                is_spherical,
-                primitive_exponents,
-                contraction_coefficients,
-                num_points,
-                xoff,
-                s,
-                buffer,
-                shell_centers_coordinates,
-                extent_squared,
-                pw,
-                px,
-                py,
-                pz,
-                p2,
-                ao_000
-                );
-            break;
+            f.write('''            case {order}:
+                get_ao_g{order}_explicit(
+                    shell_l_quantum_number,
+                    num_primitives,
+                    is_spherical,
+                    primitive_exponents,
+                    contraction_coefficients,
+                    num_points,
+                    num_points_batch,
+                    xoff,
+                    s,
+                    buffer,
+                    shell_centers_coordinates,
+                    extent_squared,
+                    pw,
+                    px,
+                    py,
+                    pz,
+                    p2,
+                    ao_000
+                    );
+                break;
 '''.format(order=g))
 
-        f.write('''
-        default:
-            std::cout << "ERROR: get_ao order too high";
-            exit(1);
-            break;
+        f.write('''            default:
+                std::cout << "ERROR: get_ao order too high";
+                exit(1);
+                break;
+        }
+    }
+    else
+    {
+        switch (max_geo_order)
+        {
+''')
+
+        for g in range(max_geo_diff_order + 1):
+            f.write('''            case {order}:
+                get_ao_g{order}_block(
+                    shell_l_quantum_number,
+                    num_primitives,
+                    is_spherical,
+                    primitive_exponents,
+                    contraction_coefficients,
+                    num_points,
+                    xoff,
+                    s,
+                    buffer,
+                    shell_centers_coordinates,
+                    extent_squared,
+                    pw,
+                    px,
+                    py,
+                    pz,
+                    p2,
+                    ao_000
+                    );
+                break;
+'''.format(order=g))
+
+        f.write('''            default:
+                std::cout << "ERROR: get_ao order too high";
+                exit(1);
+                break;
+        }
     }
 }
 ''')
@@ -392,8 +475,15 @@ def main(output_directory, max_l_value, ao_chunk_length, max_geo_diff_order):
     with open(os.path.join(output_directory, 'offsets.h'), 'w') as f:
         f.write(get_offsets(max_l_value, ao_chunk_length, max_geo_diff_order))
 
-    for g in range(0, max_geo_diff_order + 1):
-        write_routine(g, os.path.join(output_directory, 'autogenerated_%i.cpp' % g), max_l_value, ao_chunk_length, max_geo_diff_order, d_geo_ijk_slice)
+    for suffix in ['block', 'explicit']:
+        for g in range(0, max_geo_diff_order + 1):
+            write_routine(g,
+                          os.path.join(output_directory, 'autogenerated_{0}_{1}.cpp'.format(g, suffix)),
+                          max_l_value,
+                          ao_chunk_length,
+                          max_geo_diff_order,
+                          d_geo_ijk_slice,
+                          suffix)
 
     with open(os.path.join(output_directory, 'autogenerated.h'), 'w') as f:
         f.write(get_header(max_geo_diff_order))
