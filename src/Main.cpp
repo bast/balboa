@@ -277,11 +277,6 @@ int Main::get_ao(const int    max_geo_order,
     double s[AO_CHUNK_LENGTH];
     double buffer[BUFFER_LENGTH];
 
-    // FIXME can be optimized
-    // we do this because p can be shorter than 4*AO_CHUNK_LENGTH
-    // we pad it by very large numbers to let the code screen them away
-    double p_block[4*AO_CHUNK_LENGTH];
-
     assert(max_geo_order <= MAX_GEO_DIFF_ORDER);
 
     int n = 0;
@@ -294,9 +289,6 @@ int Main::get_ao(const int    max_geo_order,
             int num_points_batch = std::min(AO_CHUNK_LENGTH, num_points_left);
 
             num_points_left -= num_points_batch;
-
-            std::fill(&p_block[0], &p_block[4*AO_CHUNK_LENGTH], 1.0e50);
-            std::copy(&p[4*koff], &p[4*koff + 4*num_points_batch], &p_block[0]);
 
             int zoff = koff + shell_off[ishell]*num_points;
             int xoff = num_ao*num_points;
@@ -315,7 +307,7 @@ int Main::get_ao(const int    max_geo_order,
                  buffer,
                  &shell_centers_coordinates[3*ishell],
                  shell_extent_squared[ishell],
-                 p_block,
+                 &p[4*koff],
                  px,
                  py,
                  pz,
