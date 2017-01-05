@@ -30,7 +30,7 @@ Nothing is stable.
 
 You need the following to install the code:
 
-- C and C++ compilers
+- C++ compiler
 - [CMake](https://cmake.org)
 - [Python](https://www.python.org)
 
@@ -59,7 +59,7 @@ make test
 Let us assume that we have N basis functions and P points.
 
 ```
-[ geo_000 (undifferentiated)         ][ geo_100 ][ geo_010 ][ geo_001 ] ...
+[ geo_000 (undifferentiated)         ][ geo_100 (1st-order derivative wrt x)][ geo_010 ][ geo_001 ][ geo_200 ] ...
 [ ao_1    ][ ao_2    ] ... [ ao_N    ]
 [ 1 ... P ][ 1 ... P ] ... [ 1 ... P ]
 ```
