@@ -15,9 +15,10 @@
 #define AS_CTYPE(Type, Obj) reinterpret_cast<const Type *>(Obj)
 
 
-context_t *new_context()
+BALBOA_API
+balboa_context_t *new_balboa_context()
 {
-    return AS_TYPE(context_t, new Main());
+    return AS_TYPE(balboa_context_t, new Main());
 }
 Main::Main()
 {
@@ -25,10 +26,11 @@ Main::Main()
 }
 
 
-void free_context(context_t *context)
+BALBOA_API
+void free_balboa_context(balboa_context_t *balboa_context)
 {
-    if (!context) return;
-    delete AS_TYPE(Main, context);
+    if (!balboa_context) return;
+    delete AS_TYPE(Main, balboa_context);
 }
 Main::~Main()
 {
@@ -37,9 +39,10 @@ Main::~Main()
 }
 
 
-BALBOA_API int get_num_aos(const context_t *context)
+BALBOA_API
+int balboa_get_num_aos(const balboa_context_t *balboa_context)
 {
-    return AS_CTYPE(Main, context)->get_num_aos();
+    return AS_CTYPE(Main, balboa_context)->get_num_aos();
 }
 int Main::get_num_aos() const
 {
@@ -47,11 +50,14 @@ int Main::get_num_aos() const
 }
 
 
-BALBOA_API int get_buffer_len(const context_t *context,
-                              const int max_geo_order,
-                              const int num_points)
+BALBOA_API
+int balboa_get_buffer_len(
+    const balboa_context_t *balboa_context,
+    const int max_geo_order,
+    const int num_points
+    )
 {
-    return AS_CTYPE(Main, context)->get_buffer_len(max_geo_order,
+    return AS_CTYPE(Main, balboa_context)->get_buffer_len(max_geo_order,
                                                    num_points);
 }
 int Main::get_buffer_len(const int max_geo_order,
@@ -72,18 +78,21 @@ int Main::get_buffer_len(const int max_geo_order,
 }
 
 
-BALBOA_API int set_basis(context_t *context,
-                         const int    basis_type,
-                         const int    num_centers,
-                         const double center_coordinates[],
-                         const int    num_shells,
-                         const int    shell_centers[],
-                         const int    shell_l_quantum_numbers[],
-                         const int    shell_num_primitives[],
-                         const double primitive_exponents[],
-                         const double contraction_coefficients[])
+BALBOA_API
+int balboa_set_basis(
+    balboa_context_t *balboa_context,
+    const int    basis_type,
+    const int    num_centers,
+    const double center_coordinates[],
+    const int    num_shells,
+    const int    shell_centers[],
+    const int    shell_l_quantum_numbers[],
+    const int    shell_num_primitives[],
+    const double primitive_exponents[],
+    const double contraction_coefficients[]
+    )
 {
-    return AS_TYPE(Main, context)->set_basis(basis_type,
+    return AS_TYPE(Main, balboa_context)->set_basis(basis_type,
                                              num_centers,
                                              center_coordinates,
                                              num_shells,
@@ -264,15 +273,18 @@ int Main::set_basis(const int    in_basis_type,
 }
 
 
-BALBOA_API int get_ao(const context_t *context,
-                      const int    max_geo_order,
-                      const int    num_points,
-                      const double x_coordinates_bohr[],
-                      const double y_coordinates_bohr[],
-                      const double z_coordinates_bohr[],
-                            double buffer[])
+BALBOA_API
+int balboa_get_ao(
+    const balboa_context_t *balboa_context,
+    const int    max_geo_order,
+    const int    num_points,
+    const double x_coordinates_bohr[],
+    const double y_coordinates_bohr[],
+    const double z_coordinates_bohr[],
+          double buffer[]
+    )
 {
-    return AS_CTYPE(Main, context)->get_ao(max_geo_order,
+    return AS_CTYPE(Main, balboa_context)->get_ao(max_geo_order,
                                            num_points,
                                            x_coordinates_bohr,
                                            y_coordinates_bohr,
