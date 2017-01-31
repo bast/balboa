@@ -16,7 +16,7 @@
 
 
 BALBOA_API
-balboa_context_t *new_balboa_context()
+balboa_context_t *balboa_new_context()
 {
     return AS_TYPE(balboa_context_t, new Main());
 }
@@ -27,7 +27,7 @@ Main::Main()
 
 
 BALBOA_API
-void free_balboa_context(balboa_context_t *balboa_context)
+void balboa_free_context(balboa_context_t *balboa_context)
 {
     if (!balboa_context) return;
     delete AS_TYPE(Main, balboa_context);

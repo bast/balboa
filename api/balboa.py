@@ -44,8 +44,8 @@ _lib = _get_lib_handle(
 
 
 # outward facing API
-new_context = _lib.new_balboa_context
-free_context = _lib.free_balboa_context
+new_context = _lib.balboa_new_context
+free_context = _lib.balboa_free_context
 set_basis = _lib.balboa_set_basis
 get_buffer_len = _lib.balboa_get_buffer_len
 get_ao = _lib.balboa_get_ao

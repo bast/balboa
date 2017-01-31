@@ -27,10 +27,10 @@ struct balboa_context_s;
 typedef struct balboa_context_s balboa_context_t;
 
 BALBOA_API
-balboa_context_t *new_balboa_context();
+balboa_context_t *balboa_new_context();
 
 BALBOA_API
-void free_balboa_context(balboa_context_t *balboa_context);
+void balboa_free_context(balboa_context_t *balboa_context);
 
 BALBOA_API
 int balboa_set_basis(
