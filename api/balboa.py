@@ -1,5 +1,7 @@
 import sys
 import os
+from subprocess import Popen, PIPE
+from cffi import FFI
 
 
 def _get_env(v):
@@ -18,8 +20,6 @@ def _get_library_suffix():
 
 
 def _get_lib_handle(definitions, header, library, build_dir, include_dir):
-    from subprocess import Popen, PIPE
-    from cffi import FFI
     ffi = FFI()
 
     interface = Popen(['cc', '-E'] + definitions + [os.path.join(include_dir, header)],
