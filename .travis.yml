@@ -23,7 +23,7 @@ script:
   - make
   - cd ..
   - pep8 test/test.py
-  - PROJECT_BUILD_DIR=$PWD/build PYTHONPATH=$PWD/api py.test -s -vv test/test.py
+  - BALBOA_BUILD_DIR=$PWD/build PYTHONPATH=$PWD/api py.test -s -vv test/test.py
   - py.test -s -vv src/generate.py
 
 notifications:

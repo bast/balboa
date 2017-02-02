@@ -6,7 +6,7 @@ set_property(
     TEST
         test_main
     PROPERTY
-        ENVIRONMENT PROJECT_BUILD_DIR=${PROJECT_BINARY_DIR}
+        ENVIRONMENT BALBOA_BUILD_DIR=${PROJECT_BINARY_DIR}
     )
 
 set_property(
