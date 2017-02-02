@@ -32,7 +32,7 @@ def _get_lib_handle(definitions, header, library, build_dir, include_dir):
 
 
 _build_dir = _get_env('PROJECT_BUILD_DIR')
-_include_dir = _get_env('PROJECT_INCLUDE_DIR')
+_include_dir = os.path.dirname(os.path.realpath(__file__))
 
 _lib = _get_lib_handle(
     ['-DBALBOA_API=', '-DBALBOA_NOINCLUDE'],

@@ -14,14 +14,6 @@ set_property(
         test_main
     APPEND
     PROPERTY
-        ENVIRONMENT PROJECT_INCLUDE_DIR=${PROJECT_SOURCE_DIR}/api
-    )
-
-set_property(
-    TEST
-        test_main
-    APPEND
-    PROPERTY
         ENVIRONMENT PYTHONPATH=${PROJECT_SOURCE_DIR}/api
     )
 
