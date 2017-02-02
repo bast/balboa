@@ -33,39 +33,33 @@ BALBOA_API
 void balboa_free_context(balboa_context_t *balboa_context);
 
 BALBOA_API
-int balboa_set_basis(
-    balboa_context_t *balboa_context,
-    const int    basis_type,
-    const int    num_centers,
-    const double center_coordinates_bohr[],
-    const int    num_shells,
-    const int    shell_centers[],
-    const int    shell_l_quantum_numbers[],
-    const int    shell_num_primitives[],
-    const double primitive_exponents[],
-    const double contraction_coefficients[]
-    );
+int balboa_set_basis(balboa_context_t *balboa_context,
+                     const int basis_type,
+                     const int num_centers,
+                     const double center_coordinates_bohr[],
+                     const int num_shells,
+                     const int shell_centers[],
+                     const int shell_l_quantum_numbers[],
+                     const int shell_num_primitives[],
+                     const double primitive_exponents[],
+                     const double contraction_coefficients[]);
 
 BALBOA_API
 int balboa_get_num_aos(const balboa_context_t *balboa_context);
 
 BALBOA_API
-int balboa_get_buffer_len(
-    const balboa_context_t *balboa_context,
-    const int max_geo_order,
-    const int num_points
-    );
+int balboa_get_buffer_len(const balboa_context_t *balboa_context,
+                          const int max_geo_order,
+                          const int num_points);
 
 BALBOA_API
-int balboa_get_ao(
-    const balboa_context_t *balboa_context,
-    const int    max_geo_order,
-    const int    num_points,
-    const double x_coordinates_bohr[],
-    const double y_coordinates_bohr[],
-    const double z_coordinates_bohr[],
-          double buffer[]
-    );
+int balboa_get_ao(const balboa_context_t *balboa_context,
+                  const int max_geo_order,
+                  const int num_points,
+                  const double x_coordinates_bohr[],
+                  const double y_coordinates_bohr[],
+                  const double z_coordinates_bohr[],
+                  double buffer[]);
 
 #ifdef __cplusplus
 }
