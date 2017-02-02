@@ -18,6 +18,8 @@ class Main
                   const double contraction_coefficients[]);
 
     int get_buffer_len(const int max_geo_order, const int num_points) const;
+    int get_ao_center(const int i) const;
+    int get_geo_offset(const int i, const int j, const int k) const;
 
     int get_num_aos() const;
 
@@ -59,6 +61,8 @@ class Main
     int *ao_center;
     double *contraction_coefficients;
     int is_initialized;
+    int *geo_offset;
+    int geo_offset_size;
 };
 
 #endif // MAIN_H_INCLUDED

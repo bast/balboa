@@ -48,6 +48,15 @@ BALBOA_API
 int balboa_get_num_aos(const balboa_context_t *balboa_context);
 
 BALBOA_API
+int balboa_get_ao_center(const balboa_context_t *balboa_context, const int i);
+
+BALBOA_API
+int balboa_get_geo_offset(const balboa_context_t *balboa_context,
+                          const int i,
+                          const int j,
+                          const int k);
+
+BALBOA_API
 int balboa_get_buffer_len(const balboa_context_t *balboa_context,
                           const int max_geo_order,
                           const int num_points);

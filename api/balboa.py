@@ -50,3 +50,5 @@ set_basis = _lib.balboa_set_basis
 get_buffer_len = _lib.balboa_get_buffer_len
 get_ao = _lib.balboa_get_ao
 get_num_aos = _lib.balboa_get_num_aos
+get_ao_center = _lib.balboa_get_ao_center
+get_geo_offset = _lib.balboa_get_geo_offset

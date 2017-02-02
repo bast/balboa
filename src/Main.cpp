@@ -14,14 +14,12 @@
 #define AS_TYPE(Type, Obj) reinterpret_cast<Type *>(Obj)
 #define AS_CTYPE(Type, Obj) reinterpret_cast<const Type *>(Obj)
 
-BALBOA_API
 balboa_context_t *balboa_new_context()
 {
     return AS_TYPE(balboa_context_t, new Main());
 }
 Main::Main() { nullify(); }
 
-BALBOA_API
 void balboa_free_context(balboa_context_t *balboa_context)
 {
     if (!balboa_context)
@@ -34,14 +32,12 @@ Main::~Main()
     nullify();
 }
 
-BALBOA_API
 int balboa_get_num_aos(const balboa_context_t *balboa_context)
 {
     return AS_CTYPE(Main, balboa_context)->get_num_aos();
 }
 int Main::get_num_aos() const { return num_ao; }
 
-BALBOA_API
 int balboa_get_buffer_len(const balboa_context_t *balboa_context,
                           const int max_geo_order,
                           const int num_points)
@@ -65,7 +61,28 @@ int Main::get_buffer_len(const int max_geo_order, const int num_points) const
     return m * num_points * num_ao_cartesian;
 }
 
-BALBOA_API
+int balboa_get_ao_center(const balboa_context_t *balboa_context, const int i)
+{
+    return AS_CTYPE(Main, balboa_context)->get_ao_center(i);
+}
+int Main::get_ao_center(const int i) const { return ao_center[i]; }
+
+int balboa_get_geo_offset(const balboa_context_t *balboa_context,
+                          const int i,
+                          const int j,
+                          const int k)
+{
+    return AS_CTYPE(Main, balboa_context)->get_geo_offset(i, j, k);
+}
+int Main::get_geo_offset(const int i, const int j, const int k) const
+{
+    int id = (MAX_GEO_DIFF_ORDER + 1) * (MAX_GEO_DIFF_ORDER + 1) * k;
+    id += (MAX_GEO_DIFF_ORDER + 1) * j;
+    id += i;
+    assert(id < geo_offset_size);
+    return geo_offset[id];
+}
+
 int balboa_set_basis(balboa_context_t *balboa_context,
                      const int basis_type,
                      const int num_centers,
@@ -270,12 +287,37 @@ int Main::set_basis(const int in_basis_type,
         i += deg;
     }
 
+    int array_length = (int)pow(MAX_GEO_DIFF_ORDER + 1, 3);
+    geo_offset = new int[array_length];
+
+    int j, k, m, id;
+    m = 0;
+    for (int l = 0; l <= MAX_GEO_DIFF_ORDER; l++)
+    {
+        for (int a = 1; a <= (l + 1); a++)
+        {
+            for (int b = 1; b <= a; b++)
+            {
+                i = l + 1 - a;
+                j = a - b;
+                k = b - 1;
+
+                id = (MAX_GEO_DIFF_ORDER + 1) * (MAX_GEO_DIFF_ORDER + 1) * k;
+                id += (MAX_GEO_DIFF_ORDER + 1) * j;
+                id += i;
+                geo_offset[id] = m * num_ao;
+
+                m++;
+            }
+        }
+    }
+    geo_offset_size = id;
+
     is_initialized = 12345678;
 
     return 0;
 }
 
-BALBOA_API
 int balboa_get_ao(const balboa_context_t *balboa_context,
                   const int max_geo_order,
                   const int num_points,
@@ -387,4 +429,5 @@ void Main::deallocate()
     delete[] shell_num_primitives;
     delete[] primitive_exponents;
     delete[] contraction_coefficients;
+    delete[] geo_offset;
 }
