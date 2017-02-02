@@ -10,7 +10,7 @@ class Main
 
         int set_basis(const int    basis_type,
                       const int    num_centers,
-                      const double center_coordinates[],
+                      const double center_coordinates_bohr[],
                       const int    num_shells,
                       const int    shell_centers[],
                       const int    shell_l_quantum_numbers[],
@@ -46,7 +46,7 @@ class Main
         int    *shell_l_quantum_numbers;
         int    *shell_num_primitives;
         double *primitive_exponents;
-        double *center_coordinates;
+        double *center_coordinates_bohr;
         int    *shell_centers;
 
         double *shell_centers_coordinates;

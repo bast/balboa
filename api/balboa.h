@@ -37,7 +37,7 @@ int balboa_set_basis(
     balboa_context_t *balboa_context,
     const int    basis_type,
     const int    num_centers,
-    const double center_coordinates[],
+    const double center_coordinates_bohr[],
     const int    num_shells,
     const int    shell_centers[],
     const int    shell_l_quantum_numbers[],

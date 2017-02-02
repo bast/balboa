@@ -15,7 +15,7 @@ def sub(num_points,
     num_slices = 10
 
     num_centers = 2
-    center_coordinates = [
+    center_coordinates_bohr = [
         1.7,
         0.0,
         0.0,
@@ -102,7 +102,7 @@ def sub(num_points,
     ierr = balboa.set_basis(context,
                             0,
                             num_centers,
-                            center_coordinates,
+                            center_coordinates_bohr,
                             num_shells,
                             shell_centers,
                             shell_l_quantum_numbers,

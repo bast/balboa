@@ -83,7 +83,7 @@ int balboa_set_basis(
     balboa_context_t *balboa_context,
     const int    basis_type,
     const int    num_centers,
-    const double center_coordinates[],
+    const double center_coordinates_bohr[],
     const int    num_shells,
     const int    shell_centers[],
     const int    shell_l_quantum_numbers[],
@@ -94,7 +94,7 @@ int balboa_set_basis(
 {
     return AS_TYPE(Main, balboa_context)->set_basis(basis_type,
                                              num_centers,
-                                             center_coordinates,
+                                             center_coordinates_bohr,
                                              num_shells,
                                              shell_centers,
                                              shell_l_quantum_numbers,
@@ -104,7 +104,7 @@ int balboa_set_basis(
 }
 int Main::set_basis(const int    in_basis_type,
                     const int    in_num_centers,
-                    const double in_center_coordinates[],
+                    const double in_center_coordinates_bohr[],
                     const int    in_num_shells,
                     const int    in_shell_centers[],
                     const int    in_shell_l_quantum_numbers[],
@@ -138,8 +138,8 @@ int Main::set_basis(const int    in_basis_type,
 
     num_shells = in_num_shells;
 
-    center_coordinates = new double[3*num_centers];
-    std::copy(&in_center_coordinates[0], &in_center_coordinates[3*num_centers], &center_coordinates[0]);
+    center_coordinates_bohr = new double[3*num_centers];
+    std::copy(&in_center_coordinates_bohr[0], &in_center_coordinates_bohr[3*num_centers], &center_coordinates_bohr[0]);
 
     shell_centers = new int[num_shells];
     std::copy(&in_shell_centers[0], &in_shell_centers[num_shells], &shell_centers[0]);
@@ -150,7 +150,7 @@ int Main::set_basis(const int    in_basis_type,
     {
         for (int ixyz = 0; ixyz < 3; ixyz++)
         {
-            shell_centers_coordinates[3*ishell + ixyz] = in_center_coordinates[3*(in_shell_centers[ishell]-1) + ixyz];
+            shell_centers_coordinates[3*ishell + ixyz] = in_center_coordinates_bohr[3*(in_shell_centers[ishell]-1) + ixyz];
         }
     }
 
@@ -357,7 +357,7 @@ void Main::nullify()
     num_centers               = -1;
     num_shells                = -1;
     shell_l_quantum_numbers   = NULL;
-    center_coordinates        = NULL;
+    center_coordinates_bohr        = NULL;
     shell_centers             = NULL;
     shell_centers_coordinates = NULL;
     shell_extent_squared      = NULL;
@@ -379,7 +379,7 @@ void Main::nullify()
 void Main::deallocate()
 {
     delete[] shell_l_quantum_numbers;
-    delete[] center_coordinates;
+    delete[] center_coordinates_bohr;
     delete[] shell_centers;
     delete[] shell_centers_coordinates;
     delete[] shell_extent_squared;
