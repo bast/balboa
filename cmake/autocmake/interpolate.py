@@ -37,12 +37,12 @@ def test_interpolate():
          'bar': 'ho',
          'one': 'hey %(foo) ho %(bar)',
          'two': {'one': 'hey %(foo) ho %(bar)',
-                 'two': 'balboa_context'}}
+                 'two': 'raboof'}}
     d_interpolated = {'foo': 'hey',
                       'bar': 'ho',
                       'one': 'hey hey ho ho',
                       'two': {'one': 'hey hey ho ho',
-                              'two': 'balboa_context'}}
+                              'two': 'raboof'}}
     assert interpolate(d, d) == d_interpolated
 
 
@@ -51,12 +51,12 @@ def test_interpolate_int():
          'bar': 2,
          'one': 'hey %(foo) ho %(bar)',
          'two': {'one': 'hey %(foo) ho %(bar)',
-                 'two': 'balboa_context'}}
+                 'two': 'raboof'}}
     d_interpolated = {'foo': 1,
                       'bar': 2,
                       'one': 'hey 1 ho 2',
                       'two': {'one': 'hey 1 ho 2',
-                              'two': 'balboa_context'}}
+                              'two': 'raboof'}}
     assert interpolate(d, d) == d_interpolated
 
 

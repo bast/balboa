@@ -5,6 +5,7 @@
 
 import os
 import sys
+assert sys.version_info >= (2, 6), 'Python >= 2.6 is required' 
 
 sys.path.insert(0, 'cmake')
 from autocmake import configure
@@ -20,7 +21,7 @@ Options:
   --cxx=<CXX>                            C++ compiler [default: g++].
   --extra-cxx-flags=<EXTRA_CXXFLAGS>     Extra C++ compiler flags [default: ''].
   --python=<PYTHON_INTERPRETER>          The Python interpreter (development version) to use. [default: ''].
-  --type=<TYPE>                          Set the CMake build type (debug, release, or relwithdeb) [default: release].
+  --type=<TYPE>                          Set the CMake build type (debug, release, relwithdebinfo, minsizerel) [default: release].
   --generator=<STRING>                   Set the CMake build system generator [default: Unix Makefiles].
   --show                                 Show CMake command and exit.
   --cmake-executable=<CMAKE_EXECUTABLE>  Set the CMake executable [default: cmake].
