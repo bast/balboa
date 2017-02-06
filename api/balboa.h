@@ -2,21 +2,8 @@
 #define BALBOA_H_INCLUDED
 
 #ifndef BALBOA_API
-#  ifdef _WIN32
-#    if defined(BALBOA_BUILD_SHARED) /* build dll */
-#      define BALBOA_API __declspec(dllexport)
-#    elif !defined(BALBOA_BUILD_STATIC) /* use dll */
-#      define BALBOA_API __declspec(dllimport)
-#    else /* static library */
-#      define BALBOA_API
-#    endif
-#  else
-#    if __GNUC__ >= 4
-#      define BALBOA_API __attribute__((visibility("default")))
-#    else
-#      define BALBOA_API
-#    endif
-#  endif
+#include "balboa_export.h"
+#define BALBOA_API balboa_EXPORT
 #endif
 
 #ifdef __cplusplus

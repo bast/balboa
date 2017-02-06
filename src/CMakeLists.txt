@@ -1,5 +1,6 @@
 include_directories(${PROJECT_SOURCE_DIR}/src)
 include_directories(${PROJECT_SOURCE_DIR}/api)
+include_directories(${PROJECT_BINARY_DIR}/include)
 
 set(_generated_files ${PROJECT_BINARY_DIR}/generated/ao_dispatch.cpp)
 
@@ -24,3 +25,5 @@ add_library(
 add_dependencies(balboa generate)
 
 install(TARGETS balboa LIBRARY DESTINATION lib)
+install(FILES ${PROJECT_BINARY_DIR}/include/balboa.h DESTINATION include)
+install(FILES ${PROJECT_BINARY_DIR}/include/balboa_export.h DESTINATION include)
