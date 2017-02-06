@@ -22,7 +22,7 @@ script:
   - cd build
   - make
   - cd ..
-  - pep8 test/test.py
+  - pep8 --ignore=E501 test/test.py
   - BALBOA_BUILD_DIR=$PWD/build PYTHONPATH=$PWD/api py.test -s -vv test/test.py
   - py.test -s -vv src/generate.py
 
