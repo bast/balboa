@@ -147,10 +147,10 @@ def sub(num_points,
 
     # buffer length is adjusted for number of cartesian aos
     # so possibly longer than the number of spherical aos
-    l = balboa.get_buffer_len(context, max_geo_order, num_points)
+    _l = balboa.get_buffer_len(context, max_geo_order, num_points)
 
     # allocate a numpy array of length l and zero it out
-    aos = np.zeros(l, dtype=np.float64)
+    aos = np.zeros(_l, dtype=np.float64)
 
     # cast a pointer which points to the numpy array data
     ffi = FFI()
