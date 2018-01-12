@@ -1,14 +1,13 @@
+import balboa
+import numpy as np
+from cffi import FFI
+import os
+import random
 
 
 def sub(num_points,
         num_points_reference,
         generate_reference=False):
-
-    import balboa
-    import numpy as np
-    from cffi import FFI
-    import os
-    import random
 
     assert num_points <= num_points_reference
     max_geo_order = 2
