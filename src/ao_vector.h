@@ -1,5 +1,4 @@
-#ifndef AO_VECTOR_H_INCLUDED
-#define AO_VECTOR_H_INCLUDED
+#pragma once
 
 // vec r = vec p * vec a
 void get_pa(const int num_points,
@@ -85,5 +84,3 @@ bool calculate_chunk(const int num_points,
 
 bool calculate_chunk_block(const double extent_squared,
                            const double *__restrict__ p2);
-
-#endif // AO_VECTOR_H_INCLUDED

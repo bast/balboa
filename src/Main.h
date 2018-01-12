@@ -1,5 +1,4 @@
-#ifndef MAIN_H_INCLUDED
-#define MAIN_H_INCLUDED
+#pragma once
 
 class Main
 {
@@ -64,5 +63,3 @@ class Main
     int *geo_offset;
     int geo_offset_size;
 };
-
-#endif // MAIN_H_INCLUDED
