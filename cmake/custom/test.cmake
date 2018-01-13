@@ -17,4 +17,4 @@ set_property(
         ENVIRONMENT PYTHONPATH=${PROJECT_SOURCE_DIR}/api
     )
 
-add_test(test_generate py.test -vv -s ${PROJECT_SOURCE_DIR}/src/generate.py)
+add_test(test_generate py.test -vv -s ${PROJECT_SOURCE_DIR}/balboa/generate.py)

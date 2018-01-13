@@ -22,7 +22,7 @@ add_custom_command(
     OUTPUT
         ${_generated_files}
     COMMAND
-        ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/src/generate.py
+        ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/balboa/generate.py
                              ${PROJECT_BINARY_DIR}/generated
                              ${MAX_L_VALUE}
                              ${AO_CHUNK_LENGTH}
@@ -46,7 +46,7 @@ add_library(
 target_include_directories(
     balboa
     PRIVATE
-    ${PROJECT_SOURCE_DIR}/src
+    ${PROJECT_SOURCE_DIR}/balboa
     ${PROJECT_SOURCE_DIR}/api
     ${PROJECT_BINARY_DIR}/include
     ${PROJECT_BINARY_DIR}/generated

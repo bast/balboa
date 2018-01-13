@@ -3,7 +3,7 @@ set(MAX_GEO_DIFF_ORDER "5" CACHE STRING "Maximum geometric differentiation order
 set(MAX_L_VALUE "5" CACHE STRING "Maximum L value")
 
 configure_file(
-    ${PROJECT_SOURCE_DIR}/src/parameters.h.in
+    ${PROJECT_SOURCE_DIR}/balboa/parameters.h.in
     ${PROJECT_BINARY_DIR}/generated/parameters.h
     @ONLY
     )
