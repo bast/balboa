@@ -14,7 +14,7 @@ set_property(
         test_main
     APPEND
     PROPERTY
-        ENVIRONMENT PYTHONPATH=${PROJECT_SOURCE_DIR}/api
+        ENVIRONMENT PYTHONPATH=${PROJECT_SOURCE_DIR}/balboa
     )
 
 add_test(test_generate py.test -vv -s ${PROJECT_SOURCE_DIR}/balboa/generate.py)

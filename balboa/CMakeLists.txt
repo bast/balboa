@@ -47,7 +47,6 @@ target_include_directories(
     balboa
     PRIVATE
     ${PROJECT_SOURCE_DIR}/balboa
-    ${PROJECT_SOURCE_DIR}/api
     ${PROJECT_BINARY_DIR}/include
     ${PROJECT_BINARY_DIR}/generated
     )
