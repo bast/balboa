@@ -18,13 +18,11 @@ install:
   - pip install -r requirements.txt
 
 script:
+  - pycodestyle --ignore=E501 test/test.py
   - ./setup
   - cd build
-  - make
-  - cd ..
-  - pycodestyle --ignore=E501 test/test.py
-  - BALBOA_LIBRARY_DIR=$PWD/build/lib BALBOA_INCLUDE_DIR=$PWD/balboa PYTHONPATH=$PWD py.test -s -vv test/test.py
-  - py.test -s -vv balboa/generate.py
+  - make -j2
+  - make test
 
 notifications:
   email: false
