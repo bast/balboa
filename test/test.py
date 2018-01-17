@@ -151,6 +151,9 @@ def sub(num_points,
     # allocate a numpy array of length l and zero it out
     aos = np.zeros(_l, dtype=np.float64)
 
+    # we set the array to some number to make sure it is zeroed out inside
+    aos.fill(123.456)
+
     # cast a pointer which points to the numpy array data
     ffi = FFI()
     aos_p = ffi.cast("double *", aos.ctypes.data)

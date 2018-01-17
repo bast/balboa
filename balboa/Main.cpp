@@ -348,6 +348,7 @@ int Main::get_ao(const int max_geo_order,
     double s[AO_CHUNK_LENGTH];
     double buffer[BUFFER_LENGTH];
 
+    std::fill(&ao_local[0], &ao_local[get_buffer_len(max_geo_order,num_points)], 0.0);
     assert(max_geo_order <= MAX_GEO_DIFF_ORDER);
 
     int n = 0;
