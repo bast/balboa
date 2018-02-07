@@ -62,6 +62,9 @@ We use he following naming:
 geo_000: undifferentiated
 geo_100: 1st-order derivative wrt x
 geo_010: 1st-order derivative wrt y
+geo_001: 1st-order derivative wrt z
+geo_200: 2nd-order derivative wrt x
+geo_110: mixed derivative wrt x and y
 ...
 
 ```
@@ -69,7 +72,7 @@ geo_010: 1st-order derivative wrt y
 For N basis functions and P points the ordering is given by:
 
 ```
-[ geo_000                            ][ geo_100 ][ geo_010 ][ geo_001 ][ geo_200 ] ...
+[ geo_000                            ][ geo_100 ][ geo_010 ][ geo_001 ][ geo_200 ][ geo_110 ] ...
 [ ao_1    ][ ao_2    ] ... [ ao_N    ]
 [ 1 ... P ][ 1 ... P ] ... [ 1 ... P ]
 ```
