@@ -47,10 +47,10 @@ For testing you need:
 virtualenv venv
 source venv/bin/activate
 pip install -r requirements.txt
-./setup
+cmake -H. -Bbuild
 cd build
-make
-make test
+cmake --build .
+ctest
 ```
 
 
