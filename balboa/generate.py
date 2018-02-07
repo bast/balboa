@@ -176,8 +176,6 @@ def write_routine(_maxg,
 
                 get_exp_block(p2, c, a, s);
 
-                #pragma ivdep
-                #pragma vector aligned
                 for (int k = 0; k < %i; k++)
                 {
                     buffer[OFFSET_00_00_00_000 + k] += s[k];
@@ -191,8 +189,6 @@ def write_routine(_maxg,
 
                 get_exp(num_points_batch, p2, c, a, s);
 
-                #pragma ivdep
-                #pragma vector aligned
                 for (int k = 0; k < num_points_batch; k++)
                 {
                     buffer[OFFSET_00_00_00_000 + k] += s[k];

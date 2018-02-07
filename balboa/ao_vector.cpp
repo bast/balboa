@@ -9,8 +9,6 @@ void get_pa(const int num_points,
             const double *__restrict__ p,
             double *__restrict__ r)
 {
-#pragma ivdep
-#pragma vector aligned
     for (int k = 0; k < num_points; k++)
     {
         r[k] = p[k] * a[k];
@@ -22,8 +20,6 @@ void get_pa_block(const double *__restrict__ a,
                   const double *__restrict__ p,
                   double *__restrict__ r)
 {
-#pragma ivdep
-#pragma vector aligned
     for (int k = 0; k < AO_CHUNK_LENGTH; k++)
     {
         r[k] = p[k] * a[k];
@@ -37,8 +33,6 @@ void get_pa_plus_b(const int num_points,
                    const double *__restrict__ b,
                    double *__restrict__ r)
 {
-#pragma ivdep
-#pragma vector aligned
     for (int k = 0; k < num_points; k++)
     {
         r[k] = p[k] * a[k] + b[k];
@@ -51,8 +45,6 @@ void get_pa_plus_b_block(const double *__restrict__ a,
                          const double *__restrict__ b,
                          double *__restrict__ r)
 {
-#pragma ivdep
-#pragma vector aligned
     for (int k = 0; k < AO_CHUNK_LENGTH; k++)
     {
         r[k] = p[k] * a[k] + b[k];
@@ -67,8 +59,6 @@ void get_pa_plus_sb(const int num_points,
                     const double *__restrict__ b,
                     double *__restrict__ r)
 {
-#pragma ivdep
-#pragma vector aligned
     for (int k = 0; k < num_points; k++)
     {
         r[k] = p[k] * a[k] + s * b[k];
@@ -82,8 +72,6 @@ void get_pa_plus_sb_block(const double *__restrict__ a,
                           const double *__restrict__ b,
                           double *__restrict__ r)
 {
-#pragma ivdep
-#pragma vector aligned
     for (int k = 0; k < AO_CHUNK_LENGTH; k++)
     {
         r[k] = p[k] * a[k] + s * b[k];
@@ -98,8 +86,6 @@ void get_exp(const int num_points,
 {
     double b1, b2;
 
-#pragma ivdep
-#pragma vector aligned
     for (int k = 0; k < num_points; k++)
     {
         b1 = a * p2[k];
@@ -115,8 +101,6 @@ void get_exp_block(const double *__restrict__ p2,
 {
     double b1, b2;
 
-#pragma ivdep
-#pragma vector aligned
     for (int k = 0; k < AO_CHUNK_LENGTH; k++)
     {
         b1 = a * p2[k];
@@ -130,8 +114,6 @@ void vec_daxpy(const int num_points,
                const double *__restrict__ a,
                double *__restrict__ r)
 {
-#pragma ivdep
-#pragma vector aligned
     for (int k = 0; k < num_points; k++)
     {
         r[k] += s * a[k];
@@ -142,8 +124,6 @@ void vec_daxpy_block(const double s,
                      const double *__restrict__ a,
                      double *__restrict__ r)
 {
-#pragma ivdep
-#pragma vector aligned
     for (int k = 0; k < AO_CHUNK_LENGTH; k++)
     {
         r[k] += s * a[k];
@@ -160,8 +140,6 @@ void get_p2(const int num_points,
             double *__restrict__ pz,
             double *__restrict__ p2)
 {
-#pragma ivdep
-#pragma vector aligned
     for (int k = 0; k < num_points; k++)
     {
         px[k] = x_coordinates_bohr[k] - shell_centers_coordinates[0];
@@ -180,8 +158,6 @@ void get_p2_block(const double *__restrict__ shell_centers_coordinates,
                   double *__restrict__ pz,
                   double *__restrict__ p2)
 {
-#pragma ivdep
-#pragma vector aligned
     for (int k = 0; k < AO_CHUNK_LENGTH; k++)
     {
         px[k] = x_coordinates_bohr[k] - shell_centers_coordinates[0];
