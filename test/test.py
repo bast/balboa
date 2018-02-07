@@ -170,9 +170,14 @@ def sub(num_points,
     ao_centers = [balboa.get_ao_center(context, i) for i in range(num_aos)]
     assert ao_centers == [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1]
 
-    assert balboa.get_geo_offset(context, 0, 0, 1) == 57
-    assert balboa.get_geo_offset(context, 0, 1, 0) == 38
     assert balboa.get_geo_offset(context, 1, 0, 0) == 19
+    assert balboa.get_geo_offset(context, 0, 1, 0) == 19*2
+    assert balboa.get_geo_offset(context, 0, 0, 1) == 19*3
+    assert balboa.get_geo_offset(context, 2, 0, 0) == 19*4
+    assert balboa.get_geo_offset(context, 1, 1, 0) == 19*5
+    assert balboa.get_geo_offset(context, 1, 0, 1) == 19*6
+    assert balboa.get_geo_offset(context, 0, 2, 0) == 19*7
+    assert balboa.get_geo_offset(context, 0, 1, 1) == 19*8
 
     if generate_reference:
         with open(os.path.join(dir_path, 'result.txt'), 'w') as f:
