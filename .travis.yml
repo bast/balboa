@@ -19,10 +19,10 @@ install:
 
 script:
   - pycodestyle --ignore=E501 test/test.py
-  - ./setup
+  - cmake -H. -Bbuild
   - cd build
-  - make -j2
-  - make test
+  - cmake --build .
+  - ctest
 
 notifications:
   email: false
