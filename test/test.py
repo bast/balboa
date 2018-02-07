@@ -110,6 +110,7 @@ def sub(num_points,
                             contraction_coefficients)
 
     num_aos = balboa.get_num_aos(context)
+    assert num_aos == 19
 
     dir_path = os.path.dirname(os.path.realpath(__file__))
 
