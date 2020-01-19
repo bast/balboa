@@ -79,7 +79,7 @@ int Main::get_geo_offset(const int i, const int j, const int k) const
     int id = (MAX_GEO_DIFF_ORDER + 1) * (MAX_GEO_DIFF_ORDER + 1) * k;
     id += (MAX_GEO_DIFF_ORDER + 1) * j;
     id += i;
-    assert(id < geo_offset_size);
+    assert(id <= geo_offset_size);
     return geo_offset[id];
 }
 
