@@ -4,3 +4,5 @@ __pycache__/
 .cache/
 *.pyc
 .pytest_cache/
+/target
+**/*.rs.bk
