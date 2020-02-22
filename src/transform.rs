@@ -28,22 +28,23 @@ fn fac2(n: i32) -> f64 {
     }
 }
 
-fn binom(n: usize, k: usize) -> usize {
+// f64 to prevent overflow
+fn binom(n: usize, k: usize) -> f64 {
     if k == 0 {
-        return 1;
+        return 1.0;
     }
 
     if n == 0 {
-        return 0;
+        return 0.0;
     }
 
-    let mut m = n;
-    let mut b = 1;
+    let mut m = n as f64;
+    let mut b = 1.0;
 
     for j in 0..k {
         b = b * m;
-        b = b / (j + 1);
-        m -= 1;
+        b = b / ((j + 1) as f64);
+        m -= 1.0;
     }
 
     return b;
@@ -70,7 +71,7 @@ fn cartesian_to_spherical_coef(l: usize) -> Vec<Vec<f64>> {
     while k <= l / 2 {
         let prefactor = (-1.0 as f64).powf(k as f64) / (2.0 as f64).powf(l as f64);
         let x = binom(l, k) * binom(2 * (l - k), l);
-        legendre_coef[l - 2 * k] = prefactor * (x as f64);
+        legendre_coef[l - 2 * k] = prefactor * x;
         k += 1;
     }
 
@@ -102,9 +103,9 @@ fn cartesian_to_spherical_coef(l: usize) -> Vec<Vec<f64>> {
             let cmk = cm * legendre_coef[k];
             let mut i = 0;
             while i <= (l - k - m) / 2 {
-                let cmki = cmk * (binom((l - k - m) / 2, i) as f64);
+                let cmki = cmk * binom((l - k - m) / 2, i);
                 for j in 0..(i + 1) {
-                    let cmkij = cmki * (binom(i, j) as f64);
+                    let cmkij = cmki * binom(i, j);
                     for n in 0..(m + 1) {
                         let mut ix = l - 2 * j - m + n;
                         ix = ix * (ix + 1) / 2 + l + 1 - m - 2 * i;
