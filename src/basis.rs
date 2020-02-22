@@ -43,11 +43,9 @@ fn set_basis(
 
     let mut shell_centers_coordinates = Vec::new();
     for ishell in 0..num_shells {
-        for ixyz in 0..3 {
-            let i = shell_centers[ishell];
-            let (x, y, z) = center_coordinates_bohr[i - 1];
-            shell_centers_coordinates.push((x, y, z));
-        }
+        let i = shell_centers[ishell];
+        let (x, y, z) = center_coordinates_bohr[i - 1];
+        shell_centers_coordinates.push((x, y, z));
     }
 
     // get approximate spacial shell extent
