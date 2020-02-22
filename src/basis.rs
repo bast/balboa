@@ -1,18 +1,18 @@
 const MAX_L_VALUE: usize = 5;
 const MAX_GEO_DIFF_ORDER: usize = 3;
 
-struct Basis {
+pub struct Basis {
     is_spherical: bool,
     num_centers: usize,
     center_coordinates_bohr: Vec<(f64, f64, f64)>,
-    num_shells: usize,
+    pub num_shells: usize,
     shell_centers: Vec<usize>,
-    shell_centers_coordinates: Vec<(f64, f64, f64)>,
-    shell_l_quantum_numbers: Vec<usize>,
-    shell_num_primitives: Vec<usize>,
-    primitive_exponents: Vec<f64>,
-    contraction_coefficients: Vec<f64>,
-    cartesian_deg: Vec<usize>,
+    pub shell_centers_coordinates: Vec<(f64, f64, f64)>,
+    pub shell_l_quantum_numbers: Vec<usize>,
+    pub shell_num_primitives: Vec<usize>,
+    pub primitive_exponents: Vec<f64>,
+    pub contraction_coefficients: Vec<f64>,
+    pub cartesian_deg: Vec<usize>,
     shell_off: Vec<usize>,
     spherical_deg: Vec<usize>,
     num_ao_cartesian: usize,
@@ -23,7 +23,7 @@ struct Basis {
     geo_offset_size: usize,
 }
 
-fn set_basis(
+pub fn initialize_basis(
     is_spherical: bool,
     num_centers: usize,
     center_coordinates_bohr: Vec<(f64, f64, f64)>,
