@@ -6,7 +6,7 @@ fn main() {
     let center_coordinates_bohr = vec![(1.7, 0.0, 0.0), (0.0, 0.0, 0.0)];
     let num_shells = 9;
     let shell_centers = vec![1, 1, 1, 1, 1, 1, 2, 2, 2];
-    let shell_l_quantum_numbers = vec![0, 0, 0, 1, 1, 1, 0, 0, 1];
+    let shell_l_quantum_numbers = vec![0, 0, 0, 1, 1, 2, 0, 0, 1];
     let shell_num_primitives = vec![9, 9, 1, 4, 1, 1, 4, 1, 1];
 
     let primitive_exponents = vec![
@@ -62,5 +62,11 @@ fn main() {
         contraction_coefficients,
     );
 
-    balboa::get_ao_noddy(&basis, (-1.46254302355, 1.38973494775, 1.05509847591));
+    let c_to_s_matrices = balboa::cartesian_to_spherical_matrices();
+
+    balboa::get_ao_noddy(
+        (-1.46254302355, 1.38973494775, 1.05509847591),
+        &basis,
+        &c_to_s_matrices,
+    );
 }

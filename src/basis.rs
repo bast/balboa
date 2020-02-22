@@ -1,5 +1,4 @@
-const MAX_L_VALUE: usize = 5;
-const MAX_GEO_DIFF_ORDER: usize = 3;
+use crate::limits;
 
 pub struct Basis {
     is_spherical: bool,
@@ -14,7 +13,7 @@ pub struct Basis {
     pub contraction_coefficients: Vec<f64>,
     pub cartesian_deg: Vec<usize>,
     shell_off: Vec<usize>,
-    spherical_deg: Vec<usize>,
+    pub spherical_deg: Vec<usize>,
     num_ao_cartesian: usize,
     num_ao_spherical: usize,
     num_ao: usize,
@@ -36,7 +35,7 @@ pub fn initialize_basis(
 ) -> Basis {
     for ishell in 0..num_shells {
         assert!(
-            shell_l_quantum_numbers[ishell] <= MAX_L_VALUE,
+            shell_l_quantum_numbers[ishell] <= limits::MAX_L_VALUE,
             "increase MAX_L_VALUE"
         );
     }
@@ -59,7 +58,7 @@ pub fn initialize_basis(
 
     for ishell in 0..num_shells {
         let mut r: f64 = 0.0;
-        for j in 0..shell_num_primitives[ishell] {
+        for _ in 0..shell_num_primitives[ishell] {
             let e = primitive_exponents[n];
             let c = contraction_coefficients[n];
             n += 1;
@@ -122,21 +121,21 @@ pub fn initialize_basis(
         i += deg;
     }
 
-    let g = MAX_GEO_DIFF_ORDER + 1;
+    let g = limits::MAX_GEO_DIFF_ORDER + 1;
     let array_length = g * g * g;
     let mut geo_offset = vec![0; array_length];
 
     let mut id = 0;
     let mut m = 0;
-    for l in 0..(MAX_GEO_DIFF_ORDER + 1) {
+    for l in 0..(limits::MAX_GEO_DIFF_ORDER + 1) {
         for a in 1..(l + 2) {
             for b in 1..(a + 1) {
                 let i = l + 1 - a;
                 let j = a - b;
                 let k = b - 1;
 
-                id = (MAX_GEO_DIFF_ORDER + 1) * (MAX_GEO_DIFF_ORDER + 1) * k;
-                id += (MAX_GEO_DIFF_ORDER + 1) * j;
+                id = (limits::MAX_GEO_DIFF_ORDER + 1) * (limits::MAX_GEO_DIFF_ORDER + 1) * k;
+                id += (limits::MAX_GEO_DIFF_ORDER + 1) * j;
                 id += i;
 
                 geo_offset[id] = m * num_ao;

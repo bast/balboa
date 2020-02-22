@@ -1,3 +1,5 @@
+use crate::limits;
+
 // we return f64 to prevent overflow
 fn fac(n: usize) -> f64 {
     return (0..n).fold(1.0, |acc, i| acc * (i + 1) as f64);
@@ -47,7 +49,7 @@ fn binom(n: usize, k: usize) -> usize {
     return b;
 }
 
-pub fn cartesian_to_spherical_coef(l: usize) -> Vec<Vec<f64>> {
+fn cartesian_to_spherical_coef(l: usize) -> Vec<Vec<f64>> {
     if l == 0 {
         return vec![vec![1.0]];
     }
@@ -131,6 +133,16 @@ pub fn cartesian_to_spherical_coef(l: usize) -> Vec<Vec<f64>> {
     }
 
     return tc;
+}
+
+pub fn cartesian_to_spherical_matrices() -> Vec<Vec<Vec<f64>>> {
+    let mut m = Vec::new();
+
+    for l in 0..(limits::MAX_L_VALUE + 1) {
+        m.push(cartesian_to_spherical_coef(l));
+    }
+
+    return m;
 }
 
 #[cfg(test)]
