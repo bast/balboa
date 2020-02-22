@@ -45,7 +45,7 @@ fn set_basis(
     for ishell in 0..num_shells {
         for ixyz in 0..3 {
             let i = shell_centers[ishell];
-            let (x, y, z) = center_coordinates_bohr[i];
+            let (x, y, z) = center_coordinates_bohr[i - 1];
             shell_centers_coordinates.push((x, y, z));
         }
     }
@@ -56,7 +56,7 @@ fn set_basis(
     // threshold and factors match Dalton implementation, see also pink book
     let f = vec![1.0, 1.3333, 1.6, 1.83, 2.03, 2.22, 2.39, 2.55, 2.70, 2.84];
 
-    let mut shell_extent_squared = Vec::new();
+    let mut shell_extent_squared = vec![0.0; num_shells];
     let mut n = 0;
 
     for ishell in 0..num_shells {
