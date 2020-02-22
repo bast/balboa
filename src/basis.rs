@@ -91,7 +91,7 @@ fn set_basis(
         cartesian_deg.push(kc);
         spherical_deg.push(ks);
 
-        if (is_spherical) {
+        if is_spherical {
             shell_off.push(num_ao_spherical);
         } else {
             shell_off.push(num_ao_cartesian);
