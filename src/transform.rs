@@ -69,7 +69,7 @@ fn cartesian_to_spherical_coef(l: usize) -> Vec<Vec<f64>> {
     let mut legendre_coef = vec![0.0; l + 1];
     let mut k = 0;
     while k <= l / 2 {
-        let prefactor = (-1.0 as f64).powf(k as f64) / (2.0 as f64).powf(l as f64);
+        let prefactor = (-1.0 as f64).powi(k as i32) / (2.0 as f64).powi(l as i32);
         let x = binom(l, k) * binom(2 * (l - k), l);
         legendre_coef[l - 2 * k] = prefactor * x;
         k += 1;
@@ -81,7 +81,7 @@ fn cartesian_to_spherical_coef(l: usize) -> Vec<Vec<f64>> {
         cossin_coef[m] = 1.0;
         for k in 1..(m + 1) {
             cossin_coef[k * (l + 1) + m] +=
-                cossin_coef[(k - 1) * (l + 1) + m - 1] * (-1.0 as f64).powf((k - 1) as f64);
+                cossin_coef[(k - 1) * (l + 1) + m - 1] * (-1.0 as f64).powi((k - 1) as i32);
             if m > k {
                 cossin_coef[k * (l + 1) + m] += cossin_coef[k * (l + 1) + m - 1];
             }

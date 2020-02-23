@@ -69,9 +69,9 @@ pub fn get_ao_noddy(
             for ipoint in 0..num_points {
                 aos_c.push(
                     s[ipoint]
-                        * px[ipoint].powf(*i as f64)
-                        * py[ipoint].powf(*j as f64)
-                        * pz[ipoint].powf(*k as f64),
+                        * px[ipoint].powi(*i as i32)
+                        * py[ipoint].powi(*j as i32)
+                        * pz[ipoint].powi(*k as i32),
                 );
             }
         }
