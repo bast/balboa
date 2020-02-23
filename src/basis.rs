@@ -66,7 +66,7 @@ pub fn initialize_basis(
         }
 
         if shell_l_quantum_numbers[ishell] < 10 {
-            r = r.powf(0.5 as f64) * f[shell_l_quantum_numbers[ishell]];
+            r = r.sqrt() * f[shell_l_quantum_numbers[ishell]];
         } else {
             r = 1.0e10;
         }
