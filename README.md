@@ -3,8 +3,7 @@
 
 # balboa
 
-Balboa computes Gaussian basis functions and their geometric derivatives for a
-batch of points in space.
+Balboa computes Gaussian basis functions and their derivatives.
 
 ```
 "You know all there is to know about fighting, so there's no sense us going down
