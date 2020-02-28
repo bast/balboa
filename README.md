@@ -22,8 +22,7 @@ start building some hurtin' bombs!" [Rocky Balboa]
 ### Status
 
 Experimental code.
-Under heavy development.
-Nothing is stable.
+Rewriting it to [Rust](https://www.rust-lang.org).
 
 
 ### Requirements and dependencies
