@@ -1,5 +1,7 @@
 use balboa;
 
+use balboa::Point;
+
 fn floats_are_same(f1: f64, f2: f64) -> bool {
     let d = f1 - f2;
     return d.abs() < 1.0e-7;
@@ -73,13 +75,25 @@ fn undifferentiated() {
 
     let c_to_s_matrices = balboa::cartesian_to_spherical_matrices();
 
-    let coordinates = vec![
-        (-1.46254302355, 1.38973494775, 1.05509847591),
-        (-0.979723897042, -0.0182596516322, -0.202035740845),
-        (0.606371890891, 1.15489340454, -1.6245616529),
+    let points_bohr = vec![
+        Point {
+            x: -1.46254302355,
+            y: 1.38973494775,
+            z: 1.05509847591,
+        },
+        Point {
+            x: -0.979723897042,
+            y: -0.0182596516322,
+            z: -0.202035740845,
+        },
+        Point {
+            x: 0.606371890891,
+            y: 1.15489340454,
+            z: -1.6245616529,
+        },
     ];
 
-    let aos = balboa::get_ao_noddy(coordinates, &basis, &c_to_s_matrices);
+    let aos = balboa::get_ao_noddy(points_bohr, &basis, &c_to_s_matrices);
 
     // ao 1, point 1
     // ao 1, point 2

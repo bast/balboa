@@ -1,5 +1,6 @@
 use crate::basis::Basis;
 use crate::generate;
+use crate::point::Point;
 
 fn get_s(p2: f64, basis: &Basis, offset: usize, num_primitives: usize) -> f64 {
     let mut s = 0.0;
@@ -33,11 +34,11 @@ fn transform_to_spherical(
 }
 
 pub fn get_ao_noddy(
-    coordinates: Vec<(f64, f64, f64)>,
+    points_bohr: Vec<Point>,
     basis: &Basis,
     c_to_s_matrices: &Vec<Vec<Vec<f64>>>,
 ) -> Vec<f64> {
-    let num_points = coordinates.len();
+    let num_points = points_bohr.len();
 
     let mut offset = 0;
     let mut aos = Vec::new();
@@ -55,9 +56,9 @@ pub fn get_ao_noddy(
         let mut s = Vec::new();
 
         for ipoint in 0..num_points {
-            px.push(coordinates[ipoint].0 - x);
-            py.push(coordinates[ipoint].1 - y);
-            pz.push(coordinates[ipoint].2 - z);
+            px.push(points_bohr[ipoint].x - x);
+            py.push(points_bohr[ipoint].y - y);
+            pz.push(points_bohr[ipoint].z - z);
 
             p2.push(px[ipoint] * px[ipoint] + py[ipoint] * py[ipoint] + pz[ipoint] * pz[ipoint]);
 
