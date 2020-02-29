@@ -3,7 +3,7 @@ use crate::generate;
 use crate::point::Point;
 use std::time::Instant;
 
-fn compute_gaussian(
+fn compute_gaussians(
     p2s: Vec<f64>,
     basis: &Basis,
     offset: usize,
@@ -72,7 +72,7 @@ fn coordinates(
     return (pxs, pys, pzs, p2s);
 }
 
-fn aos_c_batch(
+fn multiply_gaussians(
     l: usize,
     gaussians: Vec<f64>,
     pxs: Vec<f64>,
@@ -116,13 +116,13 @@ pub fn aos_noddy(
         let num_primitives = basis.shell_num_primitives[ishell];
 
         let timer = Instant::now();
-        let gaussians = compute_gaussian(p2s, &basis, offset, num_primitives);
+        let gaussians = compute_gaussians(p2s, &basis, offset, num_primitives);
         time_ms_gaussian += timer.elapsed().as_millis();
 
         let l = basis.shell_l_quantum_numbers[ishell];
 
         let timer = Instant::now();
-        let mut aos_c = aos_c_batch(l, gaussians, pxs, pys, pzs);
+        let mut aos_c = multiply_gaussians(l, gaussians, pxs, pys, pzs);
         time_ms_multiply += timer.elapsed().as_millis();
 
         let timer = Instant::now();
