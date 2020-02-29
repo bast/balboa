@@ -128,7 +128,7 @@ pub fn aos_noddy(
         time_ms_multiply += timer.elapsed().as_millis();
 
         let timer = Instant::now();
-        if basis.cartesian_deg[ishell] == basis.spherical_deg[ishell] {
+        if l < 2 {
             aos.append(&mut aos_c);
         } else {
             let mut aos_s = transform_to_spherical(
