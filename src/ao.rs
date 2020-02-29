@@ -1,6 +1,7 @@
 use crate::basis::Basis;
 use crate::generate;
 use crate::point::Point;
+use std::time::Instant;
 
 fn compute_gaussian(
     p2s: Vec<f64>,
@@ -102,17 +103,27 @@ pub fn aos_noddy(
     let mut offset = 0;
     let mut aos = Vec::new();
 
+    let mut time_ms_gaussian: u128 = 0;
+    let mut time_ms_multiply: u128 = 0;
+    let mut time_ms_transform: u128 = 0;
+
     for ishell in 0..basis.num_shells {
         let (pxs, pys, pzs, p2s) =
             coordinates(basis.shell_centers_coordinates[ishell], &points_bohr);
 
         let num_primitives = basis.shell_num_primitives[ishell];
+
+        let timer = Instant::now();
         let gaussians = compute_gaussian(p2s, &basis, offset, num_primitives);
+        time_ms_gaussian += timer.elapsed().as_millis();
 
         let l = basis.shell_l_quantum_numbers[ishell];
 
+        let timer = Instant::now();
         let mut aos_c = aos_c_batch(l, gaussians, pxs, pys, pzs);
+        time_ms_multiply += timer.elapsed().as_millis();
 
+        let timer = Instant::now();
         if basis.cartesian_deg[ishell] == basis.spherical_deg[ishell] {
             aos.append(&mut aos_c);
         } else {
@@ -124,9 +135,14 @@ pub fn aos_noddy(
             );
             aos.append(&mut aos_s);
         }
+        time_ms_transform += timer.elapsed().as_millis();
 
         offset += num_primitives;
     }
+
+    println!("time spent in exp: {} ms", time_ms_gaussian);
+    println!("time spent in multiply: {} ms", time_ms_multiply);
+    println!("time spent in transform: {} ms", time_ms_transform);
 
     return aos;
 }
