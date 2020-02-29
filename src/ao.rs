@@ -34,9 +34,11 @@ fn transform_to_spherical(
     for (i, row) in c_to_s_matrix.iter().enumerate() {
         let ioff = i * num_points;
         for (j, element) in row.iter().enumerate() {
-            let joff = j * num_points;
-            for ipoint in 0..num_points {
-                aos_s[joff + ipoint] += element * aos_c[ioff + ipoint];
+            if element.abs() > std::f64::EPSILON {
+                let joff = j * num_points;
+                for ipoint in 0..num_points {
+                    aos_s[joff + ipoint] += element * aos_c[ioff + ipoint];
+                }
             }
         }
     }
