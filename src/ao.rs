@@ -23,9 +23,11 @@ fn transform_to_spherical(
     let mut aos_s = vec![0.0; spherical_deg * num_points];
 
     for (i, row) in c_to_s_matrix.iter().enumerate() {
+        let ioff = i * num_points;
         for (j, element) in row.iter().enumerate() {
+            let joff = j * num_points;
             for ipoint in 0..num_points {
-                aos_s[j * num_points + ipoint] += element * aos_c[i * num_points + ipoint];
+                aos_s[joff + ipoint] += element * aos_c[ioff + ipoint];
             }
         }
     }
