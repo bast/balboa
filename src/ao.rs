@@ -54,24 +54,19 @@ pub fn aos_noddy(
         let mut pxs = Vec::new();
         let mut pys = Vec::new();
         let mut pzs = Vec::new();
-        let mut p2s = Vec::new();
         let mut gaussians = Vec::new();
 
-        for ipoint in 0..num_points {
-            pxs.push(points_bohr[ipoint].x - x);
-            pys.push(points_bohr[ipoint].y - y);
-            pzs.push(points_bohr[ipoint].z - z);
+        for point in points_bohr.iter() {
+            let px = point.x - x;
+            let py = point.y - y;
+            let pz = point.z - z;
+            let p2 = px * px + py * py + pz * pz;
 
-            p2s.push(
-                pxs[ipoint] * pxs[ipoint] + pys[ipoint] * pys[ipoint] + pzs[ipoint] * pzs[ipoint],
-            );
+            pxs.push(px);
+            pys.push(py);
+            pzs.push(pz);
 
-            gaussians.push(compute_gaussian(
-                p2s[ipoint],
-                &basis,
-                offset,
-                num_primitives,
-            ));
+            gaussians.push(compute_gaussian(p2, &basis, offset, num_primitives));
         }
 
         let mut aos_c = Vec::new();
