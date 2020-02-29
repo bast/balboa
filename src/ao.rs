@@ -69,6 +69,29 @@ fn coordinates(
     return (pxs, pys, pzs, p2s);
 }
 
+fn aos_c_batch(
+    l: usize,
+    gaussians: Vec<f64>,
+    pxs: Vec<f64>,
+    pys: Vec<f64>,
+    pzs: Vec<f64>,
+) -> Vec<f64> {
+    let mut aos_c = Vec::new();
+
+    for (i, j, k) in generate::get_ijk_list(l).iter() {
+        for ipoint in 0..pxs.len() {
+            aos_c.push(
+                gaussians[ipoint]
+                    * pxs[ipoint].powi(*i as i32)
+                    * pys[ipoint].powi(*j as i32)
+                    * pzs[ipoint].powi(*k as i32),
+            );
+        }
+    }
+
+    return aos_c;
+}
+
 pub fn aos_noddy(
     points_bohr: Vec<Point>,
     basis: &Basis,
@@ -88,17 +111,7 @@ pub fn aos_noddy(
 
         let l = basis.shell_l_quantum_numbers[ishell];
 
-        let mut aos_c = Vec::new();
-        for (i, j, k) in generate::get_ijk_list(l).iter() {
-            for ipoint in 0..num_points {
-                aos_c.push(
-                    gaussians[ipoint]
-                        * pxs[ipoint].powi(*i as i32)
-                        * pys[ipoint].powi(*j as i32)
-                        * pzs[ipoint].powi(*k as i32),
-                );
-            }
-        }
+        let mut aos_c = aos_c_batch(l, gaussians, pxs, pys, pzs);
 
         if basis.cartesian_deg[ishell] == basis.spherical_deg[ishell] {
             aos.append(&mut aos_c);
