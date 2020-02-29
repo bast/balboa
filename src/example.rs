@@ -1,4 +1,3 @@
-use crate::basis;
 use crate::basis::Basis;
 
 pub fn example_basis() -> Basis {
@@ -54,7 +53,7 @@ pub fn example_basis() -> Basis {
         9.56881e-01,
     ];
 
-    let basis = basis::initialize_basis(
+    return Basis::new(
         is_spherical,
         num_centers,
         center_coordinates_bohr,
@@ -65,6 +64,4 @@ pub fn example_basis() -> Basis {
         primitive_exponents,
         contraction_coefficients,
     );
-
-    return basis;
 }
