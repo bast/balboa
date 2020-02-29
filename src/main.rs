@@ -3,7 +3,7 @@ use std::time::Instant;
 
 fn main() {
     let mut rng = balboa::get_rng([0; 32]);
-    let num_points = 10_000;
+    let num_points = 100_000;
     let side_length = 2.0;
     let points_bohr = balboa::random_points(&mut rng, num_points, side_length);
 
