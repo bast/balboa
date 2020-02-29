@@ -12,6 +12,6 @@ fn main() {
     let c_to_s_matrices = balboa::cartesian_to_spherical_matrices();
 
     let start = Instant::now();
-    let _aos = balboa::get_ao_noddy(points_bohr, &basis, &c_to_s_matrices);
-    println!("time elapsed in get_ao_noddy: {:?}", start.elapsed());
+    let _aos = balboa::aos_noddy(points_bohr, &basis, &c_to_s_matrices);
+    println!("time elapsed in aos_noddy: {:?}", start.elapsed());
 }

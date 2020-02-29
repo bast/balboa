@@ -2,7 +2,7 @@ use crate::basis::Basis;
 use crate::generate;
 use crate::point::Point;
 
-fn get_s(p2: f64, basis: &Basis, offset: usize, num_primitives: usize) -> f64 {
+fn compute_gaussian(p2: f64, basis: &Basis, offset: usize, num_primitives: usize) -> f64 {
     let mut s = 0.0;
 
     for ip in offset..(offset + num_primitives) {
@@ -35,7 +35,7 @@ fn transform_to_spherical(
     return aos_s;
 }
 
-pub fn get_ao_noddy(
+pub fn aos_noddy(
     points_bohr: Vec<Point>,
     basis: &Basis,
     c_to_s_matrices: &Vec<Vec<Vec<f64>>>,
@@ -51,30 +51,37 @@ pub fn get_ao_noddy(
         let num_primitives = basis.shell_num_primitives[ishell];
         let l = basis.shell_l_quantum_numbers[ishell];
 
-        let mut px = Vec::new();
-        let mut py = Vec::new();
-        let mut pz = Vec::new();
-        let mut p2 = Vec::new();
-        let mut s = Vec::new();
+        let mut pxs = Vec::new();
+        let mut pys = Vec::new();
+        let mut pzs = Vec::new();
+        let mut p2s = Vec::new();
+        let mut gaussians = Vec::new();
 
         for ipoint in 0..num_points {
-            px.push(points_bohr[ipoint].x - x);
-            py.push(points_bohr[ipoint].y - y);
-            pz.push(points_bohr[ipoint].z - z);
+            pxs.push(points_bohr[ipoint].x - x);
+            pys.push(points_bohr[ipoint].y - y);
+            pzs.push(points_bohr[ipoint].z - z);
 
-            p2.push(px[ipoint] * px[ipoint] + py[ipoint] * py[ipoint] + pz[ipoint] * pz[ipoint]);
+            p2s.push(
+                pxs[ipoint] * pxs[ipoint] + pys[ipoint] * pys[ipoint] + pzs[ipoint] * pzs[ipoint],
+            );
 
-            s.push(get_s(p2[ipoint], &basis, offset, num_primitives));
+            gaussians.push(compute_gaussian(
+                p2s[ipoint],
+                &basis,
+                offset,
+                num_primitives,
+            ));
         }
 
         let mut aos_c = Vec::new();
         for (i, j, k) in generate::get_ijk_list(l).iter() {
             for ipoint in 0..num_points {
                 aos_c.push(
-                    s[ipoint]
-                        * px[ipoint].powi(*i as i32)
-                        * py[ipoint].powi(*j as i32)
-                        * pz[ipoint].powi(*k as i32),
+                    gaussians[ipoint]
+                        * pxs[ipoint].powi(*i as i32)
+                        * pys[ipoint].powi(*j as i32)
+                        * pzs[ipoint].powi(*k as i32),
                 );
             }
         }

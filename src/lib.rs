@@ -7,7 +7,7 @@ mod point;
 mod random;
 mod transform;
 
-pub use crate::ao::get_ao_noddy;
+pub use crate::ao::aos_noddy;
 pub use crate::basis::Basis;
 pub use crate::example::example_basis;
 pub use crate::point::Point;
