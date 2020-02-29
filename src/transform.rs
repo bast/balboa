@@ -1,3 +1,5 @@
+#![allow(clippy::needless_return)]
+
 use crate::limits;
 
 // we return f64 to prevent overflow
@@ -42,8 +44,8 @@ fn binom(n: usize, k: usize) -> f64 {
     let mut b = 1.0;
 
     for j in 0..k {
-        b = b * m;
-        b = b / ((j + 1) as f64);
+        b *= m;
+        b /= (j + 1) as f64;
         m -= 1.0;
     }
 
@@ -77,9 +79,9 @@ fn cartesian_to_spherical_coef(l: usize) -> Vec<Vec<f64>> {
 
     let mut cossin_coef = vec![0.0; (l + 1) * (l + 1)];
     let mut tmat = vec![0.0; nc * ns];
-    for m in 0..(l + 1) {
+    for m in 0..=l {
         cossin_coef[m] = 1.0;
-        for k in 1..(m + 1) {
+        for k in 1..=m {
             cossin_coef[k * (l + 1) + m] +=
                 cossin_coef[(k - 1) * (l + 1) + m - 1] * (-1.0 as f64).powi((k - 1) as i32);
             if m > k {
@@ -88,7 +90,7 @@ fn cartesian_to_spherical_coef(l: usize) -> Vec<Vec<f64>> {
         }
     }
 
-    for m in 0..(l + 1) {
+    for m in 0..=l {
         let mut cm = match m {
             0 => 1.0,
             _ => (2.0 * fac(l - m) / fac(l + m)).sqrt(),
@@ -104,9 +106,9 @@ fn cartesian_to_spherical_coef(l: usize) -> Vec<Vec<f64>> {
             let mut i = 0;
             while i <= (l - k - m) / 2 {
                 let cmki = cmk * binom((l - k - m) / 2, i);
-                for j in 0..(i + 1) {
+                for j in 0..=i {
                     let cmkij = cmki * binom(i, j);
-                    for n in 0..(m + 1) {
+                    for n in 0..=m {
                         let mut ix = l - 2 * j - m + n;
                         ix = ix * (ix + 1) / 2 + l + 1 - m - 2 * i;
 
@@ -139,7 +141,7 @@ fn cartesian_to_spherical_coef(l: usize) -> Vec<Vec<f64>> {
 pub fn cartesian_to_spherical_matrices() -> Vec<Vec<Vec<f64>>> {
     let mut m = Vec::new();
 
-    for l in 0..(limits::MAX_L_VALUE + 1) {
+    for l in 0..=limits::MAX_L_VALUE {
         m.push(cartesian_to_spherical_coef(l));
     }
 

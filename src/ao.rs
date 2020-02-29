@@ -1,3 +1,5 @@
+#![allow(clippy::needless_return)]
+
 use crate::basis::Basis;
 use crate::generate;
 use crate::point::Point;
@@ -25,9 +27,9 @@ fn compute_gaussians(
 
 fn transform_to_spherical(
     num_points: usize,
-    aos_c: &Vec<f64>,
+    aos_c: &[f64],
     spherical_deg: usize,
-    c_to_s_matrix: &Vec<Vec<f64>>,
+    c_to_s_matrix: &[Vec<f64>],
 ) -> Vec<f64> {
     let mut aos_s = vec![0.0; spherical_deg * num_points];
 
@@ -48,7 +50,7 @@ fn transform_to_spherical(
 
 fn coordinates(
     shell_centers_coordinates: (f64, f64, f64),
-    points_bohr: &Vec<Point>,
+    points_bohr: &[Point],
 ) -> (Vec<f64>, Vec<f64>, Vec<f64>, Vec<f64>) {
     let (x, y, z) = shell_centers_coordinates;
 
@@ -98,7 +100,7 @@ fn multiply_gaussians(
 pub fn aos_noddy(
     points_bohr: Vec<Point>,
     basis: &Basis,
-    c_to_s_matrices: &Vec<Vec<Vec<f64>>>,
+    c_to_s_matrices: &[Vec<Vec<f64>>],
 ) -> Vec<f64> {
     let num_points = points_bohr.len();
 

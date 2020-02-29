@@ -1,3 +1,5 @@
+#![allow(clippy::needless_return)]
+
 use rand::{rngs::StdRng, Rng, SeedableRng};
 
 use crate::point::Point;

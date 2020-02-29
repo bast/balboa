@@ -1,3 +1,9 @@
+#![allow(clippy::redundant_field_names)]
+#![allow(clippy::many_single_char_names)]
+#![allow(clippy::needless_return)]
+#![allow(clippy::too_many_arguments)]
+#![allow(clippy::needless_range_loop)]
+
 use crate::limits;
 
 pub struct Basis {
@@ -34,17 +40,13 @@ impl Basis {
         primitive_exponents: Vec<f64>,
         contraction_coefficients: Vec<f64>,
     ) -> Basis {
-        for ishell in 0..num_shells {
-            assert!(
-                shell_l_quantum_numbers[ishell] <= limits::MAX_L_VALUE,
-                "increase MAX_L_VALUE"
-            );
+        for &l in shell_l_quantum_numbers.iter() {
+            assert!(l <= limits::MAX_L_VALUE, "increase MAX_L_VALUE");
         }
 
         let mut shell_centers_coordinates = Vec::new();
-        for ishell in 0..num_shells {
-            let i = shell_centers[ishell];
-            let (x, y, z) = center_coordinates_bohr[i - 1];
+        for icenter in shell_centers.iter() {
+            let (x, y, z) = center_coordinates_bohr[icenter - 1];
             shell_centers_coordinates.push((x, y, z));
         }
 
@@ -82,9 +84,7 @@ impl Basis {
         let mut num_ao_cartesian = 0;
         let mut num_ao_spherical = 0;
 
-        for ishell in 0..num_shells {
-            let l = shell_l_quantum_numbers[ishell];
-
+        for l in shell_l_quantum_numbers.iter() {
             let kc = (l + 1) * (l + 2) / 2;
             let ks = 2 * l + 1;
 
@@ -101,18 +101,20 @@ impl Basis {
             num_ao_spherical += ks;
         }
 
-        let num_ao = match is_spherical {
-            true => num_ao_spherical,
-            false => num_ao_cartesian,
+        let num_ao = if is_spherical {
+            num_ao_spherical
+        } else {
+            num_ao_cartesian
         };
 
         let mut ao_centers = vec![0; num_ao];
         let mut i = 0;
 
         for ishell in 0..num_shells {
-            let deg = match is_spherical {
-                true => spherical_deg[ishell],
-                false => cartesian_deg[ishell],
+            let deg = if is_spherical {
+                spherical_deg[ishell]
+            } else {
+                cartesian_deg[ishell]
             };
 
             for j in i..(i + deg) {
@@ -128,9 +130,9 @@ impl Basis {
 
         let mut id = 0;
         let mut m = 0;
-        for l in 0..(limits::MAX_GEO_DIFF_ORDER + 1) {
+        for l in 0..=limits::MAX_GEO_DIFF_ORDER {
             for a in 1..(l + 2) {
-                for b in 1..(a + 1) {
+                for b in 1..=a {
                     let i = l + 1 - a;
                     let j = a - b;
                     let k = b - 1;

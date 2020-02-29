@@ -1,8 +1,10 @@
+#![allow(clippy::needless_return)]
+
 pub fn get_ijk_list(m: usize) -> Vec<(usize, usize, usize)> {
     let mut l = Vec::new();
 
     for a in 1..(m + 2) {
-        for b in 1..(a + 1) {
+        for b in 1..=a {
             l.push((m + 1 - a, a - b, b - 1));
         }
     }

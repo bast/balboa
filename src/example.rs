@@ -1,3 +1,5 @@
+#![allow(clippy::needless_return)]
+
 use crate::basis::Basis;
 
 pub fn example_basis() -> Basis {
