@@ -43,6 +43,32 @@ fn transform_to_spherical(
     return aos_s;
 }
 
+fn coordinates(
+    shell_centers_coordinates: (f64, f64, f64),
+    points_bohr: &Vec<Point>,
+) -> (Vec<f64>, Vec<f64>, Vec<f64>, Vec<f64>) {
+    let (x, y, z) = shell_centers_coordinates;
+
+    let mut pxs = Vec::new();
+    let mut pys = Vec::new();
+    let mut pzs = Vec::new();
+    let mut p2s = Vec::new();
+
+    for point in points_bohr.iter() {
+        let px = point.x - x;
+        let py = point.y - y;
+        let pz = point.z - z;
+        let p2 = px * px + py * py + pz * pz;
+
+        pxs.push(px);
+        pys.push(py);
+        pzs.push(pz);
+        p2s.push(p2);
+    }
+
+    return (pxs, pys, pzs, p2s);
+}
+
 pub fn aos_noddy(
     points_bohr: Vec<Point>,
     basis: &Basis,
@@ -54,29 +80,13 @@ pub fn aos_noddy(
     let mut aos = Vec::new();
 
     for ishell in 0..basis.num_shells {
-        let (x, y, z) = basis.shell_centers_coordinates[ishell];
+        let (pxs, pys, pzs, p2s) =
+            coordinates(basis.shell_centers_coordinates[ishell], &points_bohr);
 
         let num_primitives = basis.shell_num_primitives[ishell];
-        let l = basis.shell_l_quantum_numbers[ishell];
-
-        let mut pxs = Vec::new();
-        let mut pys = Vec::new();
-        let mut pzs = Vec::new();
-        let mut p2s = Vec::new();
-
-        for point in points_bohr.iter() {
-            let px = point.x - x;
-            let py = point.y - y;
-            let pz = point.z - z;
-            let p2 = px * px + py * py + pz * pz;
-
-            pxs.push(px);
-            pys.push(py);
-            pzs.push(pz);
-            p2s.push(p2);
-        }
-
         let gaussians = compute_gaussian(p2s, &basis, offset, num_primitives);
+
+        let l = basis.shell_l_quantum_numbers[ishell];
 
         let mut aos_c = Vec::new();
         for (i, j, k) in generate::get_ijk_list(l).iter() {
