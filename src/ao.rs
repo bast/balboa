@@ -2,16 +2,24 @@ use crate::basis::Basis;
 use crate::generate;
 use crate::point::Point;
 
-fn compute_gaussian(p2: f64, basis: &Basis, offset: usize, num_primitives: usize) -> f64 {
-    let mut s = 0.0;
+fn compute_gaussian(
+    p2s: Vec<f64>,
+    basis: &Basis,
+    offset: usize,
+    num_primitives: usize,
+) -> Vec<f64> {
+    let num_points = p2s.len();
+    let mut gaussians = vec![0.0; num_points];
 
     for ip in offset..(offset + num_primitives) {
         let e = basis.primitive_exponents[ip];
         let c = basis.contraction_coefficients[ip];
-        s += c * (-e * p2).exp();
+        for ipoint in 0..num_points {
+            gaussians[ipoint] += c * (-e * p2s[ipoint]).exp();
+        }
     }
 
-    return s;
+    return gaussians;
 }
 
 fn transform_to_spherical(
@@ -54,7 +62,7 @@ pub fn aos_noddy(
         let mut pxs = Vec::new();
         let mut pys = Vec::new();
         let mut pzs = Vec::new();
-        let mut gaussians = Vec::new();
+        let mut p2s = Vec::new();
 
         for point in points_bohr.iter() {
             let px = point.x - x;
@@ -65,9 +73,10 @@ pub fn aos_noddy(
             pxs.push(px);
             pys.push(py);
             pzs.push(pz);
-
-            gaussians.push(compute_gaussian(p2, &basis, offset, num_primitives));
+            p2s.push(p2);
         }
+
+        let gaussians = compute_gaussian(p2s, &basis, offset, num_primitives);
 
         let mut aos_c = Vec::new();
         for (i, j, k) in generate::get_ijk_list(l).iter() {
