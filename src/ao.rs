@@ -2,11 +2,20 @@
 
 use crate::basis::Basis;
 use crate::generate;
+use crate::limits;
 use crate::point::Point;
 use std::time::Instant;
 
+fn g_batch(c: f64, e: f64, gaussians: &mut [f64], p2s: &[f64]) -> () {
+    for ipoint in 0..limits::BATCH_LENGTH {
+        gaussians[ipoint] += c * (-e * p2s[ipoint]).exp();
+    }
+}
+
 fn compute_gaussians(
     geo_derv_orders: (usize, usize, usize),
+    num_batches: usize,
+    l: usize,
     pxs: &Vec<f64>,
     pys: &Vec<f64>,
     pzs: &Vec<f64>,
@@ -21,12 +30,27 @@ fn compute_gaussians(
     for ip in offset..(offset + num_primitives) {
         let e = basis.primitive_exponents[ip];
         let c = basis.contraction_coefficients[ip];
-        for ipoint in 0..num_points {
-            gaussians[ipoint] += c * (-e * p2s[ipoint]).exp();
+        for ibatch in 0..num_batches {
+            let start = ibatch * limits::BATCH_LENGTH;
+            let end = start + limits::BATCH_LENGTH;
+            g_batch(c, e, &mut gaussians[start..end], &p2s[start..end]);
         }
     }
 
-    return gaussians;
+    let mut aos_c = Vec::new();
+
+    for (i, j, k) in generate::get_ijk_list(l).iter() {
+        for ipoint in 0..pxs.len() {
+            aos_c.push(
+                gaussians[ipoint]
+                    * pxs[ipoint].powi(*i as i32)
+                    * pys[ipoint].powi(*j as i32)
+                    * pzs[ipoint].powi(*k as i32),
+            );
+        }
+    }
+
+    return aos_c;
 }
 
 fn transform_to_spherical(
@@ -78,29 +102,6 @@ fn coordinates(
     return (pxs, pys, pzs, p2s);
 }
 
-fn multiply_gaussians(
-    l: usize,
-    gaussians: Vec<f64>,
-    pxs: Vec<f64>,
-    pys: Vec<f64>,
-    pzs: Vec<f64>,
-) -> Vec<f64> {
-    let mut aos_c = Vec::new();
-
-    for (i, j, k) in generate::get_ijk_list(l).iter() {
-        for ipoint in 0..pxs.len() {
-            aos_c.push(
-                gaussians[ipoint]
-                    * pxs[ipoint].powi(*i as i32)
-                    * pys[ipoint].powi(*j as i32)
-                    * pzs[ipoint].powi(*k as i32),
-            );
-        }
-    }
-
-    return aos_c;
-}
-
 pub fn aos_noddy(
     geo_derv_orders: (usize, usize, usize),
     points_bohr: &Vec<Point>,
@@ -109,11 +110,16 @@ pub fn aos_noddy(
 ) -> Vec<f64> {
     let num_points = points_bohr.len();
 
+    assert!(
+        num_points % limits::BATCH_LENGTH == 0,
+        "num_points must be multiple of BATCH_LENGTH"
+    );
+    let num_batches = num_points / limits::BATCH_LENGTH;
+
     let mut offset = 0;
     let mut aos = Vec::new();
 
     let mut time_ms_gaussian: u128 = 0;
-    let mut time_ms_multiply: u128 = 0;
     let mut time_ms_transform: u128 = 0;
 
     for ishell in 0..basis.num_shells {
@@ -121,10 +127,14 @@ pub fn aos_noddy(
             coordinates(basis.shell_centers_coordinates[ishell], &points_bohr);
 
         let num_primitives = basis.shell_num_primitives[ishell];
+        let l = basis.shell_l_quantum_numbers[ishell];
 
         let timer = Instant::now();
-        let gaussians = compute_gaussians(
+        // TODO create shortcut for s functions when multiplying
+        let mut aos_c = compute_gaussians(
             geo_derv_orders,
+            num_batches,
+            l,
             &pxs,
             &pys,
             &pzs,
@@ -134,13 +144,6 @@ pub fn aos_noddy(
             num_primitives,
         );
         time_ms_gaussian += timer.elapsed().as_millis();
-
-        let l = basis.shell_l_quantum_numbers[ishell];
-
-        let timer = Instant::now();
-        // create shortcut for s functions
-        let mut aos_c = multiply_gaussians(l, gaussians, pxs, pys, pzs);
-        time_ms_multiply += timer.elapsed().as_millis();
 
         let timer = Instant::now();
         if l < 2 {
@@ -160,7 +163,6 @@ pub fn aos_noddy(
     }
 
     println!("time spent in exp: {} ms", time_ms_gaussian);
-    println!("time spent in multiply: {} ms", time_ms_multiply);
     println!("time spent in transform: {} ms", time_ms_transform);
 
     return aos;
