@@ -6,6 +6,10 @@ use crate::point::Point;
 use std::time::Instant;
 
 fn compute_gaussians(
+    geo_derv_orders: (usize, usize, usize),
+    pxs: &Vec<f64>,
+    pys: &Vec<f64>,
+    pzs: &Vec<f64>,
     p2s: Vec<f64>,
     basis: &Basis,
     offset: usize,
@@ -98,7 +102,8 @@ fn multiply_gaussians(
 }
 
 pub fn aos_noddy(
-    points_bohr: Vec<Point>,
+    geo_derv_orders: (usize, usize, usize),
+    points_bohr: &Vec<Point>,
     basis: &Basis,
     c_to_s_matrices: &[Vec<Vec<f64>>],
 ) -> Vec<f64> {
@@ -118,12 +123,22 @@ pub fn aos_noddy(
         let num_primitives = basis.shell_num_primitives[ishell];
 
         let timer = Instant::now();
-        let gaussians = compute_gaussians(p2s, &basis, offset, num_primitives);
+        let gaussians = compute_gaussians(
+            geo_derv_orders,
+            &pxs,
+            &pys,
+            &pzs,
+            p2s,
+            &basis,
+            offset,
+            num_primitives,
+        );
         time_ms_gaussian += timer.elapsed().as_millis();
 
         let l = basis.shell_l_quantum_numbers[ishell];
 
         let timer = Instant::now();
+        // create shortcut for s functions
         let mut aos_c = multiply_gaussians(l, gaussians, pxs, pys, pzs);
         time_ms_multiply += timer.elapsed().as_millis();
 

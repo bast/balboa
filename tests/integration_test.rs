@@ -31,7 +31,7 @@ fn undifferentiated() {
         },
     ];
 
-    let aos = balboa::aos_noddy(points_bohr, &basis, &c_to_s_matrices);
+    let aos = balboa::aos_noddy((0, 0, 0), &points_bohr, &basis, &c_to_s_matrices);
 
     // ao 1, point 1
     // ao 1, point 2
