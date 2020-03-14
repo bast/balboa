@@ -1,8 +1,10 @@
 mod ao;
 mod basis;
+mod diff;
 mod example;
 mod generate;
 mod limits;
+mod multiply;
 mod point;
 mod random;
 mod transform;
