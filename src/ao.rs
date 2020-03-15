@@ -17,20 +17,14 @@ fn g_batch(c: f64, e: f64, gaussians: &mut [Vec<f64>], p2s: &[f64], max_geo_derv
     }
 }
 
-fn compute_gaussians(
-    geo_derv_orders: (usize, usize, usize),
-    c_to_s_matrices: &[Vec<Vec<f64>>],
+fn compute_prefactors(
     max_geo_derv_order: usize,
     num_batches: usize,
-    l: usize,
-    pxs: &[f64],
-    pys: &[f64],
-    pzs: &[f64],
     p2s: Vec<f64>,
     basis: &Basis,
     offset: usize,
     num_primitives: usize,
-) -> Vec<f64> {
+) -> Vec<Vec<f64>> {
     let num_points = p2s.len();
     let mut gaussians = vec![vec![0.0; max_geo_derv_order + 1]; num_points];
 
@@ -49,6 +43,21 @@ fn compute_gaussians(
             );
         }
     }
+
+    return gaussians;
+}
+
+fn compute_gaussians(
+    geo_derv_orders: (usize, usize, usize),
+    c_to_s_matrices: &[Vec<Vec<f64>>],
+    num_batches: usize,
+    l: usize,
+    pxs: &[f64],
+    pys: &[f64],
+    pzs: &[f64],
+    gaussians: &[Vec<f64>],
+) -> Vec<f64> {
+    let num_points = pxs.len();
 
     let cartesian_deg = (l + 1) * (l + 2) / 2;
     let mut aos_c = vec![0.0; num_points * cartesian_deg];
@@ -149,6 +158,7 @@ pub fn aos_noddy(
     let mut aos = Vec::new();
 
     let mut time_ms_gaussian: u128 = 0;
+    let mut time_ms_multiply: u128 = 0;
 
     // FIXME loop over primitives should be outside the loop over geo derv orders
     // otherwise we recompute the s functions over and over
@@ -163,21 +173,28 @@ pub fn aos_noddy(
                 let l = basis.shell_l_quantum_numbers[ishell];
 
                 let timer = Instant::now();
-                let mut aos_s = compute_gaussians(
-                    geo_derv_orders,
-                    c_to_s_matrices,
+                let gaussians = compute_prefactors(
                     max_geo_derv_order,
                     num_batches,
-                    l,
-                    &pxs,
-                    &pys,
-                    &pzs,
                     p2s,
                     &basis,
                     offset,
                     num_primitives,
                 );
                 time_ms_gaussian += timer.elapsed().as_millis();
+
+                let timer = Instant::now();
+                let mut aos_s = compute_gaussians(
+                    geo_derv_orders,
+                    c_to_s_matrices,
+                    num_batches,
+                    l,
+                    &pxs,
+                    &pys,
+                    &pzs,
+                    &gaussians,
+                );
+                time_ms_multiply += timer.elapsed().as_millis();
 
                 aos.append(&mut aos_s);
 
@@ -187,6 +204,7 @@ pub fn aos_noddy(
     }
 
     println!("time spent in exp: {} ms", time_ms_gaussian);
+    println!("time spent in multiply: {} ms", time_ms_multiply);
 
     return aos;
 }
