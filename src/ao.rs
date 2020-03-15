@@ -34,7 +34,7 @@ fn compute_gaussians(
     num_primitives: usize,
 ) -> Vec<f64> {
     let num_points = p2s.len();
-    let mut gaussians = vec![vec![0.0; 5]; num_points];
+    let mut gaussians = vec![vec![0.0; max_geo_derv_order + 1]; num_points];
 
     for ip in offset..(offset + num_primitives) {
         let e = basis.primitive_exponents[ip];
@@ -59,17 +59,17 @@ fn compute_gaussians(
     for &cartesian_orders in generate::get_ijk_list(l).iter() {
         for ibatch in 0..num_batches {
             let ao_offset = n;
+            let ao_end = n + limits::BATCH_LENGTH;
             let point_offset = ibatch * limits::BATCH_LENGTH;
+            let point_end = point_offset + limits::BATCH_LENGTH;
             multiply::multiply_batch(
                 cartesian_orders,
                 geo_derv_orders,
-                &mut aos_c,
-                &gaussians,
-                &pxs,
-                &pys,
-                &pzs,
-                ao_offset,
-                point_offset,
+                &gaussians[point_offset..point_end],
+                &pxs[point_offset..point_end],
+                &pys[point_offset..point_end],
+                &pzs[point_offset..point_end],
+                &mut aos_c[ao_offset..ao_end],
             );
             n += limits::BATCH_LENGTH;
         }
@@ -163,7 +163,6 @@ pub fn aos_noddy(
                 let l = basis.shell_l_quantum_numbers[ishell];
 
                 let timer = Instant::now();
-
                 let mut aos_s = compute_gaussians(
                     geo_derv_orders,
                     c_to_s_matrices,
