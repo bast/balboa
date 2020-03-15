@@ -23,8 +23,6 @@ fn compute_gaussians(
     max_geo_derv_order: usize,
     num_batches: usize,
     l: usize,
-    cartesian_deg: usize,
-    spherical_deg: usize,
     pxs: &[f64],
     pys: &[f64],
     pzs: &[f64],
@@ -52,6 +50,7 @@ fn compute_gaussians(
         }
     }
 
+    let cartesian_deg = (l + 1) * (l + 2) / 2;
     let mut aos_c = vec![0.0; num_points * cartesian_deg];
 
     // TODO create shortcut for s functions when multiplying
@@ -78,7 +77,7 @@ fn compute_gaussians(
     if l < 2 {
         return aos_c;
     } else {
-        let aos_s = transform_to_spherical(num_points, &aos_c, spherical_deg, &c_to_s_matrices[l]);
+        let aos_s = transform_to_spherical(num_points, &aos_c, l, &c_to_s_matrices[l]);
         return aos_s;
     }
 }
@@ -86,9 +85,10 @@ fn compute_gaussians(
 fn transform_to_spherical(
     num_points: usize,
     aos_c: &[f64],
-    spherical_deg: usize,
+    l: usize,
     c_to_s_matrix: &[Vec<f64>],
 ) -> Vec<f64> {
+    let spherical_deg = 2 * l + 1;
     let mut aos_s = vec![0.0; spherical_deg * num_points];
 
     for (i, row) in c_to_s_matrix.iter().enumerate() {
@@ -169,8 +169,6 @@ pub fn aos_noddy(
                     max_geo_derv_order,
                     num_batches,
                     l,
-                    basis.cartesian_deg[ishell],
-                    basis.spherical_deg[ishell],
                     &pxs,
                     &pys,
                     &pzs,

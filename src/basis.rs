@@ -17,9 +17,7 @@ pub struct Basis {
     pub shell_num_primitives: Vec<usize>,
     pub primitive_exponents: Vec<f64>,
     pub contraction_coefficients: Vec<f64>,
-    pub cartesian_deg: Vec<usize>,
     _shell_off: Vec<usize>,
-    pub spherical_deg: Vec<usize>,
     _num_ao_cartesian: usize,
     _num_ao_spherical: usize,
     _num_ao: usize,
@@ -77,9 +75,7 @@ impl Basis {
             shell_extent_squared[ishell] = r * r;
         }
 
-        let mut cartesian_deg = Vec::new();
         let mut shell_off = Vec::new();
-        let mut spherical_deg = Vec::new();
 
         let mut num_ao_cartesian = 0;
         let mut num_ao_spherical = 0;
@@ -87,9 +83,6 @@ impl Basis {
         for l in shell_l_quantum_numbers.iter() {
             let kc = (l + 1) * (l + 2) / 2;
             let ks = 2 * l + 1;
-
-            cartesian_deg.push(kc);
-            spherical_deg.push(ks);
 
             if is_spherical {
                 shell_off.push(num_ao_spherical);
@@ -111,10 +104,11 @@ impl Basis {
         let mut i = 0;
 
         for ishell in 0..num_shells {
+            let l = shell_l_quantum_numbers[ishell];
             let deg = if is_spherical {
-                spherical_deg[ishell]
+                2 * l + 1
             } else {
-                cartesian_deg[ishell]
+                (l + 1) * (l + 2) / 2
             };
 
             for j in i..(i + deg) {
@@ -160,9 +154,7 @@ impl Basis {
             shell_num_primitives: shell_num_primitives,
             primitive_exponents: primitive_exponents,
             contraction_coefficients: contraction_coefficients,
-            cartesian_deg: cartesian_deg,
             _shell_off: shell_off,
-            spherical_deg: spherical_deg,
             _num_ao_cartesian: num_ao_cartesian,
             _num_ao_spherical: num_ao_spherical,
             _num_ao: num_ao,
