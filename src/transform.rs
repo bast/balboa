@@ -1,32 +1,34 @@
-#![allow(clippy::needless_return)]
+use std::cmp::Ordering;
 
 use crate::limits;
 
 // we return f64 to prevent overflow
 fn fac(n: usize) -> f64 {
-    return (0..n).fold(1.0, |acc, i| acc * (i + 1) as f64);
+    (0..n).fold(1.0, |acc, i| acc * (i + 1) as f64)
 }
 
 // f64 to prevent overflow
 fn fac2(n: i32) -> f64 {
-    if n < 0 {
-        let mut r = (n + 2) as f64;
-        let mut i = n + 4;
-        while i < 2 {
-            r *= i as f64;
-            i += 2;
+    match n.cmp(&0) {
+        Ordering::Equal => 1.0,
+        Ordering::Greater => {
+            let mut r = n as f64;
+            let mut i: i32 = (n - 2) as i32;
+            while i > 0 {
+                r *= i as f64;
+                i -= 2;
+            }
+            r
         }
-        return 1.0 / r;
-    } else if n == 0 {
-        return 1.0;
-    } else {
-        let mut r = n as f64;
-        let mut i: i32 = (n - 2) as i32;
-        while i > 0 {
-            r *= i as f64;
-            i -= 2;
+        Ordering::Less => {
+            let mut r = (n + 2) as f64;
+            let mut i = n + 4;
+            while i < 2 {
+                r *= i as f64;
+                i += 2;
+            }
+            1.0 / r
         }
-        return r;
     }
 }
 
@@ -49,7 +51,7 @@ fn binom(n: usize, k: usize) -> f64 {
         m -= 1.0;
     }
 
-    return b;
+    b
 }
 
 fn cartesian_to_spherical_coef(l: usize) -> Vec<Vec<f64>> {
@@ -71,7 +73,7 @@ fn cartesian_to_spherical_coef(l: usize) -> Vec<Vec<f64>> {
     let mut legendre_coef = vec![0.0; l + 1];
     let mut k = 0;
     while k <= l / 2 {
-        let prefactor = (-1.0 as f64).powi(k as i32) / (2.0 as f64).powi(l as i32);
+        let prefactor = (-1.0_f64).powi(k as i32) / (2.0_f64).powi(l as i32);
         let x = binom(l, k) * binom(2 * (l - k), l);
         legendre_coef[l - 2 * k] = prefactor * x;
         k += 1;
@@ -83,7 +85,7 @@ fn cartesian_to_spherical_coef(l: usize) -> Vec<Vec<f64>> {
         cossin_coef[m] = 1.0;
         for k in 1..=m {
             cossin_coef[k * (l + 1) + m] +=
-                cossin_coef[(k - 1) * (l + 1) + m - 1] * (-1.0 as f64).powi((k - 1) as i32);
+                cossin_coef[(k - 1) * (l + 1) + m - 1] * (-1.0_f64).powi((k - 1) as i32);
             if m > k {
                 cossin_coef[k * (l + 1) + m] += cossin_coef[k * (l + 1) + m - 1];
             }
@@ -135,7 +137,7 @@ fn cartesian_to_spherical_coef(l: usize) -> Vec<Vec<f64>> {
         tc.push(ts);
     }
 
-    return tc;
+    tc
 }
 
 pub fn cartesian_to_spherical_matrices() -> Vec<Vec<Vec<f64>>> {
@@ -145,7 +147,7 @@ pub fn cartesian_to_spherical_matrices() -> Vec<Vec<Vec<f64>>> {
         m.push(cartesian_to_spherical_coef(l));
     }
 
-    return m;
+    m
 }
 
 #[cfg(test)]

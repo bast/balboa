@@ -1,5 +1,3 @@
-#![allow(clippy::needless_return)]
-
 use std::collections::HashMap;
 
 pub type DiffMap = HashMap<[usize; 4], usize>;
@@ -29,7 +27,7 @@ pub fn differentiate(
         map = differentiate_direction(map, 2);
     }
 
-    return map;
+    map
 }
 
 fn differentiate_direction(ts: DiffMap, direction: usize) -> DiffMap {
@@ -61,7 +59,7 @@ fn differentiate_direction(ts: DiffMap, direction: usize) -> DiffMap {
         ts_new.insert(t, old_value + value);
     }
 
-    return ts_new;
+    ts_new
 }
 
 #[cfg(test)]

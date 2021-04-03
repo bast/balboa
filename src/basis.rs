@@ -1,6 +1,5 @@
 #![allow(clippy::redundant_field_names)]
 #![allow(clippy::many_single_char_names)]
-#![allow(clippy::needless_return)]
 #![allow(clippy::too_many_arguments)]
 #![allow(clippy::needless_range_loop)]
 
@@ -143,7 +142,7 @@ impl Basis {
         }
         let geo_offset_size = id;
 
-        return Basis {
+        Basis {
             _is_spherical: is_spherical,
             _num_centers: num_centers,
             _center_coordinates_bohr: center_coordinates_bohr,
@@ -161,6 +160,6 @@ impl Basis {
             _ao_centers: ao_centers,
             _geo_offset: geo_offset,
             _geo_offset_size: geo_offset_size,
-        };
+        }
     }
 }

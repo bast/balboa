@@ -1,5 +1,3 @@
-#![allow(clippy::needless_return)]
-
 pub fn get_ijk_list(m: usize) -> Vec<(usize, usize, usize)> {
     let mut l = Vec::new();
 
@@ -9,7 +7,7 @@ pub fn get_ijk_list(m: usize) -> Vec<(usize, usize, usize)> {
         }
     }
 
-    return l;
+    l
 }
 
 #[cfg(test)]

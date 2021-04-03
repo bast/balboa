@@ -1,4 +1,4 @@
-#![allow(clippy::needless_return)]
+#![allow(clippy::too_many_arguments)]
 
 use crate::basis::Basis;
 use crate::generate;
@@ -44,7 +44,7 @@ fn compute_prefactors(
         }
     }
 
-    return gaussians;
+    gaussians
 }
 
 fn compute_gaussians(
@@ -84,10 +84,9 @@ fn compute_gaussians(
     }
 
     if l < 2 {
-        return aos_c;
+        aos_c
     } else {
-        let aos_s = transform_to_spherical(num_points, &aos_c, l, &c_to_s_matrices[l]);
-        return aos_s;
+        transform_to_spherical(num_points, &aos_c, l, &c_to_s_matrices[l])
     }
 }
 
@@ -112,7 +111,7 @@ fn transform_to_spherical(
         }
     }
 
-    return aos_s;
+    aos_s
 }
 
 fn coordinates(
@@ -138,7 +137,7 @@ fn coordinates(
         p2s.push(p2);
     }
 
-    return (pxs, pys, pzs, p2s);
+    (pxs, pys, pzs, p2s)
 }
 
 pub fn aos_noddy(
@@ -206,5 +205,5 @@ pub fn aos_noddy(
     println!("time spent in exp: {} ms", time_ms_gaussian);
     println!("time spent in multiply: {} ms", time_ms_multiply);
 
-    return aos;
+    aos
 }

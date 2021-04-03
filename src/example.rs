@@ -1,5 +1,3 @@
-#![allow(clippy::needless_return)]
-
 use crate::basis::Basis;
 
 pub fn example_basis() -> Basis {
@@ -55,7 +53,7 @@ pub fn example_basis() -> Basis {
         9.56881e-01,
     ];
 
-    return Basis::new(
+    Basis::new(
         is_spherical,
         num_centers,
         center_coordinates_bohr,
@@ -65,5 +63,5 @@ pub fn example_basis() -> Basis {
         shell_num_primitives,
         primitive_exponents,
         contraction_coefficients,
-    );
+    )
 }

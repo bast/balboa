@@ -11,14 +11,12 @@ where
 {
     let error_message = format!("something went wrong reading file {}", file_name);
     let contents = fs::read_to_string(file_name).expect(&error_message);
-    let v = contents.lines().map(|s| s.parse().unwrap()).collect();
-
-    return v;
+    contents.lines().map(|s| s.parse().unwrap()).collect()
 }
 
 fn floats_are_same(f1: f64, f2: f64) -> bool {
     let d = f1 - f2;
-    return d.abs() < 1.0e-7;
+    d.abs() < 1.0e-7
 }
 
 #[test]
