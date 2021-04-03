@@ -62,33 +62,28 @@ fn differentiate_direction(ts: DiffMap, direction: usize) -> DiffMap {
     ts_new
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+#[test]
+fn test_s_xxyy() {
+    let map = differentiate((0, 0, 0), (2, 2, 0));
 
-    #[test]
-    fn test_s_xxyy() {
-        let map = differentiate((0, 0, 0), (2, 2, 0));
+    let mut map_reference: DiffMap = HashMap::new();
+    map_reference.insert([0, 0, 0, 2], 1);
+    map_reference.insert([0, 2, 0, 3], 1);
+    map_reference.insert([2, 0, 0, 3], 1);
+    map_reference.insert([2, 2, 0, 4], 1);
 
-        let mut map_reference: DiffMap = HashMap::new();
-        map_reference.insert([0, 0, 0, 2], 1);
-        map_reference.insert([0, 2, 0, 3], 1);
-        map_reference.insert([2, 0, 0, 3], 1);
-        map_reference.insert([2, 2, 0, 4], 1);
+    assert_eq!(map, map_reference);
+}
 
-        assert_eq!(map, map_reference);
-    }
+#[test]
+fn test_s_xxxxxx() {
+    let map = differentiate((0, 0, 0), (6, 0, 0));
 
-    #[test]
-    fn test_s_xxxxxx() {
-        let map = differentiate((0, 0, 0), (6, 0, 0));
+    let mut map_reference: DiffMap = HashMap::new();
+    map_reference.insert([4, 0, 0, 5], 15);
+    map_reference.insert([2, 0, 0, 4], 45);
+    map_reference.insert([6, 0, 0, 6], 1);
+    map_reference.insert([0, 0, 0, 3], 15);
 
-        let mut map_reference: DiffMap = HashMap::new();
-        map_reference.insert([4, 0, 0, 5], 15);
-        map_reference.insert([2, 0, 0, 4], 45);
-        map_reference.insert([6, 0, 0, 6], 1);
-        map_reference.insert([0, 0, 0, 3], 15);
-
-        assert_eq!(map, map_reference);
-    }
+    assert_eq!(map, map_reference);
 }

@@ -10,24 +10,19 @@ pub fn get_ijk_list(m: usize) -> Vec<(usize, usize, usize)> {
     l
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_ijk() {
-        let reference = vec![
-            (3, 0, 0),
-            (2, 1, 0),
-            (2, 0, 1),
-            (1, 2, 0),
-            (1, 1, 1),
-            (1, 0, 2),
-            (0, 3, 0),
-            (0, 2, 1),
-            (0, 1, 2),
-            (0, 0, 3),
-        ];
-        assert_eq!(reference, get_ijk_list(3));
-    }
+#[test]
+fn test_ijk() {
+    let reference = vec![
+        (3, 0, 0),
+        (2, 1, 0),
+        (2, 0, 1),
+        (1, 2, 0),
+        (1, 1, 1),
+        (1, 0, 2),
+        (0, 3, 0),
+        (0, 2, 1),
+        (0, 1, 2),
+        (0, 0, 3),
+    ];
+    assert_eq!(reference, get_ijk_list(3));
 }
