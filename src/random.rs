@@ -21,9 +21,9 @@ pub fn random_points<R: Rng>(rng: &mut R, num_points: usize, side_length: f64) -
 
     for _ in 0..num_points {
         points.push(Point {
-            x: rng.gen_range(xmin, xmax),
-            y: rng.gen_range(ymin, ymax),
-            z: rng.gen_range(zmin, zmax),
+            x: rng.gen_range(xmin..xmax),
+            y: rng.gen_range(ymin..ymax),
+            z: rng.gen_range(zmin..zmax),
         });
     }
 
