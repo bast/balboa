@@ -43,7 +43,7 @@ fn floats_are_same(f1: f64, f2: f64) -> bool {
 }
 
 #[test]
-fn undifferentiated() {
+fn noddy() {
     let basis = balboa::example_basis();
 
     let c_to_s_matrices = balboa::cartesian_to_spherical_matrices();
