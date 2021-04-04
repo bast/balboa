@@ -44,7 +44,7 @@ fn floats_are_same(f1: f64, f2: f64) -> bool {
 
 #[test]
 fn noddy() {
-    let basis = balboa::example_basis();
+    let basis = balboa::example_basis(true);
 
     let c_to_s_matrices = balboa::cartesian_to_spherical_matrices();
 
@@ -94,7 +94,7 @@ fn benchmark() {
     let side_length = 2.0;
     let points_bohr = random_points(&mut rng, num_points, side_length);
 
-    let basis = balboa::example_basis();
+    let basis = balboa::example_basis(true);
 
     let c_to_s_matrices = balboa::cartesian_to_spherical_matrices();
 
