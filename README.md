@@ -1,5 +1,6 @@
-[![Build Status](https://travis-ci.org/bast/balboa.svg?branch=master)](https://travis-ci.org/bast/balboa/builds)
+[![Build status](https://github.com/bast/balboa/workflows/Test/badge.svg)](https://github.com/bast/balboa/actions)
 [![License](https://img.shields.io/badge/license-%20MPL--v2.0-blue.svg)](LICENSE)
+
 
 # balboa
 
