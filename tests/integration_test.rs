@@ -99,13 +99,6 @@ fn density_noddy() {
 
     let density_matrix = read_square_matrix("tests/dmat.txt", basis.num_ao_spherical);
 
-    let densities = balboa::densities_noddy(
-        points_bohr.len(),
-        &aos,
-        &density_matrix,
-        basis.num_ao_spherical,
-    );
-
     let densities_reference = vec![
         427.74880135855784,
         32.362597237925904,
@@ -113,6 +106,22 @@ fn density_noddy() {
         2.0615806308226245,
     ];
 
+    let densities = balboa::densities_noddy(
+        points_bohr.len(),
+        &aos,
+        &density_matrix,
+        basis.num_ao_spherical,
+    );
+    for (&x, &x_reference) in densities.iter().zip(densities_reference.iter()) {
+        assert!(floats_are_same(x, x_reference, 1.0e-12));
+    }
+
+    let densities = balboa::densities_noddy2(
+        points_bohr.len(),
+        &aos,
+        &density_matrix,
+        basis.num_ao_spherical,
+    );
     for (&x, &x_reference) in densities.iter().zip(densities_reference.iter()) {
         assert!(floats_are_same(x, x_reference, 1.0e-12));
     }
