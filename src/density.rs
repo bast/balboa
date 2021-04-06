@@ -46,7 +46,7 @@ pub fn densities_noddy2(
             k_compressed += 1;
         }
     }
-    let mut num_ao_compressed = aos_compressed.len() / num_points;
+    let num_ao_compressed = aos_compressed.len() / num_points;
 
     // compress density matrix
     let mut density_matrix_compressed = vec![0.0; num_ao_compressed * num_ao_compressed];
