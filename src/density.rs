@@ -39,9 +39,8 @@ pub fn densities(
     density_matrix: &[f64],
     density_matrix_is_symmetric: bool,
     num_ao: usize,
+    threshold: f64,
 ) -> Vec<f64> {
-    let threshold = 0.003;
-
     // compress aos and keep track of mapping original -> compressed
     let mut aos_compressed: Vec<f64> = Vec::new();
     let mut compression_mapping: Vec<(usize, usize)> = Vec::new();

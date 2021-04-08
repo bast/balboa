@@ -7,7 +7,7 @@ use std::fs;
 use std::str::FromStr;
 use std::time::Instant;
 
-pub fn random_points(num_points: usize, side_length: f64) -> Vec<Point> {
+fn random_points(num_points: usize, side_length: f64) -> Vec<Point> {
     let xmax = 0.5 * side_length;
     let xmin = -xmax;
     let ymax = 0.5 * side_length;
@@ -24,6 +24,22 @@ pub fn random_points(num_points: usize, side_length: f64) -> Vec<Point> {
             z: rng.gen_range(zmin..zmax),
         })
         .collect()
+}
+
+fn random_symmetic_matrix(n: usize) -> Vec<f64> {
+    let mut rng = rand::thread_rng();
+
+    let mut matrix = vec![0.0; n * n];
+
+    for i in 0..n {
+        for j in 0..=i {
+            let r = rng.gen_range(-1.0..1.0);
+            matrix[i * n + j] = r;
+            matrix[j * n + i] = r;
+        }
+    }
+
+    matrix
 }
 
 fn read_vector<T: FromStr>(file_name: &str) -> Vec<T>
@@ -141,24 +157,57 @@ fn density_noddy() {
     compare_vectors(&densities_x, &densities_x_reference);
     compare_vectors(&densities_y, &densities_y_reference);
     compare_vectors(&densities_z, &densities_z_reference);
+}
 
+#[test]
+fn density() {
+    let num_points = 100;
+    let side_length = 3.0;
+    let points_bohr = random_points(num_points, side_length);
+
+    let basis = balboa::example_basis(true);
+    let c_to_s_matrices = balboa::cartesian_to_spherical_matrices();
+    let aos = balboa::aos_noddy(1, &points_bohr, &basis, &c_to_s_matrices);
+    let density_matrix = random_symmetic_matrix(basis.num_ao_spherical);
+    dbg!(basis.num_ao_spherical);
+
+    let start = Instant::now();
+    let (
+        densities_reference,
+        _densities_x_reference,
+        _densities_y_reference,
+        _densities_z_reference,
+    ) = balboa::densities_noddy(
+        points_bohr.len(),
+        &aos,
+        &density_matrix,
+        basis.num_ao_spherical,
+    );
+    println!("time elapsed in densities_noddy: {:?}", start.elapsed());
+
+    let start = Instant::now();
     let densities = balboa::densities(
         points_bohr.len(),
         &aos,
         &density_matrix,
         false,
         basis.num_ao_spherical,
+        1.0e-10,
     );
     compare_vectors(&densities, &densities_reference);
+    println!("time elapsed in dgemm: {:?}", start.elapsed());
 
+    let start = Instant::now();
     let densities = balboa::densities(
         points_bohr.len(),
         &aos,
         &density_matrix,
         true,
         basis.num_ao_spherical,
+        1.0e-10,
     );
     compare_vectors(&densities, &densities_reference);
+    println!("time elapsed in dsymm: {:?}", start.elapsed());
 }
 
 #[test]
@@ -205,7 +254,7 @@ fn ao_derivatives_noddy() {
 
 #[ignore]
 #[test]
-fn benchmark() {
+fn ao_benchmark() {
     let num_points = 50_000;
     let side_length = 2.0;
     let points_bohr = random_points(num_points, side_length);
