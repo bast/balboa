@@ -40,9 +40,12 @@ pub fn densities(
     density_matrix_is_symmetric: bool,
     num_ao: usize,
     threshold: f64,
-) -> Vec<f64> {
+) -> (Vec<f64>, Vec<f64>, Vec<f64>, Vec<f64>) {
     // compress aos and keep track of mapping original -> compressed
-    let mut aos_compressed: Vec<f64> = Vec::new();
+    let mut aos_compressed: Vec<Vec<f64>> = Vec::new();
+    for _ in 0..4 {
+        aos_compressed.push(Vec::new());
+    }
     let mut compression_mapping: Vec<(usize, usize)> = Vec::new();
     let mut k_compressed = 0;
     for k in 0..num_ao {
@@ -54,14 +57,17 @@ pub fn densities(
             }
         }
         if keep_this_batch {
-            for p in 0..num_points {
-                aos_compressed.push(aos[k * num_points + p]);
+            for ixyz in 0..4 {
+                let slice_offset = (num_ao * num_points) * ixyz;
+                for p in 0..num_points {
+                    aos_compressed[ixyz].push(aos[slice_offset + k * num_points + p]);
+                }
             }
             compression_mapping.push((k_compressed, k));
             k_compressed += 1;
         }
     }
-    let num_ao_compressed = aos_compressed.len() / num_points;
+    let num_ao_compressed = aos_compressed[0].len() / num_points;
 
     // compress density matrix
     let mut density_matrix_compressed = vec![0.0; num_ao_compressed * num_ao_compressed];
@@ -73,10 +79,12 @@ pub fn densities(
         }
     }
 
-    let mut x_matrix = vec![0.0; num_ao_compressed * num_points];
+    let mut x_matrix = vec![vec![0.0; num_ao_compressed * num_points]; 4];
     let block_length = num_points as i32;
     let k_aoc_num = num_ao_compressed as i32;
     let l_aoc_num = num_ao_compressed as i32;
+
+    let mut densities = vec![vec![0.0; num_points]; 4];
 
     if density_matrix_is_symmetric {
         let si = b'R';
@@ -86,7 +94,7 @@ pub fn densities(
         let lda = n;
         let ldb = m;
         let ldc = m;
-        let alpha = 1.0;
+        let alpha = 2.0;
         let beta = 0.0;
         unsafe {
             dsymm(
@@ -97,12 +105,23 @@ pub fn densities(
                 alpha,
                 &density_matrix_compressed,
                 lda,
-                &aos_compressed,
+                &aos_compressed[0],
                 ldb,
                 beta,
-                &mut x_matrix,
+                &mut x_matrix[0],
                 ldc,
             );
+        }
+
+        let prefactors = vec![1.0, 2.0, 2.0, 2.0];
+        for (ixyz, prefactor) in prefactors.iter().enumerate() {
+            for k in 0..num_ao_compressed {
+                let k_offset = k * num_points;
+                for p in 0..num_points {
+                    densities[ixyz][p] +=
+                        prefactor * aos_compressed[ixyz][k_offset + p] * x_matrix[0][k_offset + p];
+                }
+            }
         }
     } else {
         let ta = b'N';
@@ -113,35 +132,52 @@ pub fn densities(
         let lda = m;
         let ldb = k;
         let ldc = m;
-        let alpha = 1.0;
+        let alpha = 2.0;
         let beta = 0.0;
-        unsafe {
-            dgemm(
-                ta,
-                tb,
-                m,
-                n,
-                k,
-                alpha,
-                &aos_compressed,
-                lda,
-                &density_matrix_compressed,
-                ldb,
-                beta,
-                &mut x_matrix,
-                ldc,
-            );
+        for ixyz in 0..4 {
+            unsafe {
+                dgemm(
+                    ta,
+                    tb,
+                    m,
+                    n,
+                    k,
+                    alpha,
+                    &aos_compressed[ixyz],
+                    lda,
+                    &density_matrix_compressed,
+                    ldb,
+                    beta,
+                    &mut x_matrix[ixyz],
+                    ldc,
+                );
+            }
+        }
+
+        for k in 0..num_ao_compressed {
+            let k_offset = k * num_points;
+            for p in 0..num_points {
+                densities[0][p] += aos[k_offset + p] * x_matrix[0][k_offset + p];
+            }
+        }
+
+        for ixyz in 1..=3 {
+            let slice_offset = (num_ao * num_points) * ixyz;
+            for k in 0..num_ao_compressed {
+                let k_offset = k * num_points;
+                for p in 0..num_points {
+                    densities[ixyz][p] += aos[slice_offset + k_offset + p]
+                        * x_matrix[0][k_offset + p]
+                        + aos[k_offset + p] * x_matrix[ixyz][k_offset + p];
+                }
+            }
         }
     }
 
-    // finally assemble densities in the second step
-    let mut densities = vec![0.0; num_points];
-    for k in 0..num_ao_compressed {
-        let k_offset = k * num_points;
-        for p in 0..num_points {
-            densities[p] += 2.0 * aos[k_offset + p] * x_matrix[k_offset + p];
-        }
-    }
-
-    densities
+    (
+        densities[0].to_vec(), // density
+        densities[1].to_vec(), // gradient_x
+        densities[2].to_vec(), // gradient_y
+        densities[3].to_vec(), // gradient_z
+    )
 }
