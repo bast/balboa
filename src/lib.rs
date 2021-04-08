@@ -1,3 +1,6 @@
+extern crate blas;
+extern crate openblas_src;
+
 mod ao;
 mod basis;
 mod density;
@@ -11,8 +14,8 @@ mod transform;
 
 pub use crate::ao::aos_noddy;
 pub use crate::basis::Basis;
+pub use crate::density::densities;
 pub use crate::density::densities_noddy;
-pub use crate::density::densities_noddy2;
 pub use crate::example::example_basis;
 pub use crate::point::Point;
 pub use crate::transform::cartesian_to_spherical_matrices;

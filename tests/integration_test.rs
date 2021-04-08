@@ -116,7 +116,7 @@ fn density_noddy() {
         assert!(floats_are_same(x, x_reference, 1.0e-12));
     }
 
-    let densities = balboa::densities_noddy2(
+    let densities = balboa::densities(
         points_bohr.len(),
         &aos,
         &density_matrix,

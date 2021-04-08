@@ -10,3 +10,5 @@ homepage = "https://github.com/bast/balboa"
 
 [dependencies]
 rand = "0.8.3"
+blas = "0.20"
+openblas-src = "0.10.4"

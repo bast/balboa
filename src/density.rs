@@ -1,3 +1,5 @@
+use blas::*;
+
 pub fn densities_noddy(
     num_points: usize,
     aos: &[f64],
@@ -18,7 +20,7 @@ pub fn densities_noddy(
     densities
 }
 
-pub fn densities_noddy2(
+pub fn densities(
     num_points: usize,
     aos: &[f64],
     density_matrix: &[f64],
@@ -58,16 +60,37 @@ pub fn densities_noddy2(
         }
     }
 
-    // this will be a matrix multiplication later
     let mut x_matrix = vec![0.0; num_ao_compressed * num_points];
-    for k in 0..num_ao_compressed {
-        for p in 0..num_points {
-            for l in 0..num_ao_compressed {
-                x_matrix[k * num_points + p] += density_matrix_compressed
-                    [k * num_ao_compressed + l]
-                    * aos_compressed[l * num_points + p];
-            }
-        }
+    let block_length = num_points as i32;
+    let k_aoc_num = num_ao_compressed as i32;
+    let l_aoc_num = num_ao_compressed as i32;
+
+    let ta = b'N';
+    let tb = b'N';
+    let m = block_length;
+    let n = k_aoc_num;
+    let k = l_aoc_num;
+    let lda = m;
+    let ldb = k;
+    let ldc = m;
+    let alpha = 1.0;
+    let beta = 0.0;
+    unsafe {
+        dgemm(
+            ta,
+            tb,
+            m,
+            n,
+            k,
+            alpha,
+            &aos_compressed,
+            lda,
+            &density_matrix_compressed,
+            ldb,
+            beta,
+            &mut x_matrix,
+            ldc,
+        );
     }
 
     // finally assemble densities in the second step
