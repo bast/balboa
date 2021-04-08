@@ -66,6 +66,12 @@ fn floats_are_same(value: f64, reference: f64, threshold: f64) -> bool {
     }
 }
 
+fn compare_vectors(v1: &[f64], v2: &[f64]) {
+    for (&x1, &x2) in v1.iter().zip(v2.iter()) {
+        assert!(floats_are_same(x1, x2, 1.0e-12));
+    }
+}
+
 #[test]
 fn density_noddy() {
     let basis = balboa::example_basis(false);
@@ -95,7 +101,7 @@ fn density_noddy() {
         },
     ];
 
-    let aos = balboa::aos_noddy(0, &points_bohr, &basis, &c_to_s_matrices);
+    let aos = balboa::aos_noddy(1, &points_bohr, &basis, &c_to_s_matrices);
 
     let density_matrix = read_square_matrix("tests/dmat.txt", basis.num_ao_spherical);
 
@@ -106,15 +112,37 @@ fn density_noddy() {
         2.0615806308226245,
     ];
 
-    let densities = balboa::densities_noddy(
+    let densities_x_reference = vec![
+        -9.235703423787248,
+        -543.7711358713716,
+        118.94476088385002,
+        -1.541565272853058,
+    ];
+
+    let densities_y_reference = vec![
+        0.0,
+        -55.08159215958256,
+        117.73175332829445,
+        3.012583667619674,
+    ];
+
+    let densities_z_reference = vec![
+        0.0,
+        -55.0815921595826,
+        -185.08540337559853,
+        -4.4236158386041105,
+    ];
+
+    let (densities, densities_x, densities_y, densities_z) = balboa::densities_noddy(
         points_bohr.len(),
         &aos,
         &density_matrix,
         basis.num_ao_spherical,
     );
-    for (&x, &x_reference) in densities.iter().zip(densities_reference.iter()) {
-        assert!(floats_are_same(x, x_reference, 1.0e-12));
-    }
+    compare_vectors(&densities, &densities_reference);
+    compare_vectors(&densities_x, &densities_x_reference);
+    compare_vectors(&densities_y, &densities_y_reference);
+    compare_vectors(&densities_z, &densities_z_reference);
 
     let densities = balboa::densities(
         points_bohr.len(),
@@ -123,9 +151,7 @@ fn density_noddy() {
         false,
         basis.num_ao_spherical,
     );
-    for (&x, &x_reference) in densities.iter().zip(densities_reference.iter()) {
-        assert!(floats_are_same(x, x_reference, 1.0e-12));
-    }
+    compare_vectors(&densities, &densities_reference);
 
     let densities = balboa::densities(
         points_bohr.len(),
@@ -134,9 +160,7 @@ fn density_noddy() {
         true,
         basis.num_ao_spherical,
     );
-    for (&x, &x_reference) in densities.iter().zip(densities_reference.iter()) {
-        assert!(floats_are_same(x, x_reference, 1.0e-12));
-    }
+    compare_vectors(&densities, &densities_reference);
 }
 
 #[test]
@@ -178,9 +202,7 @@ fn ao_derivatives_noddy() {
     // ...
     let aos_reference: Vec<f64> = read_vector("tests/reference.txt");
 
-    for (&ao, &ao_reference) in aos.iter().zip(aos_reference.iter()) {
-        assert!(floats_are_same(ao, ao_reference, 1.0e-12));
-    }
+    compare_vectors(&aos, &aos_reference);
 }
 
 #[ignore]

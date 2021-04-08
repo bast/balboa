@@ -5,19 +5,32 @@ pub fn densities_noddy(
     aos: &[f64],
     density_matrix: &[f64],
     num_ao: usize,
-) -> Vec<f64> {
-    let mut densities = vec![0.0; num_points];
+) -> (Vec<f64>, Vec<f64>, Vec<f64>, Vec<f64>) {
+    let mut densities = vec![vec![0.0; num_points]; 4];
 
     for k in 0..num_ao {
         for l in 0..num_ao {
             let d = 2.0 * density_matrix[k * num_ao + l];
             for p in 0..num_points {
-                densities[p] += aos[k * num_points + p] * d * aos[l * num_points + p];
+                densities[0][p] += aos[k * num_points + p] * d * aos[l * num_points + p];
+            }
+            for ixyz in 1..=3 {
+                let slice_offset = (num_ao * num_points) * ixyz;
+                for p in 0..num_points {
+                    densities[ixyz][p] += d
+                        * (aos[slice_offset + k * num_points + p] * aos[l * num_points + p]
+                            + aos[k * num_points + p] * aos[slice_offset + l * num_points + p]);
+                }
             }
         }
     }
 
-    densities
+    (
+        densities[0].to_vec(), // density
+        densities[1].to_vec(), // gradient_x
+        densities[2].to_vec(), // gradient_y
+        densities[3].to_vec(), // gradient_z
+    )
 }
 
 pub fn densities(
