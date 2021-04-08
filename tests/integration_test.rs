@@ -120,6 +120,18 @@ fn density_noddy() {
         points_bohr.len(),
         &aos,
         &density_matrix,
+        false,
+        basis.num_ao_spherical,
+    );
+    for (&x, &x_reference) in densities.iter().zip(densities_reference.iter()) {
+        assert!(floats_are_same(x, x_reference, 1.0e-12));
+    }
+
+    let densities = balboa::densities(
+        points_bohr.len(),
+        &aos,
+        &density_matrix,
+        true,
         basis.num_ao_spherical,
     );
     for (&x, &x_reference) in densities.iter().zip(densities_reference.iter()) {

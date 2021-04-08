@@ -24,6 +24,7 @@ pub fn densities(
     num_points: usize,
     aos: &[f64],
     density_matrix: &[f64],
+    density_matrix_is_symmetric: bool,
     num_ao: usize,
 ) -> Vec<f64> {
     let threshold = 0.003;
@@ -65,32 +66,60 @@ pub fn densities(
     let k_aoc_num = num_ao_compressed as i32;
     let l_aoc_num = num_ao_compressed as i32;
 
-    let ta = b'N';
-    let tb = b'N';
-    let m = block_length;
-    let n = k_aoc_num;
-    let k = l_aoc_num;
-    let lda = m;
-    let ldb = k;
-    let ldc = m;
-    let alpha = 1.0;
-    let beta = 0.0;
-    unsafe {
-        dgemm(
-            ta,
-            tb,
-            m,
-            n,
-            k,
-            alpha,
-            &aos_compressed,
-            lda,
-            &density_matrix_compressed,
-            ldb,
-            beta,
-            &mut x_matrix,
-            ldc,
-        );
+    if density_matrix_is_symmetric {
+        let si = b'R';
+        let up = b'U';
+        let m = block_length;
+        let n = k_aoc_num;
+        let lda = n;
+        let ldb = m;
+        let ldc = m;
+        let alpha = 1.0;
+        let beta = 0.0;
+        unsafe {
+            dsymm(
+                si,
+                up,
+                m,
+                n,
+                alpha,
+                &density_matrix_compressed,
+                lda,
+                &aos_compressed,
+                ldb,
+                beta,
+                &mut x_matrix,
+                ldc,
+            );
+        }
+    } else {
+        let ta = b'N';
+        let tb = b'N';
+        let m = block_length;
+        let n = k_aoc_num;
+        let k = l_aoc_num;
+        let lda = m;
+        let ldb = k;
+        let ldc = m;
+        let alpha = 1.0;
+        let beta = 0.0;
+        unsafe {
+            dgemm(
+                ta,
+                tb,
+                m,
+                n,
+                k,
+                alpha,
+                &aos_compressed,
+                lda,
+                &density_matrix_compressed,
+                ldb,
+                beta,
+                &mut x_matrix,
+                ldc,
+            );
+        }
     }
 
     // finally assemble densities in the second step
