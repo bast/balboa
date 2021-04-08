@@ -1,23 +1,21 @@
 use balboa;
 use balboa::Point;
 
-use rand::{rngs::StdRng, Rng, SeedableRng};
+use rand::Rng;
 use std::fmt::Debug;
 use std::fs;
 use std::str::FromStr;
 use std::time::Instant;
 
-pub fn get_rng(seed: [u8; 32]) -> StdRng {
-    StdRng::from_seed(seed)
-}
-
-pub fn random_points<R: Rng>(rng: &mut R, num_points: usize, side_length: f64) -> Vec<Point> {
+pub fn random_points(num_points: usize, side_length: f64) -> Vec<Point> {
     let xmax = 0.5 * side_length;
     let xmin = -xmax;
     let ymax = 0.5 * side_length;
     let ymin = -ymax;
     let zmax = 0.5 * side_length;
     let zmin = -zmax;
+
+    let mut rng = rand::thread_rng();
 
     (0..num_points)
         .map(|_| Point {
@@ -208,10 +206,9 @@ fn ao_derivatives_noddy() {
 #[ignore]
 #[test]
 fn benchmark() {
-    let mut rng = get_rng([0; 32]);
     let num_points = 50_000;
     let side_length = 2.0;
-    let points_bohr = random_points(&mut rng, num_points, side_length);
+    let points_bohr = random_points(num_points, side_length);
 
     let basis = balboa::example_basis(true);
 
