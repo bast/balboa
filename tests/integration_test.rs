@@ -169,7 +169,6 @@ fn density() {
     let c_to_s_matrices = balboa::cartesian_to_spherical_matrices();
     let aos = balboa::aos_noddy(1, &points_bohr, &basis, &c_to_s_matrices);
     let density_matrix = random_symmetic_matrix(basis.num_ao_spherical);
-    dbg!(basis.num_ao_spherical);
 
     let start = Instant::now();
     let (
