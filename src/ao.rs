@@ -1,9 +1,12 @@
 #![allow(clippy::too_many_arguments)]
 
+use std::collections::HashMap;
+
 use crate::basis::Basis;
 use crate::generate;
 use crate::limits;
 use crate::multiply;
+use crate::transform;
 use std::time::Instant;
 
 fn g_batch(c: f64, e: f64, gaussians: &mut [Vec<f64>], p2s: &[f64], max_geo_derv_order: usize) {
@@ -48,7 +51,7 @@ fn compute_prefactors(
 
 fn compute_gaussians(
     geo_derv_orders: (usize, usize, usize),
-    c_to_s_matrices: &[Vec<Vec<f64>>],
+    c_to_s_matrices: &HashMap<usize, Vec<(usize, usize, f64)>>,
     num_batches: usize,
     l: usize,
     pxs: &[f64],
@@ -85,32 +88,8 @@ fn compute_gaussians(
     if l < 2 {
         aos_c
     } else {
-        transform_to_spherical(num_points, &aos_c, l, &c_to_s_matrices[l])
+        transform::transform_to_spherical(num_points, &aos_c, l, &c_to_s_matrices.get(&l).unwrap())
     }
-}
-
-fn transform_to_spherical(
-    num_points: usize,
-    aos_c: &[f64],
-    l: usize,
-    c_to_s_matrix: &[Vec<f64>],
-) -> Vec<f64> {
-    let spherical_deg = 2 * l + 1;
-    let mut aos_s = vec![0.0; spherical_deg * num_points];
-
-    for (i, row) in c_to_s_matrix.iter().enumerate() {
-        let ioff = i * num_points;
-        for (j, element) in row.iter().enumerate() {
-            if element.abs() > std::f64::EPSILON {
-                let joff = j * num_points;
-                for ipoint in 0..num_points {
-                    aos_s[joff + ipoint] += element * aos_c[ioff + ipoint];
-                }
-            }
-        }
-    }
-
-    aos_s
 }
 
 fn coordinates(
@@ -143,7 +122,7 @@ pub fn aos_noddy(
     max_geo_derv_order: usize,
     points_bohr: &[(f64, f64, f64)],
     basis: &Basis,
-    c_to_s_matrices: &[Vec<Vec<f64>>],
+    c_to_s_matrices: &HashMap<usize, Vec<(usize, usize, f64)>>,
 ) -> Vec<f64> {
     let num_points = points_bohr.len();
 
