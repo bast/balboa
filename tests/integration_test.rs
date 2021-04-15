@@ -1,5 +1,4 @@
 use balboa;
-use balboa::Point;
 
 use rand::Rng;
 use std::fmt::Debug;
@@ -7,7 +6,7 @@ use std::fs;
 use std::str::FromStr;
 use std::time::Instant;
 
-fn random_points(num_points: usize, side_length: f64) -> Vec<Point> {
+fn random_points(num_points: usize, side_length: f64) -> Vec<(f64, f64, f64)> {
     let xmax = 0.5 * side_length;
     let xmin = -xmax;
     let ymax = 0.5 * side_length;
@@ -18,10 +17,12 @@ fn random_points(num_points: usize, side_length: f64) -> Vec<Point> {
     let mut rng = rand::thread_rng();
 
     (0..num_points)
-        .map(|_| Point {
-            x: rng.gen_range(xmin..xmax),
-            y: rng.gen_range(ymin..ymax),
-            z: rng.gen_range(zmin..zmax),
+        .map(|_| {
+            (
+                rng.gen_range(xmin..xmax),
+                rng.gen_range(ymin..ymax),
+                rng.gen_range(zmin..zmax),
+            )
         })
         .collect()
 }
@@ -101,26 +102,10 @@ fn density_noddy() {
     let c_to_s_matrices = balboa::cartesian_to_spherical_matrices();
 
     let points_bohr = vec![
-        Point {
-            x: 1.7,
-            y: 0.0,
-            z: 0.0,
-        },
-        Point {
-            x: 1.847135,
-            y: 1.505297e-02,
-            z: 1.505297e-02,
-        },
-        Point {
-            x: 1.608568,
-            y: -9.143180e-02,
-            z: 1.437394e-01,
-        },
-        Point {
-            x: 1.806738,
-            y: -2.317019e-01,
-            z: 3.402263e-01,
-        },
+        (1.7, 0.0, 0.0),
+        (1.847135, 1.505297e-02, 1.505297e-02),
+        (1.608568, -9.143180e-02, 1.437394e-01),
+        (1.806738, -2.317019e-01, 3.402263e-01),
     ];
 
     let aos = balboa::aos_noddy(1, &points_bohr, &basis, &c_to_s_matrices);
@@ -218,26 +203,10 @@ fn ao_derivatives_noddy() {
     let c_to_s_matrices = balboa::cartesian_to_spherical_matrices();
 
     let points_bohr = vec![
-        Point {
-            x: -1.46254302355,
-            y: 1.38973494775,
-            z: 1.05509847591,
-        },
-        Point {
-            x: -0.979723897042,
-            y: -0.0182596516322,
-            z: -0.202035740845,
-        },
-        Point {
-            x: 0.606371890891,
-            y: 1.15489340454,
-            z: -1.6245616529,
-        },
-        Point {
-            x: -1.88661009391,
-            y: 1.34306041568,
-            z: -0.26893172838,
-        },
+        (-1.46254302355, 1.38973494775, 1.05509847591),
+        (-0.979723897042, -0.0182596516322, -0.202035740845),
+        (0.606371890891, 1.15489340454, -1.6245616529),
+        (-1.88661009391, 1.34306041568, -0.26893172838),
     ];
 
     let aos = balboa::aos_noddy(2, &points_bohr, &basis, &c_to_s_matrices);

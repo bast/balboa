@@ -4,7 +4,6 @@ use crate::basis::Basis;
 use crate::generate;
 use crate::limits;
 use crate::multiply;
-use crate::point::Point;
 use std::time::Instant;
 
 fn g_batch(c: f64, e: f64, gaussians: &mut [Vec<f64>], p2s: &[f64], max_geo_derv_order: usize) {
@@ -115,20 +114,20 @@ fn transform_to_spherical(
 }
 
 fn coordinates(
-    shell_centers_coordinates: (f64, f64, f64),
-    points_bohr: &[Point],
+    shell_center_coordinates: (f64, f64, f64),
+    points_bohr: &[(f64, f64, f64)],
 ) -> (Vec<f64>, Vec<f64>, Vec<f64>, Vec<f64>) {
-    let (x, y, z) = shell_centers_coordinates;
+    let (cx, cy, cz) = shell_center_coordinates;
 
     let mut pxs = Vec::new();
     let mut pys = Vec::new();
     let mut pzs = Vec::new();
     let mut p2s = Vec::new();
 
-    for point in points_bohr.iter() {
-        let px = point.x - x;
-        let py = point.y - y;
-        let pz = point.z - z;
+    for &(x, y, z) in points_bohr {
+        let px = x - cx;
+        let py = y - cy;
+        let pz = z - cz;
         let p2 = px * px + py * py + pz * pz;
 
         pxs.push(px);
@@ -142,7 +141,7 @@ fn coordinates(
 
 pub fn aos_noddy(
     max_geo_derv_order: usize,
-    points_bohr: &[Point],
+    points_bohr: &[(f64, f64, f64)],
     basis: &Basis,
     c_to_s_matrices: &[Vec<Vec<f64>>],
 ) -> Vec<f64> {
