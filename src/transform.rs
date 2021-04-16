@@ -1,8 +1,6 @@
 use std::cmp::Ordering;
 use std::collections::HashMap;
 
-use crate::limits;
-
 pub fn transform_to_spherical(
     num_points: usize,
     aos_c: &[f64],
@@ -21,10 +19,12 @@ pub fn transform_to_spherical(
     aos_s
 }
 
-pub fn cartesian_to_spherical_matrices() -> HashMap<usize, Vec<(usize, usize, f64)>> {
+pub fn cartesian_to_spherical_matrices(
+    max_l_value: usize,
+) -> HashMap<usize, Vec<(usize, usize, f64)>> {
     let mut map = HashMap::new();
 
-    for l in 0..=limits::MAX_L_VALUE {
+    for l in 0..=max_l_value {
         map.insert(l, cartesian_to_spherical_coef(l));
     }
 

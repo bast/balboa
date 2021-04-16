@@ -126,6 +126,12 @@ pub fn aos_noddy(
 ) -> Vec<f64> {
     let num_points = points_bohr.len();
 
+    let max_l_value = basis.shell_l_quantum_numbers.iter().max().unwrap();
+    assert!(
+        c_to_s_matrices.contains_key(&max_l_value),
+        "increase max l value in cartesian_to_spherical_matrices"
+    );
+
     assert!(
         num_points % limits::BATCH_LENGTH == 0,
         "num_points must be multiple of BATCH_LENGTH"

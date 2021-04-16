@@ -98,8 +98,8 @@ fn compare_vectors(v1: &[f64], v2: &[f64]) {
 #[test]
 fn density_noddy() {
     let basis = balboa::example_basis(false);
-
-    let c_to_s_matrices = balboa::cartesian_to_spherical_matrices();
+    let max_l_value = basis.shell_l_quantum_numbers.iter().max().unwrap();
+    let c_to_s_matrices = balboa::cartesian_to_spherical_matrices(*max_l_value);
 
     let points_bohr = vec![
         (1.7, 0.0, 0.0),
@@ -154,12 +154,14 @@ fn density_noddy() {
 
 #[test]
 fn density() {
+    let basis = balboa::example_basis(true);
+    let max_l_value = basis.shell_l_quantum_numbers.iter().max().unwrap();
+    let c_to_s_matrices = balboa::cartesian_to_spherical_matrices(*max_l_value);
+
     let num_points = 100;
     let side_length = 3.0;
     let points_bohr = random_points(num_points, side_length);
 
-    let basis = balboa::example_basis(true);
-    let c_to_s_matrices = balboa::cartesian_to_spherical_matrices();
     let aos = balboa::aos_noddy(1, &points_bohr, &basis, &c_to_s_matrices);
 
     for symmetric in &[true, false] {
@@ -199,8 +201,8 @@ fn density() {
 #[test]
 fn ao_derivatives_noddy() {
     let basis = balboa::example_basis(true);
-
-    let c_to_s_matrices = balboa::cartesian_to_spherical_matrices();
+    let max_l_value = basis.shell_l_quantum_numbers.iter().max().unwrap();
+    let c_to_s_matrices = balboa::cartesian_to_spherical_matrices(*max_l_value);
 
     let points_bohr = vec![
         (-1.46254302355, 1.38973494775, 1.05509847591),
@@ -225,13 +227,13 @@ fn ao_derivatives_noddy() {
 #[ignore]
 #[test]
 fn ao_benchmark() {
+    let basis = balboa::example_basis(true);
+    let max_l_value = basis.shell_l_quantum_numbers.iter().max().unwrap();
+    let c_to_s_matrices = balboa::cartesian_to_spherical_matrices(*max_l_value);
+
     let num_points = 50_000;
     let side_length = 2.0;
     let points_bohr = random_points(num_points, side_length);
-
-    let basis = balboa::example_basis(true);
-
-    let c_to_s_matrices = balboa::cartesian_to_spherical_matrices();
 
     let start = Instant::now();
     let _aos = balboa::aos_noddy(2, &points_bohr, &basis, &c_to_s_matrices);

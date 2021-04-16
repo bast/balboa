@@ -37,10 +37,6 @@ impl Basis {
         primitive_exponents: Vec<f64>,
         contraction_coefficients: Vec<f64>,
     ) -> Basis {
-        for &l in shell_l_quantum_numbers.iter() {
-            assert!(l <= limits::MAX_L_VALUE, "increase MAX_L_VALUE");
-        }
-
         let mut shell_centers_coordinates = Vec::new();
         for icenter in shell_centers.iter() {
             let (x, y, z) = center_coordinates_bohr[icenter - 1];
