@@ -1,95 +1,12 @@
 #![allow(clippy::too_many_arguments)]
 
 use std::collections::HashMap;
-
-use crate::basis::Basis;
-use crate::generate;
-use crate::limits;
-use crate::multiply;
-use crate::transform;
 use std::time::Instant;
 
-fn g_batch(c: f64, e: f64, gaussians: &mut [Vec<f64>], p2s: &[f64], max_geo_derv_order: usize) {
-    for ipoint in 0..limits::BATCH_LENGTH {
-        let t = c * (-e * p2s[ipoint]).exp();
-        for geo_derv_order in 0..=max_geo_derv_order {
-            gaussians[ipoint][geo_derv_order] += t * (-2.0 * e).powi(geo_derv_order as i32);
-        }
-    }
-}
-
-fn compute_prefactors(
-    max_geo_derv_order: usize,
-    num_batches: usize,
-    p2s: Vec<f64>,
-    basis: &Basis,
-    offset: usize,
-    num_primitives: usize,
-) -> Vec<Vec<f64>> {
-    let num_points = p2s.len();
-    let mut gaussians = vec![vec![0.0; max_geo_derv_order + 1]; num_points];
-
-    for ip in offset..(offset + num_primitives) {
-        let e = basis.primitive_exponents[ip];
-        let c = basis.contraction_coefficients[ip];
-        for ibatch in 0..num_batches {
-            let offset = ibatch * limits::BATCH_LENGTH;
-            let end = offset + limits::BATCH_LENGTH;
-            g_batch(
-                c,
-                e,
-                &mut gaussians[offset..end],
-                &p2s[offset..end],
-                max_geo_derv_order,
-            );
-        }
-    }
-
-    gaussians
-}
-
-fn compute_gaussians(
-    geo_derv_orders: (usize, usize, usize),
-    c_to_s_matrices: &HashMap<usize, Vec<(usize, usize, f64)>>,
-    num_batches: usize,
-    l: usize,
-    pxs: &[f64],
-    pys: &[f64],
-    pzs: &[f64],
-    gaussians: &[Vec<f64>],
-) -> Vec<f64> {
-    let num_points = pxs.len();
-
-    let cartesian_deg = (l + 1) * (l + 2) / 2;
-    let mut aos_c = vec![0.0; num_points * cartesian_deg];
-
-    // TODO create shortcut for s functions when multiplying
-    let mut n = 0;
-    for &cartesian_orders in generate::get_ijk_list(l).iter() {
-        for ibatch in 0..num_batches {
-            let ao_offset = n;
-            let ao_end = n + limits::BATCH_LENGTH;
-            let point_offset = ibatch * limits::BATCH_LENGTH;
-            let point_end = point_offset + limits::BATCH_LENGTH;
-            multiply::multiply_batch(
-                cartesian_orders,
-                geo_derv_orders,
-                &gaussians[point_offset..point_end],
-                &pxs[point_offset..point_end],
-                &pys[point_offset..point_end],
-                &pzs[point_offset..point_end],
-                &mut aos_c[ao_offset..ao_end],
-            );
-            n += limits::BATCH_LENGTH;
-        }
-    }
-
-    if l < 2 {
-        aos_c
-    } else {
-        transform::transform_to_spherical(num_points, &aos_c, l, &c_to_s_matrices.get(&l).unwrap())
-    }
-}
+use crate::basis::Basis;
+use crate::diff;
+use crate::generate;
+use crate::transform;
 
 fn coordinates(
     shell_center_coordinates: (f64, f64, f64),
@@ -123,24 +40,18 @@ pub fn aos_noddy(
     basis: &Basis,
     c_to_s_matrices: &HashMap<usize, Vec<(usize, usize, f64)>>,
 ) -> Vec<f64> {
-    let num_points = points_bohr.len();
-
     let max_l_value = basis.shell_l_quantum_numbers.iter().max().unwrap();
     assert!(
         c_to_s_matrices.contains_key(&max_l_value),
         "increase max l value in cartesian_to_spherical_matrices"
     );
 
-    assert!(
-        num_points % limits::BATCH_LENGTH == 0,
-        "num_points must be multiple of BATCH_LENGTH"
-    );
-    let num_batches = num_points / limits::BATCH_LENGTH;
-
+    let num_points = points_bohr.len();
     let mut aos = Vec::new();
 
-    let mut time_ms_gaussian: u128 = 0;
+    let mut time_ms_prefactors: u128 = 0;
     let mut time_ms_multiply: u128 = 0;
+    let mut time_ms_transform: u128 = 0;
 
     // FIXME loop over primitives should be outside the loop over geo derv orders
     // otherwise we recompute the s functions over and over
@@ -155,38 +66,72 @@ pub fn aos_noddy(
                 let l = basis.shell_l_quantum_numbers[ishell];
 
                 let timer = Instant::now();
-                let gaussians = compute_prefactors(
-                    max_geo_derv_order,
-                    num_batches,
-                    p2s,
-                    &basis,
-                    offset,
-                    num_primitives,
-                );
-                time_ms_gaussian += timer.elapsed().as_millis();
+                let mut gaussians = vec![vec![0.0; num_points]; max_geo_derv_order + 1];
+
+                for ip in offset..(offset + num_primitives) {
+                    let e = basis.primitive_exponents[ip];
+                    let c = basis.contraction_coefficients[ip];
+
+                    let ts: Vec<_> = p2s.iter().map(|p2| c * (-e * p2).exp()).collect();
+
+                    for geo_derv_order in 0..=max_geo_derv_order {
+                        let x = (-2.0 * e).powi(geo_derv_order as i32);
+                        for ipoint in 0..num_points {
+                            gaussians[geo_derv_order][ipoint] += x * ts[ipoint];
+                        }
+                    }
+                }
+                time_ms_prefactors += timer.elapsed().as_millis();
 
                 let timer = Instant::now();
-                let mut aos_s = compute_gaussians(
-                    geo_derv_orders,
-                    c_to_s_matrices,
-                    num_batches,
-                    l,
-                    &pxs,
-                    &pys,
-                    &pzs,
-                    &gaussians,
-                );
+                let cartesian_deg = (l + 1) * (l + 2) / 2;
+                let mut aos_c = vec![0.0; num_points * cartesian_deg];
+                let mut n = 0;
+                for &cartesian_orders in generate::get_ijk_list(l).iter() {
+                    let map = diff::differentiate(cartesian_orders, geo_derv_orders);
+
+                    for (key, value) in map {
+                        let i = key[0] as i32;
+                        let j = key[1] as i32;
+                        let k = key[2] as i32;
+                        let p = key[3];
+
+                        let v = value as f64;
+
+                        for ipoint in 0..num_points {
+                            aos_c[n + ipoint] += v
+                                * gaussians[p][ipoint]
+                                * pxs[ipoint].powi(i)
+                                * pys[ipoint].powi(j)
+                                * pzs[ipoint].powi(k);
+                        }
+                    }
+
+                    n += num_points;
+                }
                 time_ms_multiply += timer.elapsed().as_millis();
 
-                aos.append(&mut aos_s);
+                let timer = Instant::now();
+                if l < 2 {
+                    aos.append(&mut aos_c);
+                } else {
+                    aos.append(&mut transform::transform_to_spherical(
+                        num_points,
+                        &aos_c,
+                        l,
+                        &c_to_s_matrices.get(&l).unwrap(),
+                    ));
+                }
+                time_ms_transform += timer.elapsed().as_millis();
 
                 offset += num_primitives;
             }
         }
     }
 
-    println!("time spent in exp: {} ms", time_ms_gaussian);
+    println!("time spent in prefactors: {} ms", time_ms_prefactors);
     println!("time spent in multiply: {} ms", time_ms_multiply);
+    println!("time spent in transform: {} ms", time_ms_transform);
 
     aos
 }

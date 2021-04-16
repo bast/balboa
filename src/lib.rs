@@ -8,7 +8,6 @@ mod diff;
 mod example;
 mod generate;
 mod limits;
-mod multiply;
 mod transform;
 
 pub use crate::ao::aos_noddy;
