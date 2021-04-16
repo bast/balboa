@@ -10,6 +10,7 @@ pub struct Basis {
     pub num_ao_cartesian: usize,
     pub num_ao_spherical: usize,
     pub shells: Vec<Shell>,
+    pub shell_extents_squared: Vec<f64>,
 }
 
 impl Basis {
@@ -23,31 +24,30 @@ impl Basis {
             num_ao_cartesian,
             num_ao_spherical,
             shells: shells.to_vec(),
+            shell_extents_squared: shells.iter().map(shell_extent_squared).collect(),
         }
     }
 }
 
-// // threshold and factors match Dalton implementation, see also pink book
-// let f = vec![1.0, 1.3333, 1.6, 1.83, 2.03, 2.22, 2.39, 2.55, 2.70, 2.84];
-// let shell_screening_threshold: f64 = 2.0e-12;
+// threshold and factors match Dalton implementation, see also pink book
+fn shell_extent_squared(shell: &Shell) -> f64 {
+    let f = vec![1.0, 1.3333, 1.6, 1.83, 2.03, 2.22, 2.39, 2.55, 2.70, 2.84];
+    let shell_screening_threshold: f64 = 2.0e-12;
 
-// let mut shell_extent_squared = vec![0.0; num_shells];
-// let mut n = 0;
-// for ishell in 0..num_shells {
-//     let mut r: f64 = 0.0;
-//     for _ in 0..shell_num_primitives[ishell] {
-//         let e = primitive_exponents[n];
-//         let c = contraction_coefficients[n];
-//         n += 1;
-//         r = r.max((c.abs().ln() - shell_screening_threshold.ln()) / e);
-//     }
+    let mut r: f64 = 0.0;
+    for (e, c) in shell
+        .primitive_exponents
+        .iter()
+        .zip(shell.contraction_coefficients.iter())
+    {
+        r = r.max((c.abs().ln() - shell_screening_threshold.ln()) / e);
+    }
 
-//     let l = shell_l_quantum_numbers[ishell];
-//     if l < 10 {
-//         r = r.sqrt() * f[l];
-//     } else {
-//         r = 1.0e10;
-//     }
+    if shell.l < 10 {
+        r = r.sqrt() * f[shell.l];
+    } else {
+        r = 1.0e10;
+    }
 
-//     shell_extent_squared[ishell] = r * r;
-// }
+    r * r
+}

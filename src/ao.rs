@@ -56,8 +56,12 @@ pub fn aos_noddy(
     let mut time_ms_multiply: u128 = 0;
     let mut time_ms_transform: u128 = 0;
 
-    for shell in &basis.shells {
+    for (i, shell) in basis.shells.iter().enumerate() {
         let (pxs, pys, pzs, p2s) = coordinates(shell.coordinates, &points_bohr);
+
+        if skip_chunk(&p2s, basis.shell_extents_squared[i]) {
+            continue;
+        }
 
         let l = shell.l;
         let cartesian_deg = (l + 1) * (l + 2) / 2;
@@ -132,4 +136,13 @@ pub fn aos_noddy(
     println!("time spent in transform: {} ms", time_ms_transform);
 
     aos
+}
+
+fn skip_chunk(p2s: &[f64], extent_squared: f64) -> bool {
+    for p2 in p2s {
+        if p2 < &extent_squared {
+            return false;
+        }
+    }
+    true
 }
