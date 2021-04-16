@@ -1,11 +1,8 @@
 use crate::basis::Basis;
 
 pub fn example_basis(extra_l_coverage: bool) -> Basis {
-    let is_spherical = false;
-    let num_centers = 2;
     let center_coordinates_bohr = vec![(1.7, 0.0, 0.0), (0.0, 0.0, 0.0)];
-    let num_shells = 9;
-    let shell_centers = vec![1, 1, 1, 1, 1, 1, 2, 2, 2];
+    let shell_centers = vec![0, 0, 0, 0, 0, 0, 1, 1, 1];
 
     let shell_l_quantum_numbers = if extra_l_coverage {
         // these values have been modified for better code coverage for higher l
@@ -58,10 +55,7 @@ pub fn example_basis(extra_l_coverage: bool) -> Basis {
     ];
 
     Basis::new(
-        is_spherical,
-        num_centers,
         center_coordinates_bohr,
-        num_shells,
         shell_centers,
         shell_l_quantum_numbers,
         shell_num_primitives,

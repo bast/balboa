@@ -48,6 +48,7 @@ pub fn aos_noddy(
     );
 
     let num_points = points_bohr.len();
+    let num_shells = basis.shell_centers_coordinates.len();
 
     let mut aos = HashMap::new();
 
@@ -56,7 +57,7 @@ pub fn aos_noddy(
     let mut time_ms_transform: u128 = 0;
 
     let mut ip = 0;
-    for ishell in 0..basis.num_shells {
+    for ishell in 0..num_shells {
         let (pxs, pys, pzs, p2s) =
             coordinates(basis.shell_centers_coordinates[ishell], &points_bohr);
 
