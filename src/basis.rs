@@ -3,8 +3,6 @@
 #![allow(clippy::too_many_arguments)]
 #![allow(clippy::needless_range_loop)]
 
-use crate::limits;
-
 pub struct Basis {
     _is_spherical: bool,
     _num_centers: usize,
@@ -21,8 +19,6 @@ pub struct Basis {
     pub num_ao_spherical: usize,
     pub num_ao: usize,
     _ao_centers: Vec<usize>,
-    _geo_offset: Vec<usize>,
-    _geo_offset_size: usize,
 }
 
 impl Basis {
@@ -113,31 +109,6 @@ impl Basis {
             i += deg;
         }
 
-        let g = limits::MAX_GEO_DIFF_ORDER + 1;
-        let array_length = g * g * g;
-        let mut geo_offset = vec![0; array_length];
-
-        let mut id = 0;
-        let mut m = 0;
-        for l in 0..=limits::MAX_GEO_DIFF_ORDER {
-            for a in 1..(l + 2) {
-                for b in 1..=a {
-                    let i = l + 1 - a;
-                    let j = a - b;
-                    let k = b - 1;
-
-                    id = (limits::MAX_GEO_DIFF_ORDER + 1) * (limits::MAX_GEO_DIFF_ORDER + 1) * k;
-                    id += (limits::MAX_GEO_DIFF_ORDER + 1) * j;
-                    id += i;
-
-                    geo_offset[id] = m * num_ao;
-
-                    m += 1;
-                }
-            }
-        }
-        let geo_offset_size = id;
-
         Basis {
             _is_spherical: is_spherical,
             _num_centers: num_centers,
@@ -154,8 +125,6 @@ impl Basis {
             num_ao_spherical: num_ao_spherical,
             num_ao: num_ao,
             _ao_centers: ao_centers,
-            _geo_offset: geo_offset,
-            _geo_offset_size: geo_offset_size,
         }
     }
 }

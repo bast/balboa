@@ -7,7 +7,6 @@ mod density;
 mod diff;
 mod example;
 mod generate;
-mod limits;
 mod transform;
 
 pub use crate::ao::aos_noddy;
