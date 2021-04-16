@@ -11,10 +11,9 @@ use std::time::Instant;
 
 fn g_batch(c: f64, e: f64, gaussians: &mut [Vec<f64>], p2s: &[f64], max_geo_derv_order: usize) {
     for ipoint in 0..limits::BATCH_LENGTH {
-        let mut t = c * (-e * p2s[ipoint]).exp();
+        let t = c * (-e * p2s[ipoint]).exp();
         for geo_derv_order in 0..=max_geo_derv_order {
-            gaussians[ipoint][geo_derv_order] += t;
-            t *= -2.0 * e;
+            gaussians[ipoint][geo_derv_order] += t * (-2.0 * e).powi(geo_derv_order as i32);
         }
     }
 }
