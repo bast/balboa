@@ -175,7 +175,7 @@ fn density() {
                 &density_matrix,
                 basis.num_ao_spherical,
             );
-        println!("time elapsed in densities_noddy: {:?}", start.elapsed());
+        println!("time spent in densities_noddy: {:?}", start.elapsed());
 
         let start = Instant::now();
         let (densities, densities_x, densities_y, densities_z) = balboa::densities(
@@ -191,11 +191,23 @@ fn density() {
         compare_vectors(&densities_y, &densities_y_ref);
         compare_vectors(&densities_z, &densities_z_ref);
         println!(
-            "time elapsed in blas version (symmetric={}): {:?}",
+            "time spent in blas version (symmetric={}): {:?}",
             symmetric,
             start.elapsed()
         );
     }
+}
+
+fn get_ijk_list(m: usize) -> Vec<(usize, usize, usize)> {
+    let mut l = Vec::new();
+
+    for a in 1..(m + 2) {
+        for b in 1..=a {
+            l.push((m + 1 - a, a - b, b - 1));
+        }
+    }
+
+    l
 }
 
 #[test]
@@ -213,15 +225,20 @@ fn ao_derivatives_noddy() {
 
     let aos = balboa::aos_noddy(2, &points_bohr, &basis, &c_to_s_matrices);
 
-    // ao 1, point 1
-    // ao 1, point 2
-    // ao 1, point 3
-    // ao 1, point 4
-    // ao 2, point 1
-    // ...
     let aos_ref: Vec<f64> = read_vector("tests/reference.txt");
 
-    compare_vectors(&aos, &aos_ref);
+    let mut n = 0;
+    for geo_derv_order in 0..=2 {
+        for (i, j, k) in get_ijk_list(geo_derv_order) {
+            let batch = aos.get(&(i, j, k)).unwrap();
+            let mut m = 0;
+            for _ in 0..(basis.num_ao_spherical * points_bohr.len()) {
+                assert!(floats_are_same(aos_ref[n], batch[m], 1.0e-10));
+                n += 1;
+                m += 1;
+            }
+        }
+    }
 }
 
 #[ignore]
@@ -237,5 +254,5 @@ fn ao_benchmark() {
 
     let start = Instant::now();
     let _aos = balboa::aos_noddy(2, &points_bohr, &basis, &c_to_s_matrices);
-    println!("time elapsed in aos_noddy: {:?}", start.elapsed());
+    println!("time spent in aos_noddy: {:?}", start.elapsed());
 }

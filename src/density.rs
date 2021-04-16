@@ -1,26 +1,32 @@
 use blas::*;
+use std::collections::HashMap;
 
 pub fn densities_noddy(
     num_points: usize,
-    aos: &[f64],
+    aos: &HashMap<(usize, usize, usize), Vec<f64>>,
     density_matrix: &[f64],
     num_ao: usize,
 ) -> (Vec<f64>, Vec<f64>, Vec<f64>, Vec<f64>) {
-    let mut densities = vec![vec![0.0; num_points]; 4];
+    let ao_0 = aos.get(&(0, 0, 0)).unwrap();
+    let ao_x = aos.get(&(1, 0, 0)).unwrap();
+    let ao_y = aos.get(&(0, 1, 0)).unwrap();
+    let ao_z = aos.get(&(0, 0, 1)).unwrap();
 
+    let mut densities = vec![vec![0.0; num_points]; 4];
     for k in 0..num_ao {
         for l in 0..num_ao {
             let d = 2.0 * density_matrix[k * num_ao + l];
             for p in 0..num_points {
-                densities[0][p] += aos[k * num_points + p] * d * aos[l * num_points + p];
-            }
-            for ixyz in 1..=3 {
-                let slice_offset = (num_ao * num_points) * ixyz;
-                for p in 0..num_points {
-                    densities[ixyz][p] += d
-                        * (aos[slice_offset + k * num_points + p] * aos[l * num_points + p]
-                            + aos[k * num_points + p] * aos[slice_offset + l * num_points + p]);
-                }
+                densities[0][p] += ao_0[k * num_points + p] * d * ao_0[l * num_points + p];
+                densities[1][p] += d
+                    * (ao_x[k * num_points + p] * ao_0[l * num_points + p]
+                        + ao_0[k * num_points + p] * ao_x[l * num_points + p]);
+                densities[2][p] += d
+                    * (ao_y[k * num_points + p] * ao_0[l * num_points + p]
+                        + ao_0[k * num_points + p] * ao_y[l * num_points + p]);
+                densities[3][p] += d
+                    * (ao_z[k * num_points + p] * ao_0[l * num_points + p]
+                        + ao_0[k * num_points + p] * ao_z[l * num_points + p]);
             }
         }
     }
@@ -35,12 +41,17 @@ pub fn densities_noddy(
 
 pub fn densities(
     num_points: usize,
-    aos: &[f64],
+    aos: &HashMap<(usize, usize, usize), Vec<f64>>,
     density_matrix: &[f64],
     density_matrix_is_symmetric: bool,
     num_ao: usize,
     threshold: f64,
 ) -> (Vec<f64>, Vec<f64>, Vec<f64>, Vec<f64>) {
+    let ao_0 = aos.get(&(0, 0, 0)).unwrap();
+    let ao_x = aos.get(&(1, 0, 0)).unwrap();
+    let ao_y = aos.get(&(0, 1, 0)).unwrap();
+    let ao_z = aos.get(&(0, 0, 1)).unwrap();
+
     // compress aos and keep track of mapping original -> compressed
     let mut aos_compressed: Vec<Vec<f64>> = Vec::new();
     for _ in 0..4 {
@@ -51,17 +62,17 @@ pub fn densities(
     for k in 0..num_ao {
         let mut keep_this_batch = false;
         for p in 0..num_points {
-            if aos[k * num_points + p].abs() > threshold {
+            if ao_0[k * num_points + p].abs() > threshold {
                 keep_this_batch = true;
                 break;
             }
         }
         if keep_this_batch {
-            for ixyz in 0..4 {
-                let slice_offset = (num_ao * num_points) * ixyz;
-                for p in 0..num_points {
-                    aos_compressed[ixyz].push(aos[slice_offset + k * num_points + p]);
-                }
+            for p in 0..num_points {
+                aos_compressed[0].push(ao_0[k * num_points + p]);
+                aos_compressed[1].push(ao_x[k * num_points + p]);
+                aos_compressed[2].push(ao_y[k * num_points + p]);
+                aos_compressed[3].push(ao_z[k * num_points + p]);
             }
             compression_mapping.push((k_compressed, k));
             k_compressed += 1;
@@ -157,18 +168,16 @@ pub fn densities(
         for k in 0..num_ao_compressed {
             let k_offset = k * num_points;
             for p in 0..num_points {
-                densities[0][p] += aos[k_offset + p] * x_matrix[0][k_offset + p];
+                densities[0][p] += aos_compressed[0][k_offset + p] * x_matrix[0][k_offset + p]
             }
         }
-
         for ixyz in 1..=3 {
-            let slice_offset = (num_ao * num_points) * ixyz;
             for k in 0..num_ao_compressed {
                 let k_offset = k * num_points;
                 for p in 0..num_points {
-                    densities[ixyz][p] += aos[slice_offset + k_offset + p]
+                    densities[ixyz][p] += aos_compressed[ixyz][k_offset + p]
                         * x_matrix[0][k_offset + p]
-                        + aos[k_offset + p] * x_matrix[ixyz][k_offset + p];
+                        + aos_compressed[0][k_offset + p] * x_matrix[ixyz][k_offset + p];
                 }
             }
         }
