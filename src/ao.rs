@@ -41,14 +41,14 @@ pub fn aos_noddy(
     basis: &Basis,
     c_to_s_matrices: &HashMap<usize, Vec<(usize, usize, f64)>>,
 ) -> HashMap<(usize, usize, usize), Vec<f64>> {
-    let max_l_value = basis.shell_l_quantum_numbers.iter().max().unwrap();
+    let max_l_value = basis.shells.iter().fold(0, |m, s| m.max(s.l));
+
     assert!(
         c_to_s_matrices.contains_key(&max_l_value),
         "increase max l value in cartesian_to_spherical_matrices"
     );
 
     let num_points = points_bohr.len();
-    let num_shells = basis.shell_centers_coordinates.len();
 
     let mut aos = HashMap::new();
 
@@ -56,22 +56,19 @@ pub fn aos_noddy(
     let mut time_ms_multiply: u128 = 0;
     let mut time_ms_transform: u128 = 0;
 
-    let mut ip = 0;
-    for ishell in 0..num_shells {
-        let (pxs, pys, pzs, p2s) =
-            coordinates(basis.shell_centers_coordinates[ishell], &points_bohr);
+    for shell in &basis.shells {
+        let (pxs, pys, pzs, p2s) = coordinates(shell.coordinates, &points_bohr);
 
-        let num_primitives = basis.shell_num_primitives[ishell];
-        let l = basis.shell_l_quantum_numbers[ishell];
+        let l = shell.l;
         let cartesian_deg = (l + 1) * (l + 2) / 2;
 
         let timer = Instant::now();
         let mut gaussians = vec![vec![0.0; num_points]; max_geo_derv_order + 1];
-        for _ in 0..num_primitives {
-            let e = basis.primitive_exponents[ip];
-            let c = basis.contraction_coefficients[ip];
-            ip += 1;
-
+        for (e, c) in shell
+            .primitive_exponents
+            .iter()
+            .zip(shell.contraction_coefficients.iter())
+        {
             let ts: Vec<_> = p2s.iter().map(|p2| c * (-e * p2).exp()).collect();
 
             for geo_derv_order in 0..=max_geo_derv_order {

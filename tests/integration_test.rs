@@ -98,8 +98,8 @@ fn compare_vectors(v1: &[f64], v2: &[f64]) {
 #[test]
 fn density_noddy() {
     let basis = balboa::example_basis(false);
-    let max_l_value = basis.shell_l_quantum_numbers.iter().max().unwrap();
-    let c_to_s_matrices = balboa::cartesian_to_spherical_matrices(*max_l_value);
+    let max_l_value = basis.shells.iter().fold(0, |m, s| m.max(s.l));
+    let c_to_s_matrices = balboa::cartesian_to_spherical_matrices(max_l_value);
 
     let points_bohr = vec![
         (1.7, 0.0, 0.0),
@@ -155,8 +155,8 @@ fn density_noddy() {
 #[test]
 fn density() {
     let basis = balboa::example_basis(true);
-    let max_l_value = basis.shell_l_quantum_numbers.iter().max().unwrap();
-    let c_to_s_matrices = balboa::cartesian_to_spherical_matrices(*max_l_value);
+    let max_l_value = basis.shells.iter().fold(0, |m, s| m.max(s.l));
+    let c_to_s_matrices = balboa::cartesian_to_spherical_matrices(max_l_value);
 
     let num_points = 100;
     let side_length = 3.0;
@@ -213,8 +213,8 @@ fn get_ijk_list(m: usize) -> Vec<(usize, usize, usize)> {
 #[test]
 fn ao_derivatives_noddy() {
     let basis = balboa::example_basis(true);
-    let max_l_value = basis.shell_l_quantum_numbers.iter().max().unwrap();
-    let c_to_s_matrices = balboa::cartesian_to_spherical_matrices(*max_l_value);
+    let max_l_value = basis.shells.iter().fold(0, |m, s| m.max(s.l));
+    let c_to_s_matrices = balboa::cartesian_to_spherical_matrices(max_l_value);
 
     let points_bohr = vec![
         (-1.46254302355, 1.38973494775, 1.05509847591),
@@ -245,8 +245,8 @@ fn ao_derivatives_noddy() {
 #[test]
 fn ao_benchmark() {
     let basis = balboa::example_basis(true);
-    let max_l_value = basis.shell_l_quantum_numbers.iter().max().unwrap();
-    let c_to_s_matrices = balboa::cartesian_to_spherical_matrices(*max_l_value);
+    let max_l_value = basis.shells.iter().fold(0, |m, s| m.max(s.l));
+    let c_to_s_matrices = balboa::cartesian_to_spherical_matrices(max_l_value);
 
     let num_points = 50_000;
     let side_length = 2.0;
