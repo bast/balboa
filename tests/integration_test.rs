@@ -154,7 +154,7 @@ fn density_noddy() {
 
 #[test]
 fn density() {
-    let basis = balboa::example_basis(true);
+    let basis = balboa::example_basis_benchmark(10, 4);
     let max_l_value = basis.shells.iter().fold(0, |m, s| m.max(s.l));
     let c_to_s_matrices = balboa::cartesian_to_spherical_matrices(max_l_value);
 
@@ -244,7 +244,7 @@ fn ao_derivatives_noddy() {
 #[ignore]
 #[test]
 fn ao_benchmark() {
-    let basis = balboa::example_basis(true);
+    let basis = balboa::example_basis_benchmark(15, 4);
     let max_l_value = basis.shells.iter().fold(0, |m, s| m.max(s.l));
     let c_to_s_matrices = balboa::cartesian_to_spherical_matrices(max_l_value);
 

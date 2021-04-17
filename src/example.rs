@@ -1,3 +1,5 @@
+use rand::Rng;
+
 use crate::basis::{Basis, Shell};
 
 pub fn example_basis(extra_l_coverage: bool) -> Basis {
@@ -92,6 +94,42 @@ pub fn example_basis(extra_l_coverage: bool) -> Basis {
             contraction_coefficients: vec![9.56881e-01],
         },
     ];
+
+    Basis::new(&shells)
+}
+
+pub fn example_basis_benchmark(num_centers: usize, l: usize) -> Basis {
+    let rmin = -2.0;
+    let rmax = 2.0;
+
+    let mut rng = rand::thread_rng();
+
+    let mut shells = Vec::new();
+    for _ in 0..num_centers {
+        shells.push(Shell {
+            coordinates: (
+                rng.gen_range(rmin..rmax),
+                rng.gen_range(rmin..rmax),
+                rng.gen_range(rmin..rmax),
+            ),
+            l: l,
+            primitive_exponents: vec![
+                1.471e+04, 2.207e+03, 5.028e+02, 1.426e+02, 4.647e+01, 1.670e+01, 6.356e+00,
+                1.316e+00, 3.897e-01,
+            ],
+            contraction_coefficients: vec![
+                6.86365e-01,
+                1.27435e+00,
+                2.13913e+00,
+                3.13055e+00,
+                3.63823e+00,
+                2.64148e+00,
+                7.55357e-01,
+                1.34270e-02,
+                -8.19760e-04,
+            ],
+        });
+    }
 
     Basis::new(&shells)
 }

@@ -56,7 +56,7 @@ pub fn aos_noddy(
     let mut time_ms_multiply: u128 = 0;
     let mut time_ms_transform: u128 = 0;
 
-    for (i, shell) in basis.shells.iter().enumerate() {
+    for shell in &basis.shells {
         let (pxs, pys, pzs, p2s) = coordinates(shell.coordinates, &points_bohr);
 
         // this needs more work, it cannot just jump to the next shell
@@ -139,7 +139,7 @@ pub fn aos_noddy(
     aos
 }
 
-fn skip_chunk(p2s: &[f64], extent_squared: f64) -> bool {
+fn _skip_chunk(p2s: &[f64], extent_squared: f64) -> bool {
     for p2 in p2s {
         if p2 < &extent_squared {
             return false;
