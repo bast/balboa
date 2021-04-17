@@ -59,9 +59,10 @@ pub fn aos_noddy(
     for (i, shell) in basis.shells.iter().enumerate() {
         let (pxs, pys, pzs, p2s) = coordinates(shell.coordinates, &points_bohr);
 
-        if skip_chunk(&p2s, basis.shell_extents_squared[i]) {
-            continue;
-        }
+        // this needs more work, it cannot just jump to the next shell
+        // if skip_chunk(&p2s, basis.shell_extents_squared[i]) {
+        //     continue;
+        // }
 
         let l = shell.l;
         let cartesian_deg = (l + 1) * (l + 2) / 2;
